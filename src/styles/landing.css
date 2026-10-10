@@ -1,0 +1,2684 @@
+/* Public homepage only: keep the workshop and installed-app themes independent. */
+.landing-page {
+  position: relative;
+  --landing-blue: #0066ff;
+  --landing-navy: #080a2e;
+  --landing-body: #35425b;
+  background: #fff;
+  color: var(--landing-navy);
+  font-family: "Inter", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.landing-page h1,
+.landing-page h2,
+.landing-page h3 {
+  font-family: "Inter", Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+}
+.landing-page h2 {
+  font-size: clamp(30px, 3.4vw, 50px);
+  line-height: 1.07;
+}
+.landing-page p {
+  margin: 0;
+}
+.landing-page a,
+.landing-page button {
+  -webkit-tap-highlight-color: transparent;
+}
+.landing-page a:focus-visible,
+.landing-page button:focus-visible {
+  outline: 3px solid #0066ff;
+  outline-offset: 5px;
+}
+.landing-container {
+  width: min(100% - 96px, 1280px);
+  margin-inline: auto;
+}
+.landing-wide-container {
+  width: min(100% - 48px, 1340px);
+  margin-inline: auto;
+}
+/* The header floats over the hero photo so the hero reads as one image from the top of the page. */
+.landing-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 50;
+  background: transparent;
+}
+.landing-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 86px;
+}
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1;
+  color: #081122;
+}
+/* Frosted-glass pill shared by the desktop links, the mobile menu button and the mobile menu. */
+.landing-desktop-nav,
+.landing-menu-button,
+.landing-mobile-nav {
+  background: #ffffff9e;
+  border: 1px solid #ffffffd9;
+  box-shadow: 0 10px 30px #0a1f3d1a;
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+.landing-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+}
+.landing-desktop-nav a {
+  padding: 9px clamp(10px, 1.3vw, 18px);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+  color: #13263d;
+  transition: color 0.2s, background 0.2s;
+}
+.landing-desktop-nav a:hover {
+  color: #0066ff;
+  background: #ffffffd9;
+}
+.landing-desktop-nav a.is-active {
+  color: #fff;
+  background: var(--landing-blue);
+  box-shadow: 0 4px 14px #0066ff40;
+}
+.landing-mobile-nav a.is-active {
+  color: var(--landing-blue);
+  font-weight: 700;
+}
+@media (min-width: 821px) {
+  /* Logo left, links centred on the page, booking button right. */
+  .landing-header-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+  .landing-header-book {
+    justify-self: end;
+  }
+}
+.landing-button {
+  min-height: 46px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 1.5px solid transparent;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.landing-button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.landing-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px #0066ff18;
+}
+.landing-button-blue {
+  background: var(--landing-blue);
+  color: white;
+}
+.landing-button-blue:hover {
+  background: #0055d8;
+}
+.landing-button-outline {
+  color: var(--landing-blue);
+  border-color: #b6d4ff;
+  background: #ffffffdd;
+}
+.landing-button-outline:hover {
+  background: #eaf3ff;
+  border-color: var(--landing-blue);
+}
+.landing-button-white {
+  background: #fff;
+  color: #14203c;
+}
+.landing-button-white svg {
+  color: #0066ff;
+}
+.landing-button-whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+.landing-button-whatsapp:hover {
+  background: #1ebe5a;
+  box-shadow: 0 5px 18px #25d36640;
+}
+.landing-button-navy {
+  background: #001c37;
+  color: white;
+}
+.landing-header-book {
+  min-height: 40px;
+  padding: 10px 23px;
+  font-size: 11px;
+}
+.landing-menu-button {
+  display: none;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  color: #0066ff;
+  border-radius: 999px;
+}
+.landing-mobile-nav {
+  margin-top: 4px;
+  padding: 8px 18px;
+  border-radius: 24px;
+  background: #ffffffeb;
+}
+.landing-mobile-nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  font-size: 15px;
+  font-weight: 550;
+  border-bottom: 1px solid #dfebf5;
+}
+.landing-mobile-nav a:last-child {
+  border-bottom: 0;
+}
+.landing-eyebrow {
+  color: #7b92ad;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.landing-hero {
+  --landing-header-height: 86px;
+  min-height: 690px;
+  padding-top: var(--landing-header-height);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* Sky tone matching the photo's top edge, so the photo's faded left edge has no seam. */
+  background: linear-gradient(180deg, #e3f0fd 0%, #eef6fe 45%, #f8fbff 80%, #fff 100%);
+}
+/* A soft, blurred copy of the photo fills the whole hero so no side reads as empty. */
+.landing-hero::before {
+  content: "";
+  position: absolute;
+  inset: -60px;
+  z-index: -3;
+  background: url("/images/landing/hero.webp") 70% 55% / cover no-repeat;
+  filter: blur(34px) saturate(1.15);
+  opacity: 0.55;
+}
+.landing-hero-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -2;
+  width: min(78%, 1250px);
+  height: 100%;
+  object-fit: cover;
+  /* Frame toward the sky so the scooter sits below the floating navigation. */
+  object-position: right 30%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+.landing-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #ffffffb3 0%, #ffffff80 32%, #ffffff00 50%),
+    linear-gradient(0deg, #fff 0%, #ffffff00 13%);
+}
+.landing-hero-content {
+  padding-block: 62px 42px;
+  position: relative;
+}
+.landing-hero h1 {
+  font-size: clamp(58px, 6.6vw, 96px);
+  line-height: 0.94;
+  margin: 15px 0 20px;
+  letter-spacing: -0.06em;
+}
+.landing-hero h1 span {
+  color: var(--landing-blue);
+}
+/* Rotating second line: a little taller than the text so descenders aren't clipped. */
+.landing-hero-rotating {
+  padding-bottom: 0.08em;
+}
+.landing-hero-description {
+  color: #27314c;
+  font-size: 18px;
+  line-height: 1.4;
+  max-width: 540px;
+}
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+.landing-hero .landing-actions {
+  margin-top: 26px;
+}
+.landing-hero-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  max-width: 610px;
+  margin-top: 40px;
+}
+.landing-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+.landing-feature-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #dcefff;
+  color: #0066ff;
+}
+.landing-feature-icon svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 2.3;
+}
+.landing-feature h3 {
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  margin: 2px 0 6px;
+}
+.landing-feature p {
+  color: var(--landing-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.landing-hero-features .landing-feature {
+  gap: 10px;
+}
+.landing-hero-features .landing-feature-icon {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border-radius: 0;
+}
+.landing-hero-features .landing-feature-icon svg {
+  width: 29px;
+  height: 29px;
+}
+.landing-hero-features h3 {
+  font-size: 12px;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.landing-hero-features p {
+  font-size: 11px;
+  max-width: 140px;
+  color: #617189;
+}
+.landing-section {
+  padding-block: 34px 0;
+}
+.landing-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.landing-section-heading h2 {
+  margin-top: 7px;
+}
+.landing-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  color: #0066ff;
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+  padding-bottom: 5px;
+}
+.landing-text-link svg {
+  width: 21px;
+  height: 21px;
+  transition: transform 0.2s;
+}
+.landing-text-link:hover svg {
+  transform: translateX(4px);
+}
+.landing-service-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 190px 190px 210px;
+  gap: 14px;
+}
+.landing-service-card {
+  border-radius: 10px;
+  background: #eef6fb;
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  transition: box-shadow 0.2s;
+}
+.landing-service-card:hover {
+  box-shadow: 0 6px 25px #143b641a;
+}
+.landing-service-card > img {
+  position: absolute;
+  right: 0;
+  inset-block: 0;
+  width: 70%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  transition: transform 0.4s;
+}
+.landing-service-card:hover > img {
+  transform: scale(1.04);
+}
+.landing-service-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, #f2f8fc 0%, #f2f8fc 33%, #f2f8fce6 40%, #f2f8fc00 58%);
+  z-index: -1;
+}
+.landing-service-copy {
+  padding: 20px 22px;
+  width: 45%;
+  height: 100%;
+  position: relative;
+}
+.landing-service-number {
+  display: block;
+  color: #8294a7;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+.landing-service-card h3 {
+  font-size: 29px;
+  line-height: 1;
+  color: #090d17;
+  margin: 8px 0 12px;
+}
+.landing-service-card p {
+  font-size: 13px;
+  color: var(--landing-body);
+  line-height: 1.3;
+  max-width: 180px;
+}
+.landing-round-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border: 1.5px solid #b7d7ff;
+  color: #0066ff;
+  background: #fff;
+  border-radius: 50%;
+  margin-top: 17px;
+}
+.landing-round-arrow svg {
+  width: 21px;
+  height: 21px;
+}
+.landing-service-sales {
+  grid-row: span 2;
+}
+.landing-service-sales > img {
+  width: 100%;
+  object-position: 78% center;
+}
+.landing-service-sales::after {
+  background: linear-gradient(110deg, #edf7ff 3%, #edf7ff 25%, #d9eeffa8 42%, #d9eeff00 66%);
+}
+.landing-service-sales .landing-service-copy {
+  width: 43%;
+}
+.landing-service-sales h3 {
+  font-size: 50px;
+  margin-top: 12px;
+  margin-bottom: 20px;
+}
+.landing-service-sales p {
+  font-size: 16px;
+  line-height: 1.4;
+}
+.landing-service-repairs .landing-round-arrow,
+.landing-service-servicing .landing-round-arrow,
+.landing-service-rentals .landing-round-arrow,
+.landing-service-claims .landing-round-arrow {
+  position: absolute;
+  right: -12px;
+  bottom: 30px;
+}
+.landing-service-repairs > img {
+  object-position: 40% center;
+}
+.landing-service-claims > img {
+  object-position: 85% center;
+}
+.landing-service-claims h3 {
+  font-size: 27px;
+  white-space: nowrap;
+}
+.landing-range {
+  padding-top: 32px;
+  padding-bottom: 30px;
+}
+.landing-scooter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.landing-scooter-card {
+  background: linear-gradient(120deg, #f2f8fc, #f6f9fb);
+  border-radius: 9px;
+  overflow: hidden;
+}
+.landing-scooter-photo {
+  height: 225px;
+  overflow: hidden;
+}
+.landing-scooter-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s;
+}
+.landing-scooter-card:hover img {
+  transform: scale(1.04);
+}
+.landing-scooter-maxi img {
+  object-position: center;
+}
+.landing-scooter-copy {
+  padding: 17px 22px 18px;
+}
+.landing-scooter-copy h3 {
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+.landing-scooter-copy p {
+  font-size: 14px;
+  max-width: 240px;
+  color: var(--landing-body);
+  line-height: 1.4;
+  min-height: 40px;
+}
+.landing-scooter-copy .landing-button {
+  margin-top: 14px;
+  min-height: 36px;
+  padding: 8px 22px;
+  font-size: 12px;
+  gap: 14px;
+}
+.landing-scooter-copy .landing-button svg {
+  width: 15px;
+  height: 15px;
+}
+.landing-availability {
+  color: #63738b;
+  font-size: 11px;
+  padding-top: 12px;
+}
+/* A rounded card the width of the page content; the photo ends at the card's edge. */
+.landing-trust {
+  width: min(100% - 96px, 1280px);
+  margin: 40px auto 0;
+  border-radius: 24px;
+  background: linear-gradient(105deg, #f7fbff, #eaf4ff);
+  overflow: hidden;
+}
+.landing-trust-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  min-height: 500px;
+}
+.landing-trust-copy {
+  padding: 42px 30px 36px 0;
+}
+.landing-trust h2 {
+  margin-top: 10px;
+}
+.landing-trust-description {
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--landing-body);
+  max-width: 510px;
+  margin-top: 16px !important;
+}
+.landing-trust-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 24px;
+  margin-top: 27px;
+}
+.landing-trust-photo {
+  margin-right: -48px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 14% 100%);
+}
+.landing-trust-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% center;
+}
+.landing-steps-section {
+  padding-top: 32px;
+  padding-bottom: 27px;
+}
+.landing-steps-section h2 {
+  font-size: clamp(28px, 3vw, 43px);
+  margin-top: 9px;
+}
+.landing-steps {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+.landing-steps li {
+  position: relative;
+  background: #f3f8fc;
+  border-radius: 16px;
+  padding: 22px 18px;
+}
+.landing-steps .landing-feature h3 {
+  font-size: 15px;
+}
+.landing-steps .landing-feature p {
+  font-size: 13px;
+}
+.landing-step-arrow {
+  position: absolute;
+  right: -25px;
+  top: 43%;
+  width: 18px;
+  height: 18px;
+  color: #0066ff;
+}
+.landing-accident {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 17px;
+  background: #001b32;
+  min-height: 310px;
+}
+.landing-accident > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+  z-index: -2;
+}
+.landing-accident::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #00172ff5 0%, #00172fe0 35%, #00172f20 64%);
+  z-index: -1;
+}
+.landing-accident-copy {
+  padding: 30px 42px;
+  color: white;
+}
+.landing-accident .landing-eyebrow {
+  color: #bdd6f0;
+  font-size: 10px;
+}
+.landing-accident h2 {
+  font-size: clamp(32px, 3.6vw, 50px);
+  margin-top: 13px;
+}
+.landing-accident h2 span {
+  color: #80c8ff;
+}
+.landing-accident-copy > p:not(.landing-eyebrow) {
+  font-size: 16px;
+  line-height: 1.45;
+  color: #d9e4f0;
+  margin-top: 14px;
+}
+.landing-accident .landing-button {
+  min-height: 40px;
+  margin-top: 16px;
+  padding: 10px 25px;
+  font-size: 12px;
+  color: #0066ff;
+}
+.landing-cta {
+  margin-top: 22px;
+  margin-bottom: 22px;
+  min-height: 200px;
+  padding: 36px 70px 36px 115px;
+  background: #0060ff;
+  color: white;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.landing-cta::before,
+.landing-cta::after {
+  content: "";
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border: 50px solid #2085ff;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.65;
+}
+.landing-cta::before {
+  top: -155px;
+  left: -110px;
+  box-shadow: 30px 290px 0 -65px #45a0ff;
+}
+.landing-cta::after {
+  bottom: -165px;
+  right: -40px;
+  box-shadow: -60px -310px 0 -50px #329cff;
+}
+.landing-cta .landing-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #a9d7ff;
+}
+.landing-cta h2 {
+  font-size: clamp(28px, 3.1vw, 44px);
+  margin-top: 12px;
+}
+.landing-cta p:last-child {
+  font-size: 14px;
+  color: #d9eaff;
+  margin-top: 13px;
+}
+.landing-cta .landing-actions {
+  flex-shrink: 0;
+  gap: 16px;
+}
+.landing-cta .landing-button {
+  min-height: 43px;
+  font-size: 12px;
+  padding-inline: 25px;
+}
+.landing-footer {
+  background: linear-gradient(180deg, #001a33 0%, #00101f 100%);
+  color: #fff;
+  padding-top: 64px;
+  margin-top: 64px;
+}
+.landing-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 0.8fr)) minmax(0, 1.3fr);
+  gap: 48px;
+  padding-bottom: 48px;
+}
+.landing-footer .landing-brand {
+  color: white;
+  font-size: 24px;
+}
+.landing-brand small {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  font-weight: 500;
+  margin-top: 13px;
+  color: #85a1bc;
+}
+.landing-footer-about p {
+  margin-top: 20px;
+  max-width: 340px;
+  color: #a9bdd2;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.landing-footer-cta {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--landing-blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  transition: background 0.2s, transform 0.2s;
+}
+.landing-footer-cta:hover {
+  background: #0055d8;
+  transform: translateY(-2px);
+}
+.landing-footer-cta svg {
+  width: 16px;
+  height: 16px;
+}
+.landing-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-style: normal;
+}
+.landing-footer .landing-footer-col h2 {
+  margin-bottom: 6px;
+  line-height: 1.3;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.landing-footer-col a,
+.landing-footer-col span {
+  color: #a9bdd2;
+  font-size: 14px;
+  line-height: 1.45;
+  transition: color 0.2s;
+}
+.landing-footer-col a:hover {
+  color: #fff;
+}
+.landing-footer-contact a,
+.landing-footer-contact span {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  overflow-wrap: anywhere;
+}
+.landing-footer-contact svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: #3d8bff;
+}
+.landing-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 22px;
+  border-top: 1px solid #ffffff1a;
+  color: #7690aa;
+  font-size: 12px;
+}
+@media (max-width: 1150px) {
+  .landing-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px 32px;
+  }
+  .landing-footer-about {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 640px) {
+  .landing-footer {
+    padding-top: 48px;
+    margin-top: 48px;
+  }
+  .landing-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+  }
+  .landing-footer-contact {
+    grid-column: 1 / -1;
+  }
+  .landing-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (min-width: 1500px) {
+  .landing-hero-image {
+    object-position: right bottom;
+  }
+}
+@media (max-width: 1150px) {
+  .landing-container {
+    width: calc(100% - 64px);
+  }
+  .landing-header-row {
+    gap: 16px;
+  }
+  .landing-brand {
+    font-size: 23px;
+  }
+  .landing-desktop-nav {
+    gap: 0;
+  }
+  .landing-desktop-nav a {
+    font-size: 11px;
+    padding-inline: 10px;
+  }
+  .landing-header-book {
+    padding-inline: 18px;
+  }
+  .landing-hero {
+    min-height: 621px;
+  }
+  .landing-hero-image {
+    width: 72%;
+  }
+  .landing-hero::after {
+    background:
+      linear-gradient(90deg, #ffffffd9 0%, #ffffffb8 46%, #ffffff00 66%),
+      linear-gradient(0deg, #fff 0%, #ffffff00 13%);
+  }
+  .landing-hero-content {
+    padding-top: 50px;
+  }
+  .landing-hero h1 {
+    font-size: 76px;
+  }
+  .landing-hero-description {
+    font-size: 17px;
+  }
+  .landing-hero-features {
+    max-width: 535px;
+    gap: 14px;
+  }
+  .landing-service-grid {
+    grid-template-rows: 165px 165px 185px;
+  }
+  .landing-service-copy {
+    padding: 18px;
+  }
+  .landing-service-card h3 {
+    font-size: 25px;
+  }
+  .landing-service-sales h3 {
+    font-size: 43px;
+  }
+  .landing-service-sales p {
+    font-size: 14px;
+  }
+  .landing-service-card p {
+    font-size: 12px;
+  }
+  .landing-service-claims h3 {
+    font-size: 23px;
+  }
+  .landing-scooter-photo {
+    height: 190px;
+  }
+  .landing-trust-inner {
+    min-height: 450px;
+  }
+  .landing-trust-description {
+    font-size: 16px;
+  }
+  .landing-trust-features {
+    gap: 25px 16px;
+  }
+  .landing-feature {
+    gap: 12px;
+  }
+  .landing-feature-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .landing-feature h3 {
+    font-size: 14px;
+  }
+  .landing-feature p {
+    font-size: 13px;
+  }
+  .landing-trust {
+    width: calc(100% - 64px);
+  }
+  .landing-trust-photo {
+    margin-right: -32px;
+  }
+  .landing-steps {
+    gap: 26px;
+  }
+  .landing-steps li {
+    padding: 18px 14px;
+  }
+  .landing-steps .landing-feature {
+    gap: 10px;
+  }
+  .landing-steps .landing-feature-icon {
+    width: 46px;
+    height: 46px;
+  }
+  .landing-steps .landing-feature h3 {
+    font-size: 13px;
+  }
+  .landing-steps .landing-feature p {
+    font-size: 12px;
+  }
+  .landing-step-arrow {
+    right: -22px;
+  }
+  .landing-cta {
+    padding: 30px 35px 30px 70px;
+  }
+  .landing-cta .landing-button {
+    padding-inline: 20px;
+    gap: 12px;
+  }
+}
+@media (max-width: 900px) {
+  .landing-header-row {
+    min-height: 72px;
+    gap: 12px;
+  }
+  .landing-desktop-nav {
+    gap: 0;
+  }
+  .landing-desktop-nav a {
+    font-size: 10px;
+    padding-inline: 7px;
+  }
+  .landing-brand {
+    font-size: 19px;
+    gap: 5px;
+  }
+  .landing-header-book {
+    font-size: 10px;
+    padding: 9px 14px;
+    min-height: 36px;
+    gap: 10px;
+  }
+  .landing-hero {
+    --landing-header-height: 72px;
+    min-height: 512px;
+  }
+  .landing-hero-image {
+    width: 62%;
+  }
+  .landing-hero-content {
+    padding-block: 39px 30px;
+  }
+  .landing-hero h1 {
+    font-size: 63px;
+  }
+  .landing-hero-description {
+    font-size: 15px;
+  }
+  .landing-hero .landing-actions {
+    margin-top: 22px;
+  }
+  .landing-button {
+    min-height: 40px;
+    padding: 10px 22px;
+    font-size: 12px;
+    gap: 14px;
+  }
+  .landing-hero-features {
+    margin-top: 28px;
+    max-width: 470px;
+  }
+  .landing-hero-features .landing-feature {
+    gap: 8px;
+  }
+  .landing-hero-features h3 {
+    font-size: 10px;
+  }
+  .landing-hero-features p {
+    font-size: 10px;
+  }
+  .landing-eyebrow {
+    font-size: 9px;
+  }
+  .landing-section {
+    padding-top: 26px;
+  }
+  .landing-section-heading {
+    margin-bottom: 18px;
+  }
+  .landing-text-link {
+    font-size: 11px;
+    gap: 12px;
+  }
+  .landing-service-grid {
+    grid-template-rows: 140px 140px 160px;
+    gap: 10px;
+  }
+  .landing-service-copy {
+    padding: 16px;
+  }
+  .landing-service-number {
+    font-size: 10px;
+  }
+  .landing-service-card h3 {
+    font-size: 23px;
+    margin-bottom: 10px;
+  }
+  .landing-service-sales h3 {
+    font-size: 38px;
+  }
+  .landing-service-card p {
+    font-size: 11px;
+  }
+  .landing-round-arrow {
+    width: 36px;
+    height: 36px;
+    margin-top: 14px;
+  }
+  .landing-service-repairs .landing-round-arrow,
+  .landing-service-servicing .landing-round-arrow,
+  .landing-service-rentals .landing-round-arrow,
+  .landing-service-claims .landing-round-arrow {
+    right: -17px;
+    bottom: 20px;
+  }
+  .landing-service-claims h3 {
+    font-size: 21px;
+  }
+  .landing-scooter-grid {
+    gap: 16px;
+  }
+  .landing-scooter-photo {
+    height: 160px;
+  }
+  .landing-scooter-copy {
+    padding: 14px 18px;
+  }
+  .landing-scooter-copy h3 {
+    font-size: 15px;
+  }
+  .landing-scooter-copy p {
+    font-size: 12px;
+  }
+  .landing-scooter-copy .landing-button {
+    font-size: 11px;
+    padding-inline: 17px;
+  }
+  .landing-trust-inner {
+    min-height: 400px;
+  }
+  .landing-trust-copy {
+    padding: 30px 10px 28px 0;
+  }
+  .landing-trust-features {
+    gap: 20px 14px;
+  }
+  .landing-trust-description {
+    font-size: 14px;
+  }
+  .landing-feature-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .landing-feature-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+  .landing-feature h3 {
+    font-size: 12px;
+  }
+  .landing-feature p {
+    font-size: 11px;
+  }
+  .landing-steps {
+    gap: 25px;
+  }
+  .landing-steps .landing-feature-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .landing-steps .landing-feature h3 {
+    font-size: 11px;
+  }
+  .landing-steps .landing-feature p {
+    font-size: 10px;
+  }
+  .landing-accident {
+    min-height: 230px;
+  }
+  .landing-accident-copy {
+    padding: 23px 32px;
+  }
+  .landing-accident-copy > p:not(.landing-eyebrow) {
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .landing-accident .landing-button {
+    font-size: 10px;
+    min-height: 34px;
+  }
+  .landing-cta {
+    padding: 28px 20px 28px 85px;
+    min-height: 155px;
+    gap: 20px;
+  }
+  .landing-cta .landing-eyebrow {
+    font-size: 7px;
+  }
+  .landing-cta h2 {
+    font-size: 28px;
+    margin-top: 10px;
+  }
+  .landing-cta p:last-child {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .landing-cta .landing-actions {
+    gap: 12px;
+  }
+  .landing-cta .landing-button {
+    font-size: 10px;
+    min-height: 36px;
+    padding-inline: 20px;
+  }
+}
+@media (max-width: 820px) {
+  .landing-container {
+    width: calc(100% - 40px);
+  }
+  .landing-wide-container {
+    width: calc(100% - 32px);
+  }
+  .landing-header-row {
+    min-height: 70px;
+    gap: 12px;
+  }
+  .landing-brand {
+    font-size: 21px;
+  }
+  .landing-desktop-nav {
+    display: none;
+  }
+  .landing-menu-button {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  .landing-header-book {
+    margin-left: auto;
+  }
+  .landing-hero {
+    --landing-header-height: 70px;
+    min-height: 800px;
+  }
+  .landing-hero-image {
+    width: 100%;
+    height: 360px;
+    top: auto;
+    bottom: 0;
+    object-position: 75% 65%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 30%);
+  }
+  .landing-hero::after {
+    background: linear-gradient(180deg, #fff 0%, #fff 44%, #ffffffbd 53%, #ffffff00 68%, #fff 100%);
+  }
+  .landing-hero-content {
+    padding-block: 30px 28px;
+  }
+  .landing-hero h1 {
+    font-size: clamp(48px, 9.6vw, 68px);
+    margin-top: 13px;
+  }
+  .landing-hero-description {
+    font-size: 15px;
+    max-width: 430px;
+  }
+  .landing-hero-features {
+    margin-top: 26px;
+    gap: 12px;
+    max-width: 500px;
+  }
+  .landing-hero-features h3 {
+    font-size: 11px;
+  }
+  .landing-hero-features p {
+    font-size: 10px;
+  }
+  .landing-page h2 {
+    font-size: 30px;
+  }
+  .landing-section-heading {
+    gap: 15px;
+    align-items: flex-start;
+  }
+  .landing-text-link {
+    margin-top: 21px;
+    font-size: 10px;
+    gap: 6px;
+  }
+  .landing-service-grid {
+    grid-template-rows: 160px 160px 160px;
+  }
+  .landing-service-copy {
+    width: 53%;
+    padding: 15px 13px;
+  }
+  .landing-service-card h3 {
+    font-size: 23px;
+  }
+  .landing-service-card p {
+    font-size: 11px;
+  }
+  .landing-service-sales h3 {
+    font-size: 37px;
+  }
+  .landing-service-sales .landing-service-copy {
+    width: 55%;
+  }
+  .landing-service-card::after {
+    background: linear-gradient(100deg, #f2f8fc 0%, #f2f8fc 43%, #f2f8fce6 50%, #f2f8fc00 72%);
+  }
+  .landing-service-sales::after {
+    background: linear-gradient(105deg, #edf7ff 0%, #edf7ff 22%, #edf7ffa0 49%, #edf7ff00 76%);
+  }
+  .landing-service-card > img {
+    width: 65%;
+  }
+  .landing-service-sales > img {
+    width: 100%;
+    object-position: 70% center;
+  }
+  .landing-service-claims h3 {
+    font-size: 20px;
+    white-space: normal;
+  }
+  .landing-service-repairs .landing-round-arrow,
+  .landing-service-servicing .landing-round-arrow,
+  .landing-service-rentals .landing-round-arrow,
+  .landing-service-claims .landing-round-arrow {
+    bottom: 12px;
+    right: -15px;
+  }
+  .landing-scooter-grid {
+    gap: 12px;
+  }
+  .landing-scooter-photo {
+    height: 135px;
+  }
+  .landing-scooter-copy {
+    padding: 14px 12px;
+  }
+  .landing-scooter-copy h3 {
+    font-size: 14px;
+  }
+  .landing-scooter-copy p {
+    font-size: 11px;
+  }
+  .landing-scooter-copy .landing-button {
+    font-size: 10px;
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  .landing-trust {
+    width: calc(100% - 40px);
+    border-radius: 18px;
+  }
+  .landing-trust-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .landing-trust-copy {
+    padding-right: 0;
+  }
+  .landing-trust h2 br {
+    display: none;
+  }
+  .landing-trust-features {
+    gap: 24px;
+  }
+  .landing-feature h3 {
+    font-size: 14px;
+  }
+  .landing-feature p {
+    font-size: 12px;
+  }
+  .landing-trust-photo {
+    height: 320px;
+    margin-inline: -20px;
+    clip-path: none;
+  }
+  .landing-trust-photo img {
+    object-position: center 40%;
+  }
+  .landing-steps {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .landing-steps li {
+    padding: 20px;
+  }
+  .landing-steps .landing-feature h3 {
+    font-size: 15px;
+  }
+  .landing-steps .landing-feature p {
+    font-size: 13px;
+  }
+  .landing-steps .landing-feature-icon {
+    width: 54px;
+    height: 54px;
+  }
+  .landing-step-arrow {
+    top: auto;
+    bottom: -17px;
+    right: 50%;
+    transform: rotate(90deg);
+    z-index: 1;
+  }
+  .landing-accident {
+    min-height: 280px;
+  }
+  .landing-accident-copy {
+    padding: 25px;
+  }
+  .landing-accident > img {
+    object-position: 70% center;
+  }
+  .landing-accident::after {
+    background: linear-gradient(90deg, #00172ff5, #00172fc9 55%, #00172f40);
+  }
+  .landing-cta {
+    padding: 28px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .landing-cta h2 {
+    font-size: 30px;
+  }
+  .landing-cta .landing-eyebrow {
+    font-size: 8px;
+  }
+  .landing-cta p:last-child {
+    font-size: 13px;
+  }
+  .landing-cta .landing-button {
+    font-size: 12px;
+    min-height: 42px;
+  }
+
+}
+@media (max-width: 480px) {
+  .landing-header-book {
+    display: none;
+  }
+  .landing-menu-button {
+    margin-left: auto;
+  }
+  .landing-hero {
+    min-height: 800px;
+  }
+  .landing-hero h1 {
+    font-size: 49px;
+  }
+  .landing-desktop-break {
+    display: none;
+  }
+  .landing-hero-description {
+    font-size: 14px;
+  }
+  .landing-hero .landing-actions {
+    gap: 10px;
+  }
+  .landing-hero .landing-button {
+    font-size: 11px;
+    padding-inline: 17px;
+    gap: 10px;
+  }
+  .landing-hero-features {
+    gap: 9px;
+  }
+  .landing-hero-features .landing-feature {
+    display: block;
+  }
+  .landing-hero-features .landing-feature-icon {
+    margin-bottom: 5px;
+  }
+  .landing-hero-features h3 {
+    font-size: 11px;
+  }
+  .landing-hero-features p {
+    font-size: 10px;
+  }
+  .landing-section-heading {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .landing-text-link {
+    margin-top: 0;
+  }
+  .landing-page h2 {
+    font-size: 29px;
+  }
+  .landing-service-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .landing-service-card {
+    min-height: 180px;
+  }
+  .landing-service-sales {
+    grid-row: auto;
+    min-height: 285px;
+  }
+  .landing-service-copy {
+    width: 48%;
+    padding: 21px;
+  }
+  .landing-service-sales .landing-service-copy {
+    width: 49%;
+  }
+  .landing-service-card h3 {
+    font-size: 28px;
+  }
+  .landing-service-sales h3 {
+    font-size: 42px;
+  }
+  .landing-service-card p {
+    font-size: 13px;
+  }
+  .landing-service-claims h3 {
+    font-size: 24px;
+  }
+  .landing-service-repairs .landing-round-arrow,
+  .landing-service-servicing .landing-round-arrow,
+  .landing-service-rentals .landing-round-arrow,
+  .landing-service-claims .landing-round-arrow {
+    bottom: 20px;
+    right: -15px;
+  }
+  .landing-scooter-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .landing-scooter-photo {
+    height: 225px;
+  }
+  .landing-scooter-copy {
+    padding: 18px 22px;
+  }
+  .landing-scooter-copy h3 {
+    font-size: 18px;
+  }
+  .landing-scooter-copy p {
+    font-size: 14px;
+    min-height: auto;
+  }
+  .landing-scooter-copy .landing-button {
+    font-size: 12px;
+    padding-inline: 22px;
+  }
+  .landing-trust-features {
+    gap: 22px 16px;
+  }
+  .landing-trust-features .landing-feature {
+    display: block;
+  }
+  .landing-trust-features .landing-feature-icon {
+    margin-bottom: 10px;
+  }
+  .landing-trust-photo {
+    height: 280px;
+  }
+  .landing-accident-copy {
+    padding: 25px 20px;
+  }
+  .landing-accident h2 {
+    font-size: 30px;
+  }
+  .landing-accident-copy > p:not(.landing-eyebrow) {
+    max-width: 270px;
+  }
+  .landing-cta {
+    padding: 26px 22px;
+  }
+  .landing-cta .landing-actions {
+    gap: 10px;
+  }
+  .landing-cta .landing-button {
+    padding-inline: 18px;
+    gap: 10px;
+    font-size: 11px;
+  }
+  .landing-brand small {
+    font-size: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Inner public pages (Sales, Services, Rentals, Accident Claims, Contact) ── */
+.landing-subhero {
+  --landing-header-height: 86px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 560px;
+  padding-top: var(--landing-header-height);
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #e3f0fd 0%, #eef6fe 50%, #fff 100%);
+}
+.landing-subhero-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -2;
+  width: min(66%, 1100px);
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 32%);
+}
+.landing-subhero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #ffffffcc 0%, #ffffff8c 34%, #ffffff00 55%),
+    linear-gradient(0deg, #fff 0%, #ffffff00 14%);
+}
+.landing-subhero-content {
+  padding-block: 56px 64px;
+}
+.landing-subhero h1 {
+  font-size: clamp(44px, 5.2vw, 76px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  margin: 14px 0 18px;
+  max-width: 640px;
+}
+.landing-subhero h1 span {
+  color: var(--landing-blue);
+}
+.landing-subhero-description {
+  color: #27314c;
+  font-size: 18px;
+  line-height: 1.45;
+  max-width: 520px;
+}
+.landing-subhero .landing-actions {
+  margin-top: 26px;
+}
+.landing-crumbs {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7b92ad;
+}
+.landing-crumbs a:hover {
+  color: var(--landing-blue);
+}
+
+/* Small stat/price chips under a page hero. */
+.landing-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.landing-chip {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: #ffffffc7;
+  border: 1px solid #ffffff;
+  box-shadow: 0 6px 20px #0a1f3d14;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.landing-chip strong {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--landing-navy);
+}
+.landing-chip span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #617189;
+}
+
+.landing-block {
+  padding-top: 72px;
+}
+.landing-block-heading {
+  max-width: 640px;
+  margin-bottom: 28px;
+}
+.landing-block-heading h2 {
+  margin-top: 8px;
+}
+.landing-block-heading p:not(.landing-eyebrow) {
+  margin-top: 12px;
+  color: var(--landing-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.landing-block-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Photo + copy rows, alternating sides. */
+.landing-split-list {
+  display: grid;
+  gap: 72px;
+}
+.landing-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.landing-split-reverse .landing-split-photo {
+  order: 2;
+}
+.landing-split-photo {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #eef6fe, #f8fbff);
+  box-shadow: 0 18px 50px #0a1f3d1f;
+}
+.landing-split-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.landing-split:hover .landing-split-photo img {
+  transform: scale(1.03);
+}
+.landing-split-photo .landing-photo-badge {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+}
+.landing-photo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ffffffe6;
+  color: var(--landing-navy);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 20px #0a1f3d1f;
+}
+.landing-photo-badge svg {
+  width: 15px;
+  height: 15px;
+  color: var(--landing-blue);
+}
+.landing-split-copy .landing-feature-icon {
+  width: 52px;
+  height: 52px;
+}
+.landing-split-copy h2 {
+  margin-top: 18px;
+  font-size: clamp(28px, 2.8vw, 40px);
+}
+.landing-split-copy > p {
+  margin-top: 14px !important;
+  color: var(--landing-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.landing-split-copy .landing-actions {
+  margin-top: 26px;
+}
+.landing-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+}
+.landing-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.4;
+  color: #1c2a44;
+}
+.landing-checklist svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--landing-blue);
+}
+.landing-checklist-single {
+  grid-template-columns: 1fr;
+}
+
+/* Product / fleet cards. */
+.landing-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.landing-card-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.landing-card-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.landing-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e3edf7;
+  box-shadow: 0 10px 30px #0a1f3d0f;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.landing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px #0a1f3d1f;
+}
+.landing-card-photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: linear-gradient(160deg, #f4f9ff 0%, #e6f1fd 100%);
+}
+.landing-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+.landing-card-photo-contain img {
+  object-fit: contain;
+  padding: 14px;
+}
+.landing-card:hover .landing-card-photo img {
+  transform: scale(1.04);
+}
+.landing-card-photo .landing-photo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--landing-blue);
+  color: #fff;
+}
+.landing-card-photo .landing-photo-badge svg {
+  color: #fff;
+}
+.landing-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 22px 22px;
+}
+.landing-card-body h3 {
+  font-size: 19px;
+  letter-spacing: -0.035em;
+}
+.landing-card-body p {
+  margin-top: 8px !important;
+  color: var(--landing-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.landing-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.landing-tags span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e6f1ff;
+  color: #0052cc;
+  font-size: 11px;
+  font-weight: 650;
+}
+.landing-card-body .landing-text-link {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* Soft feature panel (icon tiles in a tinted rounded box). */
+.landing-panel {
+  border-radius: 24px;
+  background: linear-gradient(105deg, #f7fbff, #eaf4ff);
+  padding: 40px;
+}
+.landing-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.landing-panel-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Contact page. */
+.landing-contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 32px;
+  align-items: start;
+}
+.landing-info-list {
+  display: grid;
+  gap: 14px;
+}
+.landing-info-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #e3edf7;
+  box-shadow: 0 10px 30px #0a1f3d0d;
+}
+.landing-info-card .landing-feature-icon {
+  width: 46px;
+  height: 46px;
+}
+.landing-info-card .landing-feature-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.landing-info-card small {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7b92ad;
+}
+.landing-info-card strong,
+.landing-info-card a {
+  display: block;
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--landing-navy);
+  word-break: break-word;
+}
+.landing-info-card a:hover {
+  color: var(--landing-blue);
+}
+.landing-info-card p {
+  margin-top: 4px !important;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--landing-body);
+}
+.landing-info-photo {
+  border-radius: 18px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+}
+.landing-info-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.landing-form-card {
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid #e3edf7;
+  box-shadow: 0 18px 50px #0a1f3d14;
+  padding: 36px;
+}
+.landing-form-card h2 {
+  font-size: clamp(26px, 2.4vw, 34px);
+  margin-top: 8px;
+}
+.landing-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 26px;
+}
+.landing-form .landing-field-wide {
+  grid-column: 1 / -1;
+}
+.landing-form label {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+  color: #34445f;
+  margin-bottom: 6px;
+}
+.landing-form label span {
+  color: var(--landing-blue);
+}
+.landing-form input,
+.landing-form select,
+.landing-form textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #dbe6f2;
+  background: #f8fbff;
+  color: var(--landing-navy);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.landing-form input::placeholder,
+.landing-form textarea::placeholder {
+  color: #9aabc0;
+}
+.landing-form input:focus,
+.landing-form select:focus,
+.landing-form textarea:focus {
+  outline: none;
+  border-color: var(--landing-blue);
+  background: #fff;
+  box-shadow: 0 0 0 4px #0066ff1a;
+}
+.landing-form .landing-button {
+  border: 0;
+  cursor: pointer;
+}
+.landing-form .landing-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.landing-form-error {
+  grid-column: 1 / -1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff1f1;
+  color: #b42318;
+  font-size: 13px;
+}
+.landing-form-done {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  border-radius: 18px;
+  background: #eef6ff;
+  text-align: center;
+}
+.landing-form-done svg {
+  width: 44px;
+  height: 44px;
+  color: var(--landing-blue);
+}
+.landing-form-done strong {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+.landing-form-done p {
+  color: var(--landing-body);
+  font-size: 14px;
+}
+.landing-form-done a {
+  color: var(--landing-blue);
+  font-weight: 650;
+}
+.landing-map {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid #e3edf7;
+  box-shadow: 0 18px 50px #0a1f3d14;
+}
+.landing-map iframe {
+  display: block;
+  width: 100%;
+  height: 420px;
+  border: 0;
+}
+
+@media (max-width: 1150px) {
+  .landing-subhero {
+    min-height: 500px;
+  }
+  .landing-subhero-image {
+    width: 72%;
+  }
+  .landing-subhero::after {
+    background:
+      linear-gradient(90deg, #ffffffe6 0%, #ffffffb8 45%, #ffffff00 70%),
+      linear-gradient(0deg, #fff 0%, #ffffff00 14%);
+  }
+  .landing-card-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landing-panel-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landing-split {
+    gap: 36px;
+  }
+}
+@media (max-width: 900px) {
+  .landing-subhero {
+    --landing-header-height: 72px;
+  }
+  .landing-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landing-panel-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .landing-contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 820px) {
+  /* Photo sits under the copy on phones, fading in from the top. */
+  .landing-subhero {
+    --landing-header-height: 70px;
+    min-height: 0;
+    padding-bottom: 250px;
+    align-items: flex-start;
+  }
+  .landing-subhero-image {
+    width: 100%;
+    height: 300px;
+    top: auto;
+    bottom: 0;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 35%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 35%);
+  }
+  .landing-subhero::after {
+    background: none;
+  }
+  .landing-subhero-content {
+    padding-block: 36px 20px;
+  }
+  .landing-subhero-description {
+    font-size: 16px;
+  }
+  .landing-block {
+    padding-top: 52px;
+  }
+  .landing-split,
+  .landing-split-reverse {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .landing-split-reverse .landing-split-photo {
+    order: 0;
+  }
+  .landing-split-list {
+    gap: 48px;
+  }
+  .landing-panel {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+  .landing-form-card {
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+  .landing-map iframe {
+    height: 320px;
+  }
+}
+@media (max-width: 560px) {
+  .landing-card-grid,
+  .landing-card-grid-2,
+  .landing-card-grid-4,
+  .landing-panel-grid,
+  .landing-panel-grid-4,
+  .landing-checklist,
+  .landing-form {
+    grid-template-columns: 1fr;
+  }
+  .landing-subhero h1 {
+    font-size: 42px;
+  }
+  .landing-subhero .landing-actions .landing-button {
+    flex: 1 1 100%;
+  }
+  .landing-chip strong {
+    font-size: 17px;
+  }
+}
+.landing-block-cta {
+  margin-top: 72px;
+}
+@media (max-width: 820px) {
+  .landing-block-cta {
+    margin-top: 52px;
+  }
+}
+
+/* Homepage photo framing: keep the bike in view inside each card. */
+.landing-service-sales > img {
+  object-position: 62% 60%;
+}
+.landing-scooter-urban img {
+  object-position: 88% 70%;
+}
+
+/* Phones: the Sales card uses the same layout as the other service cards. */
+@media (max-width: 480px) {
+  .landing-service-sales {
+    min-height: 180px;
+  }
+  .landing-service-sales::after {
+    background: linear-gradient(100deg, #f2f8fc 0%, #f2f8fc 43%, #f2f8fce6 50%, #f2f8fc00 72%);
+  }
+  .landing-service-sales > img {
+    width: 65%;
+    object-position: 60% center;
+  }
+  .landing-service-sales .landing-service-copy {
+    width: 48%;
+  }
+  .landing-service-sales h3 {
+    font-size: 28px;
+    margin: 8px 0 12px;
+  }
+  .landing-service-sales p {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .landing-service-sales .landing-round-arrow {
+    position: absolute;
+    right: -15px;
+    bottom: 20px;
+    margin-top: 0;
+  }
+}
+
+/* ── Login ── */
+.landing-login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: 100svh;
+}
+.landing-login-visual {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 14px 0 14px 14px;
+  border-radius: 28px;
+  display: flex;
+  align-items: flex-end;
+  color: #fff;
+}
+.landing-login-visual > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% center;
+  z-index: -2;
+  animation: landing-fade 0.9s ease both;
+}
+.landing-login-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, #00172f00 30%, #00172fe0 100%),
+    linear-gradient(135deg, #0066ff40, #00172f00 60%);
+}
+.landing-login-visual-copy {
+  padding: 44px;
+  animation: landing-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.1s both;
+}
+.landing-login-visual .landing-eyebrow {
+  color: #bdd6f0;
+}
+.landing-login-quote {
+  margin-top: 12px !important;
+  font-size: clamp(28px, 2.8vw, 40px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.landing-login-quote span {
+  color: #80c8ff;
+}
+.landing-login-visual ul {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.landing-login-visual li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ffffff1f;
+  border: 1px solid #ffffff33;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 600;
+}
+.landing-login-visual li svg {
+  width: 15px;
+  height: 15px;
+  color: #80c8ff;
+}
+.landing-login-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 28px clamp(24px, 5vw, 72px) 40px;
+  background:
+    radial-gradient(circle at 100% 0%, #e3f0fd 0%, #ffffff00 45%),
+    #fff;
+}
+.landing-login-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.landing-login-top .landing-text-link {
+  gap: 6px;
+}
+.landing-login-box {
+  width: min(100%, 420px);
+  margin: auto;
+  padding-block: 40px;
+  animation: landing-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.landing-login-box h1 {
+  margin-top: 10px;
+  font-size: clamp(34px, 3.4vw, 46px);
+  line-height: 1.02;
+}
+.landing-login-hint {
+  margin-top: 10px !important;
+  color: var(--landing-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.landing-login-form {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+.landing-input-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.landing-input-icon > svg {
+  position: absolute;
+  left: 15px;
+  width: 17px;
+  height: 17px;
+  color: #7b92ad;
+  pointer-events: none;
+}
+.landing-form .landing-input-icon input {
+  padding-left: 44px;
+  padding-right: 44px;
+}
+.landing-input-icon button {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: #7b92ad;
+}
+.landing-input-icon button:hover {
+  color: var(--landing-blue);
+  background: #eef6ff;
+}
+.landing-input-icon button svg {
+  width: 17px;
+  height: 17px;
+}
+.landing-login-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+.landing-form .landing-login-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 550;
+  color: #34445f;
+}
+.landing-form .landing-login-remember input {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  accent-color: var(--landing-blue);
+}
+.landing-login-link {
+  font-weight: 650;
+  color: var(--landing-blue);
+}
+.landing-login-link:hover {
+  text-decoration: underline;
+}
+.landing-login-submit {
+  width: 100%;
+  min-height: 50px;
+  font-size: 14px;
+}
+.landing-login-foot {
+  margin-top: 22px !important;
+  font-size: 12px;
+  color: #7b92ad;
+  text-align: center;
+}
+.landing-login-note {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #eef6ff;
+  color: #1c2a44;
+  font-size: 13px;
+}
+.landing-login-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #00172f8c;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: landing-fade 0.2s ease both;
+}
+.landing-login-dialog .landing-form-card {
+  width: min(100%, 440px);
+  animation: landing-rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.landing-login-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.landing-login-dialog-head button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #34445f;
+}
+.landing-login-dialog-head button:hover {
+  background: #eef6ff;
+}
+.landing-login-dialog .landing-form {
+  margin-top: 6px;
+}
+.landing-login-blocked {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 28px;
+  padding: 24px;
+  text-align: center;
+}
+.landing-login-blocked h1 {
+  margin-top: 10px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+@media (max-width: 900px) {
+  /* Phones and the installed app: photo becomes a short banner above the form. */
+  .landing-login {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .landing-login-visual {
+    order: -1;
+    margin: 10px 10px 0;
+    min-height: 210px;
+    border-radius: 22px;
+  }
+  .landing-login-visual-copy {
+    padding: 22px;
+  }
+  .landing-login-quote {
+    font-size: 24px;
+  }
+  .landing-login-visual ul {
+    display: none;
+  }
+  .landing-login-panel {
+    padding: 20px 20px 32px;
+  }
+  .landing-login-top {
+    order: -2;
+  }
+  .landing-login-box {
+    margin: 0 auto;
+    padding-block: 24px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-login-visual > img,
+  .landing-login-visual-copy,
+  .landing-login-box,
+  .landing-login-dialog,
+  .landing-login-dialog .landing-form-card {
+    animation: none;
+  }
+}
+
+/* The header's Book button is hidden on small phones, so the menu offers it there instead. */
+.landing-mobile-nav .landing-mobile-book {
+  display: none;
+  color: var(--landing-blue);
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .landing-mobile-nav .landing-mobile-book {
+    display: flex;
+  }
+}
+
+/* Header actions: Login + Book a Service, right-aligned. */
+.landing-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+@media (min-width: 821px) {
+  .landing-header-actions {
+    justify-self: end;
+  }
+}
+@media (max-width: 820px) {
+  .landing-header-actions {
+    margin-left: auto;
+  }
+  .landing-header-actions .landing-header-book {
+    margin-left: 0;
+  }
+}
+/* Login stays in the menu on narrow screens, where both buttons don't fit. */
+@media (max-width: 640px) {
+  .landing-header-login {
+    display: none;
+  }
+}
+
+/* Logo image (public/images/brand). */
+.landing-brand img {
+  display: block;
+  height: 76px;
+  width: auto;
+}
+.landing-brand-footer {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.landing-brand-footer img {
+  height: 112px;
+}
+.landing-login-top .landing-brand img {
+  height: 68px;
+}
+@media (max-width: 1150px) {
+  .landing-brand img {
+    height: 66px;
+  }
+}
+@media (max-width: 900px) {
+  .landing-brand img {
+    height: 58px;
+  }
+}
+@media (max-width: 480px) {
+  .landing-brand img {
+    height: 52px;
+  }
+  .landing-brand-footer img {
+    height: 96px;
+  }
+}
+
+/* ── Motion ── */
+/* Scroll reveal: ScrollReveal.tsx adds these classes only to blocks below the fold. */
+.landing-page .reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.7s ease var(--reveal-delay, 0ms),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.landing-page .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* Hero copy rises in on page load. */
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes landing-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.landing-hero-content > *,
+.landing-subhero-content > * {
+  animation: landing-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.landing-hero-content > :nth-child(2),
+.landing-subhero-content > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+.landing-hero-content > :nth-child(3),
+.landing-subhero-content > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+.landing-hero-content > :nth-child(4),
+.landing-subhero-content > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+.landing-hero-content > :nth-child(n + 5),
+.landing-subhero-content > :nth-child(n + 5) {
+  animation-delay: 0.32s;
+}
+.landing-hero-image,
+.landing-subhero-image {
+  animation: landing-fade 0.9s ease both;
+}
+.landing-header {
+  animation: landing-fade 0.6s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-page .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .landing-hero-content > *,
+  .landing-subhero-content > *,
+  .landing-hero-image,
+  .landing-subhero-image,
+  .landing-header {
+    animation: none;
+  }
+}

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.has_dawat_role(uuid, text) FROM anon;

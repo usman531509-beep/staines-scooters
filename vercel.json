@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "crons": [
+    { "path": "/api/public/cron/recurring-expenses", "schedule": "0 5 * * *" },
+    { "path": "/api/public/cron/fixed-monthly-expenses", "schedule": "30 5 1 * *" }
+  ]
+}

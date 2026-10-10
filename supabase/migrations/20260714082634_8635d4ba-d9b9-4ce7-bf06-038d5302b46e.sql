@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.is_dawat_member(uuid) TO authenticated;

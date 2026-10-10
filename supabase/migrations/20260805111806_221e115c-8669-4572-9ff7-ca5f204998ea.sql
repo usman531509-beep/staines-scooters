@@ -1,0 +1,2 @@
+ALTER TABLE public.vouchers ADD COLUMN IF NOT EXISTS issued_sale_id uuid REFERENCES public.sales(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS vouchers_issued_sale_id_idx ON public.vouchers(issued_sale_id);

@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS pin_to_best_sellers boolean NOT NULL DEFAULT false;

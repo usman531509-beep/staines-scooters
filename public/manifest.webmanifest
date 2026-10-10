@@ -1,0 +1,17 @@
+{
+  "name": "Stainess Scooter",
+  "short_name": "Stainess Scooter",
+  "description": "Till, rentals and back-office app for Stainess Scooter staff.",
+  "start_url": "/appsign?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0066ff",
+  "icons": [
+    { "src": "/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

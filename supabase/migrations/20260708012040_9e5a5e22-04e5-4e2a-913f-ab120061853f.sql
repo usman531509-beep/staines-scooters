@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.lost_damaged_apply_stock() FROM PUBLIC, anon, authenticated;

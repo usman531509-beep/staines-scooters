@@ -1,0 +1,1 @@
+UPDATE public.rentals SET stripe_customer_id = NULL, default_payment_method_id = NULL WHERE stripe_customer_id = 'cus_UwuqeD7KsDZ2J8';

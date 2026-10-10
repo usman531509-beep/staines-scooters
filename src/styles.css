@@ -1,0 +1,302 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-rust: var(--rust);
+  --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
+  --color-stock-current: var(--stock-current);
+  --color-stock-next: var(--stock-next);
+  --color-stock-later: var(--stock-later);
+  --color-stock-badge-foreground: var(--stock-badge-foreground);
+  --color-stock-action: var(--stock-action);
+
+  --font-display: "Bebas Neue", "Impact", sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  --signature-paper: #fff;
+  --signature-ink: #111;
+  --radius: 0.25rem;
+  --stock-current: oklch(0.57 0.14 163);
+  --stock-action: oklch(0.62 0.16 130);
+  --stock-next: oklch(0.55 0.23 262);
+  --stock-later: oklch(0.78 0.17 78);
+  --stock-badge-foreground: oklch(1 0 0);
+
+  /* Bright retina workshop palette — white & crisp */
+  --background: oklch(0.995 0.002 80);         /* near-white */
+  --foreground: oklch(0.18 0.012 50);          /* deep ink */
+
+  --surface: oklch(0.975 0.004 80);            /* off-white */
+  --surface-elevated: oklch(1 0 0);            /* pure white */
+  --ink: oklch(0.18 0.012 50);
+  --ink-muted: oklch(0.46 0.012 60);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.012 50);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.012 50);
+
+  --primary: oklch(0.58 0.22 27);              /* signal red */
+  --primary-foreground: oklch(0.99 0.005 80);
+  --rust: oklch(0.55 0.16 40);
+
+  --sale: oklch(0.88 0.17 95);                 /* sale banner yellow */
+  --sale-foreground: oklch(0.24 0.05 70);      /* dark brown-ink text */
+
+  --secondary: oklch(0.95 0.008 60);
+  --secondary-foreground: oklch(0.18 0.012 50);
+  --muted: oklch(0.95 0.006 60);
+  --muted-foreground: oklch(0.46 0.012 60);
+  --accent: oklch(0.58 0.22 27);
+  --accent-foreground: oklch(0.99 0.005 80);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 80);
+
+  --border: oklch(0.90 0.006 60);
+  --input: oklch(1 0 0);
+  --ring: oklch(0.58 0.22 27);
+
+  --gradient-hero: linear-gradient(135deg, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.7) 50%, oklch(0.58 0.22 27 / 0.18));
+  --gradient-red: linear-gradient(135deg, oklch(0.62 0.22 27), oklch(0.52 0.20 32));
+  --shadow-card: 0 1px 0 oklch(1 0 0 / 0.6) inset, 0 10px 30px -18px oklch(0.18 0.012 50 / 0.18);
+  --shadow-red: 0 10px 30px -10px oklch(0.58 0.22 27 / 0.45);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 15% -5%, oklch(0.58 0.22 27 / 0.06), transparent 45%),
+      radial-gradient(circle at 90% 110%, oklch(0.55 0.16 40 / 0.05), transparent 50%);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+    line-height: 0.95;
+  }
+}
+
+.signature-pad { background: var(--signature-paper); color: var(--signature-ink); }
+
+.inventory-workspace, .inventory-popup { font-family: var(--font-sans); letter-spacing: 0; }
+.inventory-workspace th, .inventory-popup th { text-transform: none; letter-spacing: 0; }
+.inventory-stock-table { white-space: nowrap; }
+.inventory-stock-table > thead { background: var(--background); }
+.inventory-stock-table > tbody > tr > td { padding-block: 0.25rem; }
+.inventory-popup input, .inventory-popup select { border-radius: var(--radius-lg); }
+.inventory-popup header { margin-bottom: 3rem; }
+
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 80rem;
+  @media (min-width: 768px) { padding-inline: 2rem; }
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+@utility section-pad {
+  padding-block: 5rem;
+  @media (min-width: 768px) { padding-block: 7rem; }
+}
+
+@utility hairline {
+  background-image: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  height: 1px;
+}
+
+@keyframes flash-button {
+  0%, 100% {
+    background-color: var(--color-primary);
+    box-shadow: 0 0 0 0 oklch(0.58 0.22 27 / 0.6);
+  }
+  50% {
+    background-color: oklch(0.66 0.22 27);
+    box-shadow: 0 0 22px 6px oklch(0.58 0.22 27 / 0.35);
+  }
+}
+
+@utility animate-flash-button {
+  animation: flash-button 1.4s ease-in-out infinite;
+}
+
+@keyframes pos-pop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.12); }
+  60%  { transform: scale(1.05); }
+  100% { transform: scale(1.08); }
+}
+
+@utility animate-pos-pop {
+  animation: pos-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+}
+
+/* =========================================================
+   Customer App (AppShell) typography — friendlier & larger.
+   Scoped to .app-ui so it doesn't touch the marketing site,
+   POS, or admin. Uses !important because Tailwind utility
+   classes carry the same specificity.
+   ========================================================= */
+.app-ui {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 16px;
+  line-height: 1.55;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-ui h1, .app-ui h2, .app-ui h3, .app-ui h4, .app-ui h5, .app-ui h6,
+.app-ui .font-display {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+}
+
+.app-ui .uppercase { text-transform: none !important; }
+.app-ui [class*="tracking-"] { letter-spacing: 0 !important; }
+
+.app-ui .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Bump utility text sizes to be customer-friendly on phones */
+.app-ui .text-\[10px\] { font-size: 0.75rem !important; }
+.app-ui .text-xs   { font-size: 0.875rem  !important; line-height: 1.5 !important; }
+.app-ui .text-sm   { font-size: 1rem      !important; line-height: 1.55 !important; }
+.app-ui .text-base { font-size: 1.0625rem !important; }
+.app-ui .text-lg   { font-size: 1.25rem   !important; }
+.app-ui .text-xl   { font-size: 1.5rem    !important; }
+.app-ui .text-2xl  { font-size: 1.75rem   !important; }
+.app-ui .text-3xl  { font-size: 2rem      !important; }
+
+.app-ui button, .app-ui a[role="button"], .app-ui .btn {
+  font-size: 1rem;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* Keep installed-app navigation pinned above page content and device controls. */
+.app-bottom-nav {
+  position: fixed !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* =========================================================
+   Mobile density pass — phones & installed app.
+   Squeezes padding, gaps and section spacing so noticeably
+   more content fits on a phone screen without changing any
+   layout structure. Desktop/tablet are untouched.
+   ========================================================= */
+@media (max-width: 640px) {
+  /* --- container / section padding --- */
+  .p-4 { padding: 0.625rem !important; }
+  .p-5 { padding: 0.75rem !important; }
+  .p-6 { padding: 0.875rem !important; }
+  .p-8 { padding: 1rem !important; }
+  .px-4 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+  .px-5 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+  .px-6 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
+  .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-4 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+  .py-5 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+  .py-6 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
+  .py-8 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+  .py-10 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+  .py-12 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+  .py-14, .py-16 { padding-top: 1.75rem !important; padding-bottom: 1.75rem !important; }
+  .py-20, .py-24, .py-28, .py-32 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+  .pt-8, .pt-10, .pt-12, .pt-16, .pt-20 { padding-top: 1.25rem !important; }
+  .pb-8, .pb-10, .pb-12, .pb-16, .pb-20 { padding-bottom: 1.25rem !important; }
+
+  /* --- gaps & stacks --- */
+  .gap-3 { gap: 0.5rem !important; }
+  .gap-4 { gap: 0.625rem !important; }
+  .gap-5 { gap: 0.75rem !important; }
+  .gap-6 { gap: 0.875rem !important; }
+  .gap-8, .gap-10, .gap-12 { gap: 1rem !important; }
+  .space-y-4 > * + * { margin-top: 0.625rem !important; }
+  .space-y-5 > * + * { margin-top: 0.75rem !important; }
+  .space-y-6 > * + * { margin-top: 0.875rem !important; }
+  .space-y-8 > * + * { margin-top: 1rem !important; }
+  .space-y-10 > * + *, .space-y-12 > * + * { margin-top: 1.25rem !important; }
+
+  /* --- block margins --- */
+  .mt-6, .mt-8 { margin-top: 0.875rem !important; }
+  .mt-10, .mt-12, .mt-16 { margin-top: 1.25rem !important; }
+  .mb-6, .mb-8 { margin-bottom: 0.875rem !important; }
+  .mb-10, .mb-12, .mb-16 { margin-bottom: 1.25rem !important; }
+
+  /* --- oversized display type on phones --- */
+  .text-4xl { font-size: 1.75rem !important; line-height: 1.15 !important; }
+  .text-5xl { font-size: 2rem !important; line-height: 1.1 !important; }
+  .text-6xl, .text-7xl, .text-8xl { font-size: 2.25rem !important; line-height: 1.05 !important; }
+
+  /* Customer app: keep readable, but a notch tighter than before */
+  .app-ui { font-size: 15px; line-height: 1.45; }
+  .app-ui .text-xs   { font-size: 0.8125rem !important; line-height: 1.4 !important; }
+  .app-ui .text-sm   { font-size: 0.9375rem !important; line-height: 1.45 !important; }
+  .app-ui .text-base { font-size: 1rem !important; }
+  .app-ui .text-lg   { font-size: 1.125rem !important; }
+  .app-ui .text-xl   { font-size: 1.3125rem !important; }
+  .app-ui .text-2xl  { font-size: 1.5rem !important; }
+  .app-ui .text-3xl  { font-size: 1.75rem !important; }
+}

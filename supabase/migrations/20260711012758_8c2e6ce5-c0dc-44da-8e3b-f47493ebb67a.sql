@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "settings read authenticated" ON public.loyalty_settings;

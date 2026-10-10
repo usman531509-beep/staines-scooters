@@ -1,0 +1,1 @@
+-- Removed: one-off cleanup of specific customer records from the previous project.

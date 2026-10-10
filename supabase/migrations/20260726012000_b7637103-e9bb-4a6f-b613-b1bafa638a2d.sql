@@ -1,0 +1,1 @@
+ALTER TABLE public.rentals ADD COLUMN IF NOT EXISTS deposit_refunded_at timestamptz;

@@ -1,0 +1,97 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791407999784,
+      "tag": "0000_customer_payment_plans",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791410085860,
+      "tag": "0001_payment_plan_autopay",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791411973972,
+      "tag": "0002_motorbike_finance_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791412685178,
+      "tag": "0003_finance_phases_2_4",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791417546429,
+      "tag": "0004_finance_final_payment_undo_template",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791422929775,
+      "tag": "0005_add_finance_tx_undo_link",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791425519974,
+      "tag": "0006_stock_inventory_module",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791493251837,
+      "tag": "0007_finance_rebate_notes_admin_signatures",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791590221245,
+      "tag": "0008_stock_count_financial_postings",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791631601324,
+      "tag": "0009_pos_customers",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791636160977,
+      "tag": "0010_contact_enquiries",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791637530632,
+      "tag": "0011_rental_admin_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791637601956,
+      "tag": "0012_sale_items_detail_columns",
+      "breakpoints": true
+    }
+  ]
+}

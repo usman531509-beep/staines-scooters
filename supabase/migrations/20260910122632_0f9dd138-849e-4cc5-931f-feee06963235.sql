@@ -1,0 +1,1 @@
+revoke execute on function public.rentals_protect_customer_linkage() from public, anon, authenticated;

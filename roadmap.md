@@ -1,0 +1,16 @@
+# Motorbike Financing roadmap
+- [x] Update stock page, clickable summaries and waste/count/receive/adjust/history popup layouts from supplied references; window-fitting product form; no variants or recipes. Browser selection/layout checks passed without saving stock changes.
+- [x] Implement stock-count financial exclusion, accounting postings and report readback; checked/unchecked database postings and balanced ledger verified, accounting tests passed.
+- [x] Add two editable quantity confirmations before saving received stock; corrected quantity saved through both prompts in browser verification.
+- [x] Interest rebate setting off by default and enforced throughout finance
+- [x] Customer conversation notes beside Default notice
+- [x] Double-size bold red new-card payment buttons
+- [x] Full downloadable customer agreement popup
+- [x] Saved reusable admin digital signatures with explicit agreement signing
+- [x] Expand Stock/Inventory products into received-batch rows with FIFO colours and batch-specific adjustment selection
+- [x] Detailed settlement, arrears and recovery confirmations; capitalised finance settings fields
+- [x] Phase 1: dashboard, applications/quotes, calculator (reducing/flat/zero, UK APR), affordability, agreement generator + PDF, e-signature link, handover, schedules, cash/card/saved-card payments, autopay, reminders, failed-charge emails, customer portal, settings, audit trail
+- [x] Phase 2: early settlement (2004 rebate regs), arrears notices (NOSIA/default), voluntary termination, returns & repossessions
+- [x] Phase 3: accounting — interest income, P&L, balance sheet, cash flow, ledger, reconciliation, finance reports
+- [x] Phase 4: finance staff permissions, compliance dashboard
+- [ ] Direct Debit collection — blocked: needs a Direct Debit provider account (e.g. GoCardless)

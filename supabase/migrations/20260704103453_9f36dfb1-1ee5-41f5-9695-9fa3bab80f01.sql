@@ -1,0 +1,1 @@
+CREATE POLICY "settings read authenticated" ON public.loyalty_settings FOR SELECT TO authenticated USING (true);

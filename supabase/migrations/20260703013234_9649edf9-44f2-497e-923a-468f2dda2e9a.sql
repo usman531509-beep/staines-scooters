@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.protect_cash_out_immutable_fields() FROM PUBLIC, anon, authenticated;

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_loyalty_settings() FROM PUBLIC, anon, authenticated;
