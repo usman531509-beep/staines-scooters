@@ -2559,11 +2559,6 @@
   width: 22px;
   height: 22px;
 }
-.lnav-divider {
-  width: 1px;
-  height: 28px;
-  background: #d9e3ee;
-}
 .lnav-login {
   display: inline-flex;
   align-items: center;
@@ -2638,102 +2633,6 @@
   gap: 14px;
   padding: 18px 4px 22px;
 }
-/* Search popup. */
-.lnav-search {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 12vh 16px 16px;
-  background: #00172f73;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  animation: landing-fade 0.15s ease both;
-}
-.lnav-search-box {
-  width: min(100%, 560px);
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 24px 60px #0a1f3d40;
-  overflow: hidden;
-  animation: landing-rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-.lnav-search-field {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  border-bottom: 1px solid #e6eef7;
-}
-.lnav-search-field > svg {
-  width: 20px;
-  height: 20px;
-  color: #7b92ad;
-}
-.lnav-search-field input {
-  flex: 1;
-  border: 0;
-  outline: none;
-  font-size: 17px;
-  font-family: inherit;
-  color: #0d1b33;
-  background: transparent;
-}
-.lnav-search-field button {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  color: #34445f;
-}
-.lnav-search-field button:hover {
-  background: #eef5ff;
-}
-.lnav-search-results {
-  list-style: none;
-  margin: 0;
-  padding: 8px;
-  max-height: 55vh;
-  overflow-y: auto;
-}
-.lnav-search-results button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  text-align: left;
-}
-.lnav-search-results button:hover,
-.lnav-search-results button:focus-visible {
-  background: #eef5ff;
-}
-.lnav-search-results strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 650;
-  color: #0d1b33;
-}
-.lnav-search-results small {
-  font-size: 13px;
-  color: #7b92ad;
-}
-.lnav-search-results svg {
-  width: 18px;
-  height: 18px;
-  color: var(--landing-blue);
-  flex-shrink: 0;
-}
-.lnav-search-empty {
-  padding: 18px 14px;
-  font-size: 15px;
-  color: #617189;
-}
 @media (max-width: 1360px) {
   .lnav-item > a {
     padding-inline: 12px;
@@ -2745,7 +2644,6 @@
 /* Below this width the links and Login move into the menu. */
 @media (max-width: 1200px) {
   .lnav-links,
-  .lnav-divider,
   .lnav-actions > .lnav-login {
     display: none;
   }

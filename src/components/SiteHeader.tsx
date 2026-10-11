@@ -1,12 +1,11 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, Search, ChevronDown, LayoutDashboard } from "lucide-react";
+import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard } from "lucide-react";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
 import { BRAND } from "@/lib/brand";
 
 import { LandingBrand, landingNav } from "./LandingBrand";
-import { SiteSearch } from "./SiteSearch";
 
 const nav = [
   { to: "/", label: "Home", icon: Home },
@@ -17,7 +16,6 @@ const nav = [
 
 export function SiteHeader({ appearance = "default" }: { appearance?: "default" | "landing" }) {
   const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const { user, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -58,10 +56,6 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
             ))}
           </nav>
           <div className="lnav-actions">
-            <button type="button" className="lnav-icon" onClick={() => setSearchOpen(true)} aria-label="Search">
-              <Search />
-            </button>
-            <span className="lnav-divider" aria-hidden="true" />
             <Link to={user ? portal : "/auth"} className="lnav-login">
               {user ? <LayoutDashboard aria-hidden="true" /> : <User aria-hidden="true" />} {user ? "Dashboard" : "Login"}
             </Link>
@@ -111,7 +105,6 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
             </div>
           </nav>
         )}
-        {searchOpen && <SiteSearch onClose={() => setSearchOpen(false)} />}
       </header>
     );
 
