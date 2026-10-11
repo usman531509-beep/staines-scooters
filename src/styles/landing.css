@@ -41,20 +41,6 @@
   width: min(100% - 48px, 1340px);
   margin-inline: auto;
 }
-/* The header floats over the hero photo so the hero reads as one image from the top of the page. */
-.landing-header {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 50;
-  background: transparent;
-}
-.landing-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 86px;
-}
 .landing-brand {
   display: inline-flex;
   align-items: center;
@@ -66,55 +52,6 @@
   line-height: 1;
   color: #081122;
 }
-/* Frosted-glass pill shared by the desktop links, the mobile menu button and the mobile menu. */
-.landing-desktop-nav,
-.landing-menu-button,
-.landing-mobile-nav {
-  background: #ffffff9e;
-  border: 1px solid #ffffffd9;
-  box-shadow: 0 10px 30px #0a1f3d1a;
-  -webkit-backdrop-filter: blur(16px) saturate(1.5);
-  backdrop-filter: blur(16px) saturate(1.5);
-}
-.landing-desktop-nav {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 5px;
-  border-radius: 999px;
-}
-.landing-desktop-nav a {
-  padding: 9px clamp(10px, 1.3vw, 18px);
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 550;
-  white-space: nowrap;
-  color: #13263d;
-  transition: color 0.2s, background 0.2s;
-}
-.landing-desktop-nav a:hover {
-  color: #0066ff;
-  background: #ffffffd9;
-}
-.landing-desktop-nav a.is-active {
-  color: #fff;
-  background: var(--landing-blue);
-  box-shadow: 0 4px 14px #0066ff40;
-}
-.landing-mobile-nav a.is-active {
-  color: var(--landing-blue);
-  font-weight: 700;
-}
-@media (min-width: 821px) {
-  /* Logo left, links centred on the page, booking button right. */
-  .landing-header-row {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-  }
-  .landing-header-book {
-    justify-self: end;
-  }
-}
 .landing-button {
   min-height: 46px;
   padding: 12px 26px;
@@ -123,7 +60,7 @@
   justify-content: center;
   align-items: center;
   gap: 18px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 650;
   line-height: 1.2;
   white-space: nowrap;
@@ -177,48 +114,16 @@
   background: #001c37;
   color: white;
 }
-.landing-header-book {
-  min-height: 40px;
-  padding: 10px 23px;
-  font-size: 11px;
-}
-.landing-menu-button {
-  display: none;
-  width: 46px;
-  height: 46px;
-  align-items: center;
-  justify-content: center;
-  color: #0066ff;
-  border-radius: 999px;
-}
-.landing-mobile-nav {
-  margin-top: 4px;
-  padding: 8px 18px;
-  border-radius: 24px;
-  background: #ffffffeb;
-}
-.landing-mobile-nav a {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 4px;
-  font-size: 15px;
-  font-weight: 550;
-  border-bottom: 1px solid #dfebf5;
-}
-.landing-mobile-nav a:last-child {
-  border-bottom: 0;
-}
 .landing-eyebrow {
   color: #7b92ad;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.24em;
   line-height: 1.5;
   text-transform: uppercase;
 }
 .landing-hero {
-  --landing-header-height: 86px;
+  --landing-header-height: 0px;
   min-height: 690px;
   padding-top: var(--landing-header-height);
   position: relative;
@@ -327,7 +232,7 @@
 }
 .landing-feature p {
   color: var(--landing-body);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.45;
 }
 .landing-hero-features .landing-feature {
@@ -344,13 +249,13 @@
   height: 29px;
 }
 .landing-hero-features h3 {
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
 .landing-hero-features p {
-  font-size: 11px;
-  max-width: 140px;
+  font-size: 13px;
+  max-width: 170px;
   color: #617189;
 }
 .landing-section {
@@ -371,7 +276,7 @@
   align-items: center;
   gap: 16px;
   color: #0066ff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
   white-space: nowrap;
   padding-bottom: 5px;
@@ -387,7 +292,7 @@
 .landing-service-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 190px 190px 210px;
+  grid-template-rows: repeat(3, minmax(200px, auto));
   gap: 14px;
 }
 .landing-service-card {
@@ -430,7 +335,7 @@
 .landing-service-number {
   display: block;
   color: #8294a7;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 750;
   letter-spacing: 0.02em;
 }
@@ -441,10 +346,10 @@
   margin: 8px 0 12px;
 }
 .landing-service-card p {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--landing-body);
   line-height: 1.3;
-  max-width: 180px;
+  max-width: 220px;
 }
 .landing-round-arrow {
   display: inline-flex;
@@ -540,7 +445,7 @@
   margin-bottom: 7px;
 }
 .landing-scooter-copy p {
-  font-size: 14px;
+  font-size: 15px;
   max-width: 240px;
   color: var(--landing-body);
   line-height: 1.4;
@@ -550,7 +455,7 @@
   margin-top: 14px;
   min-height: 36px;
   padding: 8px 22px;
-  font-size: 12px;
+  font-size: 14px;
   gap: 14px;
 }
 .landing-scooter-copy .landing-button svg {
@@ -559,7 +464,7 @@
 }
 .landing-availability {
   color: #63738b;
-  font-size: 11px;
+  font-size: 13px;
   padding-top: 12px;
 }
 /* A rounded card the width of the page content; the photo ends at the card's edge. */
@@ -628,10 +533,10 @@
   padding: 22px 18px;
 }
 .landing-steps .landing-feature h3 {
-  font-size: 15px;
+  font-size: 16px;
 }
 .landing-steps .landing-feature p {
-  font-size: 13px;
+  font-size: 15px;
 }
 .landing-step-arrow {
   position: absolute;
@@ -671,7 +576,7 @@
 }
 .landing-accident .landing-eyebrow {
   color: #bdd6f0;
-  font-size: 10px;
+  font-size: 12px;
 }
 .landing-accident h2 {
   font-size: clamp(32px, 3.6vw, 50px);
@@ -690,7 +595,7 @@
   min-height: 40px;
   margin-top: 16px;
   padding: 10px 25px;
-  font-size: 12px;
+  font-size: 14px;
   color: #0066ff;
 }
 .landing-cta {
@@ -731,7 +636,7 @@
   box-shadow: -60px -310px 0 -50px #329cff;
 }
 .landing-cta .landing-eyebrow {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   color: #a9d7ff;
 }
@@ -740,7 +645,7 @@
   margin-top: 12px;
 }
 .landing-cta p:last-child {
-  font-size: 14px;
+  font-size: 15px;
   color: #d9eaff;
   margin-top: 13px;
 }
@@ -750,7 +655,7 @@
 }
 .landing-cta .landing-button {
   min-height: 43px;
-  font-size: 12px;
+  font-size: 14px;
   padding-inline: 25px;
 }
 .landing-footer {
@@ -771,7 +676,7 @@
 }
 .landing-brand small {
   display: block;
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   font-weight: 500;
   margin-top: 13px;
@@ -781,7 +686,7 @@
   margin-top: 20px;
   max-width: 340px;
   color: #a9bdd2;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
 }
 .landing-footer-cta {
@@ -793,7 +698,7 @@
   border-radius: 999px;
   background: var(--landing-blue);
   color: #fff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 650;
   transition: background 0.2s, transform 0.2s;
 }
@@ -815,7 +720,7 @@
   margin-bottom: 6px;
   line-height: 1.3;
   color: #fff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -823,7 +728,7 @@
 .landing-footer-col a,
 .landing-footer-col span {
   color: #a9bdd2;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.45;
   transition: color 0.2s;
 }
@@ -853,7 +758,7 @@
   padding-block: 22px;
   border-top: 1px solid #ffffff1a;
   color: #7690aa;
-  font-size: 12px;
+  font-size: 14px;
 }
 @media (max-width: 1150px) {
   .landing-footer-grid {
@@ -890,21 +795,8 @@
   .landing-container {
     width: calc(100% - 64px);
   }
-  .landing-header-row {
-    gap: 16px;
-  }
   .landing-brand {
     font-size: 23px;
-  }
-  .landing-desktop-nav {
-    gap: 0;
-  }
-  .landing-desktop-nav a {
-    font-size: 11px;
-    padding-inline: 10px;
-  }
-  .landing-header-book {
-    padding-inline: 18px;
   }
   .landing-hero {
     min-height: 621px;
@@ -931,7 +823,7 @@
     gap: 14px;
   }
   .landing-service-grid {
-    grid-template-rows: 165px 165px 185px;
+    grid-template-rows: repeat(3, minmax(185px, auto));
   }
   .landing-service-copy {
     padding: 18px;
@@ -943,10 +835,10 @@
     font-size: 43px;
   }
   .landing-service-sales p {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-service-card p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .landing-service-claims h3 {
     font-size: 23px;
@@ -971,10 +863,10 @@
     height: 48px;
   }
   .landing-feature h3 {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-feature p {
-    font-size: 13px;
+    font-size: 15px;
   }
   .landing-trust {
     width: calc(100% - 64px);
@@ -996,10 +888,10 @@
     height: 46px;
   }
   .landing-steps .landing-feature h3 {
-    font-size: 13px;
+    font-size: 15px;
   }
   .landing-steps .landing-feature p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .landing-step-arrow {
     right: -22px;
@@ -1013,29 +905,12 @@
   }
 }
 @media (max-width: 900px) {
-  .landing-header-row {
-    min-height: 72px;
-    gap: 12px;
-  }
-  .landing-desktop-nav {
-    gap: 0;
-  }
-  .landing-desktop-nav a {
-    font-size: 10px;
-    padding-inline: 7px;
-  }
   .landing-brand {
     font-size: 19px;
     gap: 5px;
   }
-  .landing-header-book {
-    font-size: 10px;
-    padding: 9px 14px;
-    min-height: 36px;
-    gap: 10px;
-  }
   .landing-hero {
-    --landing-header-height: 72px;
+    --landing-header-height: 0px;
     min-height: 512px;
   }
   .landing-hero-image {
@@ -1048,7 +923,7 @@
     font-size: 63px;
   }
   .landing-hero-description {
-    font-size: 15px;
+    font-size: 16px;
   }
   .landing-hero .landing-actions {
     margin-top: 22px;
@@ -1056,7 +931,7 @@
   .landing-button {
     min-height: 40px;
     padding: 10px 22px;
-    font-size: 12px;
+    font-size: 14px;
     gap: 14px;
   }
   .landing-hero-features {
@@ -1067,13 +942,13 @@
     gap: 8px;
   }
   .landing-hero-features h3 {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-hero-features p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-eyebrow {
-    font-size: 9px;
+    font-size: 12px;
   }
   .landing-section {
     padding-top: 26px;
@@ -1082,18 +957,18 @@
     margin-bottom: 18px;
   }
   .landing-text-link {
-    font-size: 11px;
+    font-size: 13px;
     gap: 12px;
   }
   .landing-service-grid {
-    grid-template-rows: 140px 140px 160px;
+    grid-template-rows: repeat(3, minmax(165px, auto));
     gap: 10px;
   }
   .landing-service-copy {
     padding: 16px;
   }
   .landing-service-number {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-service-card h3 {
     font-size: 23px;
@@ -1103,7 +978,7 @@
     font-size: 38px;
   }
   .landing-service-card p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-round-arrow {
     width: 36px;
@@ -1111,9 +986,9 @@
     margin-top: 14px;
   }
   .landing-service-repairs .landing-round-arrow,
-  .landing-service-servicing .landing-round-arrow,
-  .landing-service-rentals .landing-round-arrow,
-  .landing-service-claims .landing-round-arrow {
+.landing-service-servicing .landing-round-arrow,
+.landing-service-rentals .landing-round-arrow,
+.landing-service-claims .landing-round-arrow {
     right: -17px;
     bottom: 20px;
   }
@@ -1130,13 +1005,13 @@
     padding: 14px 18px;
   }
   .landing-scooter-copy h3 {
-    font-size: 15px;
+    font-size: 16px;
   }
   .landing-scooter-copy p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .landing-scooter-copy .landing-button {
-    font-size: 11px;
+    font-size: 13px;
     padding-inline: 17px;
   }
   .landing-trust-inner {
@@ -1149,7 +1024,7 @@
     gap: 20px 14px;
   }
   .landing-trust-description {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-feature-icon {
     width: 40px;
@@ -1160,10 +1035,10 @@
     height: 26px;
   }
   .landing-feature h3 {
-    font-size: 12px;
+    font-size: 14px;
   }
   .landing-feature p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-steps {
     gap: 25px;
@@ -1173,10 +1048,10 @@
     height: 42px;
   }
   .landing-steps .landing-feature h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-steps .landing-feature p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-accident {
     min-height: 230px;
@@ -1185,11 +1060,11 @@
     padding: 23px 32px;
   }
   .landing-accident-copy > p:not(.landing-eyebrow) {
-    font-size: 13px;
+    font-size: 15px;
     margin-top: 10px;
   }
   .landing-accident .landing-button {
-    font-size: 10px;
+    font-size: 12px;
     min-height: 34px;
   }
   .landing-cta {
@@ -1198,21 +1073,21 @@
     gap: 20px;
   }
   .landing-cta .landing-eyebrow {
-    font-size: 7px;
+    font-size: 10px;
   }
   .landing-cta h2 {
     font-size: 28px;
     margin-top: 10px;
   }
   .landing-cta p:last-child {
-    font-size: 12px;
+    font-size: 14px;
     margin-top: 10px;
   }
   .landing-cta .landing-actions {
     gap: 12px;
   }
   .landing-cta .landing-button {
-    font-size: 10px;
+    font-size: 12px;
     min-height: 36px;
     padding-inline: 20px;
   }
@@ -1224,25 +1099,11 @@
   .landing-wide-container {
     width: calc(100% - 32px);
   }
-  .landing-header-row {
-    min-height: 70px;
-    gap: 12px;
-  }
   .landing-brand {
     font-size: 21px;
   }
-  .landing-desktop-nav {
-    display: none;
-  }
-  .landing-menu-button {
-    display: inline-flex;
-    flex-shrink: 0;
-  }
-  .landing-header-book {
-    margin-left: auto;
-  }
   .landing-hero {
-    --landing-header-height: 70px;
+    --landing-header-height: 0px;
     min-height: 800px;
   }
   .landing-hero-image {
@@ -1265,7 +1126,7 @@
     margin-top: 13px;
   }
   .landing-hero-description {
-    font-size: 15px;
+    font-size: 16px;
     max-width: 430px;
   }
   .landing-hero-features {
@@ -1274,10 +1135,10 @@
     max-width: 500px;
   }
   .landing-hero-features h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-hero-features p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-page h2 {
     font-size: 30px;
@@ -1288,11 +1149,11 @@
   }
   .landing-text-link {
     margin-top: 21px;
-    font-size: 10px;
+    font-size: 12px;
     gap: 6px;
   }
   .landing-service-grid {
-    grid-template-rows: 160px 160px 160px;
+    grid-template-rows: repeat(3, minmax(175px, auto));
   }
   .landing-service-copy {
     width: 53%;
@@ -1302,7 +1163,7 @@
     font-size: 23px;
   }
   .landing-service-card p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-service-sales h3 {
     font-size: 37px;
@@ -1328,9 +1189,9 @@
     white-space: normal;
   }
   .landing-service-repairs .landing-round-arrow,
-  .landing-service-servicing .landing-round-arrow,
-  .landing-service-rentals .landing-round-arrow,
-  .landing-service-claims .landing-round-arrow {
+.landing-service-servicing .landing-round-arrow,
+.landing-service-rentals .landing-round-arrow,
+.landing-service-claims .landing-round-arrow {
     bottom: 12px;
     right: -15px;
   }
@@ -1344,13 +1205,13 @@
     padding: 14px 12px;
   }
   .landing-scooter-copy h3 {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-scooter-copy p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-scooter-copy .landing-button {
-    font-size: 10px;
+    font-size: 12px;
     padding-inline: 12px;
     gap: 8px;
   }
@@ -1372,10 +1233,10 @@
     gap: 24px;
   }
   .landing-feature h3 {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-feature p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .landing-trust-photo {
     height: 320px;
@@ -1393,10 +1254,10 @@
     padding: 20px;
   }
   .landing-steps .landing-feature h3 {
-    font-size: 15px;
+    font-size: 16px;
   }
   .landing-steps .landing-feature p {
-    font-size: 13px;
+    font-size: 15px;
   }
   .landing-steps .landing-feature-icon {
     width: 54px;
@@ -1431,24 +1292,18 @@
     font-size: 30px;
   }
   .landing-cta .landing-eyebrow {
-    font-size: 8px;
+    font-size: 11px;
   }
   .landing-cta p:last-child {
-    font-size: 13px;
+    font-size: 15px;
   }
   .landing-cta .landing-button {
-    font-size: 12px;
+    font-size: 14px;
     min-height: 42px;
   }
 
 }
 @media (max-width: 480px) {
-  .landing-header-book {
-    display: none;
-  }
-  .landing-menu-button {
-    margin-left: auto;
-  }
   .landing-hero {
     min-height: 800px;
   }
@@ -1459,13 +1314,13 @@
     display: none;
   }
   .landing-hero-description {
-    font-size: 14px;
+    font-size: 15px;
   }
   .landing-hero .landing-actions {
     gap: 10px;
   }
   .landing-hero .landing-button {
-    font-size: 11px;
+    font-size: 13px;
     padding-inline: 17px;
     gap: 10px;
   }
@@ -1479,10 +1334,10 @@
     margin-bottom: 5px;
   }
   .landing-hero-features h3 {
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-hero-features p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .landing-section-heading {
     flex-wrap: wrap;
@@ -1520,15 +1375,15 @@
     font-size: 42px;
   }
   .landing-service-card p {
-    font-size: 13px;
+    font-size: 15px;
   }
   .landing-service-claims h3 {
     font-size: 24px;
   }
   .landing-service-repairs .landing-round-arrow,
-  .landing-service-servicing .landing-round-arrow,
-  .landing-service-rentals .landing-round-arrow,
-  .landing-service-claims .landing-round-arrow {
+.landing-service-servicing .landing-round-arrow,
+.landing-service-rentals .landing-round-arrow,
+.landing-service-claims .landing-round-arrow {
     bottom: 20px;
     right: -15px;
   }
@@ -1546,11 +1401,11 @@
     font-size: 18px;
   }
   .landing-scooter-copy p {
-    font-size: 14px;
+    font-size: 15px;
     min-height: auto;
   }
   .landing-scooter-copy .landing-button {
-    font-size: 12px;
+    font-size: 14px;
     padding-inline: 22px;
   }
   .landing-trust-features {
@@ -1583,16 +1438,16 @@
   .landing-cta .landing-button {
     padding-inline: 18px;
     gap: 10px;
-    font-size: 11px;
+    font-size: 13px;
   }
   .landing-brand small {
-    font-size: 7px;
+    font-size: 10px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-page *,
-  .landing-page *::before,
-  .landing-page *::after {
+.landing-page *::before,
+.landing-page *::after {
     transition: none !important;
     scroll-behavior: auto !important;
   }
@@ -1600,11 +1455,11 @@
 
 /* ── Inner public pages (Sales, Services, Rentals, Accident Claims, Contact) ── */
 .landing-subhero {
-  --landing-header-height: 86px;
+  --landing-header-height: 0px;
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 560px;
+  min-height: 700px;
   padding-top: var(--landing-header-height);
   display: flex;
   align-items: center;
@@ -1615,8 +1470,12 @@
   top: 0;
   right: 0;
   z-index: -2;
-  width: min(66%, 1100px);
+  /* The box keeps the photos' 3:2 shape so the whole scene shows; it only crops
+     once the 72% width cap is reached on narrower screens. */
   height: 100%;
+  width: auto;
+  aspect-ratio: 3 / 2;
+  max-width: 72%;
   object-fit: cover;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%);
   mask-image: linear-gradient(90deg, transparent 0%, #000 32%);
@@ -1628,7 +1487,7 @@
   z-index: -1;
   background:
     linear-gradient(90deg, #ffffffcc 0%, #ffffff8c 34%, #ffffff00 55%),
-    linear-gradient(0deg, #fff 0%, #ffffff00 14%);
+    linear-gradient(0deg, #fff 0%, #ffffff00 6%);
 }
 .landing-subhero-content {
   padding-block: 56px 64px;
@@ -1655,7 +1514,7 @@
 .landing-crumbs {
   display: flex;
   gap: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #7b92ad;
 }
@@ -1688,7 +1547,7 @@
   color: var(--landing-navy);
 }
 .landing-chip span {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: #617189;
 }
@@ -1758,7 +1617,7 @@
   border-radius: 999px;
   background: #ffffffe6;
   color: var(--landing-navy);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   box-shadow: 0 6px 20px #0a1f3d1f;
 }
@@ -1796,7 +1655,7 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 550;
   line-height: 1.4;
   color: #1c2a44;
@@ -1880,7 +1739,7 @@
 .landing-card-body p {
   margin-top: 8px !important;
   color: var(--landing-body);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.45;
 }
 .landing-tags {
@@ -1894,7 +1753,7 @@
   border-radius: 999px;
   background: #e6f1ff;
   color: #0052cc;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 650;
 }
 .landing-card-body .landing-text-link {
@@ -1947,7 +1806,7 @@
 }
 .landing-info-card small {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1967,7 +1826,7 @@
 }
 .landing-info-card p {
   margin-top: 4px !important;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--landing-body);
 }
@@ -2003,7 +1862,7 @@
 }
 .landing-form label {
   display: block;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 650;
   color: #34445f;
   margin-bottom: 6px;
@@ -2020,7 +1879,7 @@
   border: 1.5px solid #dbe6f2;
   background: #f8fbff;
   color: var(--landing-navy);
-  font-size: 14px;
+  font-size: 15px;
   font-family: inherit;
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
@@ -2050,7 +1909,7 @@
   border-radius: 12px;
   background: #fff1f1;
   color: #b42318;
-  font-size: 13px;
+  font-size: 15px;
 }
 .landing-form-done {
   margin-top: 26px;
@@ -2074,7 +1933,7 @@
 }
 .landing-form-done p {
   color: var(--landing-body);
-  font-size: 14px;
+  font-size: 15px;
 }
 .landing-form-done a {
   color: var(--landing-blue);
@@ -2095,15 +1954,12 @@
 
 @media (max-width: 1150px) {
   .landing-subhero {
-    min-height: 500px;
-  }
-  .landing-subhero-image {
-    width: 72%;
+    min-height: 620px;
   }
   .landing-subhero::after {
     background:
       linear-gradient(90deg, #ffffffe6 0%, #ffffffb8 45%, #ffffff00 70%),
-      linear-gradient(0deg, #fff 0%, #ffffff00 14%);
+      linear-gradient(0deg, #fff 0%, #ffffff00 6%);
   }
   .landing-card-grid-4 {
     grid-template-columns: repeat(2, 1fr);
@@ -2117,7 +1973,7 @@
 }
 @media (max-width: 900px) {
   .landing-subhero {
-    --landing-header-height: 72px;
+    --landing-header-height: 0px;
   }
   .landing-card-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -2132,13 +1988,15 @@
 @media (max-width: 820px) {
   /* Photo sits under the copy on phones, fading in from the top. */
   .landing-subhero {
-    --landing-header-height: 70px;
+    --landing-header-height: 0px;
     min-height: 0;
     padding-bottom: 250px;
     align-items: flex-start;
   }
   .landing-subhero-image {
     width: 100%;
+    max-width: none;
+    aspect-ratio: auto;
     height: 300px;
     top: auto;
     bottom: 0;
@@ -2158,7 +2016,7 @@
     padding-top: 52px;
   }
   .landing-split,
-  .landing-split-reverse {
+.landing-split-reverse {
     grid-template-columns: 1fr;
     gap: 22px;
   }
@@ -2182,12 +2040,12 @@
 }
 @media (max-width: 560px) {
   .landing-card-grid,
-  .landing-card-grid-2,
-  .landing-card-grid-4,
-  .landing-panel-grid,
-  .landing-panel-grid-4,
-  .landing-checklist,
-  .landing-form {
+.landing-card-grid-2,
+.landing-card-grid-4,
+.landing-panel-grid,
+.landing-panel-grid-4,
+.landing-checklist,
+.landing-form {
     grid-template-columns: 1fr;
   }
   .landing-subhero h1 {
@@ -2237,7 +2095,7 @@
     margin: 8px 0 12px;
   }
   .landing-service-sales p {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.3;
   }
   .landing-service-sales .landing-round-arrow {
@@ -2318,7 +2176,7 @@
   border: 1px solid #ffffff33;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 .landing-login-visual li svg {
@@ -2357,7 +2215,7 @@
 .landing-login-hint {
   margin-top: 10px !important;
   color: var(--landing-body);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
 }
 .landing-login-form {
@@ -2404,14 +2262,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  font-size: 13px;
+  font-size: 15px;
 }
 .landing-form .landing-login-remember {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 550;
   color: #34445f;
 }
@@ -2431,11 +2289,11 @@
 .landing-login-submit {
   width: 100%;
   min-height: 50px;
-  font-size: 14px;
+  font-size: 15px;
 }
 .landing-login-foot {
   margin-top: 22px !important;
-  font-size: 12px;
+  font-size: 14px;
   color: #7b92ad;
   text-align: center;
 }
@@ -2444,7 +2302,7 @@
   border-radius: 12px;
   background: #eef6ff;
   color: #1c2a44;
-  font-size: 13px;
+  font-size: 15px;
 }
 .landing-login-dialog {
   position: fixed;
@@ -2528,49 +2386,11 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-login-visual > img,
-  .landing-login-visual-copy,
-  .landing-login-box,
-  .landing-login-dialog,
-  .landing-login-dialog .landing-form-card {
+.landing-login-visual-copy,
+.landing-login-box,
+.landing-login-dialog,
+.landing-login-dialog .landing-form-card {
     animation: none;
-  }
-}
-
-/* The header's Book button is hidden on small phones, so the menu offers it there instead. */
-.landing-mobile-nav .landing-mobile-book {
-  display: none;
-  color: var(--landing-blue);
-  font-weight: 700;
-}
-@media (max-width: 480px) {
-  .landing-mobile-nav .landing-mobile-book {
-    display: flex;
-  }
-}
-
-/* Header actions: Login + Book a Service, right-aligned. */
-.landing-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-@media (min-width: 821px) {
-  .landing-header-actions {
-    justify-self: end;
-  }
-}
-@media (max-width: 820px) {
-  .landing-header-actions {
-    margin-left: auto;
-  }
-  .landing-header-actions .landing-header-book {
-    margin-left: 0;
-  }
-}
-/* Login stays in the menu on narrow screens, where both buttons don't fit. */
-@media (max-width: 640px) {
-  .landing-header-login {
-    display: none;
   }
 }
 
@@ -2607,6 +2427,415 @@
   .landing-brand-footer img {
     height: 96px;
   }
+}
+
+/* ── Navbar: white sticky bar, round logo, centred links, actions on the right ── */
+.lnav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #fff;
+  box-shadow: 0 1px 0 #e6eef7, 0 8px 24px #0a1f3d0f;
+  font-family: "Inter", Arial, sans-serif;
+}
+.lnav-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 96px;
+}
+/* The logo keeps the bar's height but hangs below it, over the hero. */
+.lnav .landing-brand {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  align-items: flex-start;
+  height: 96px;
+}
+.lnav .landing-brand img {
+  height: 132px;
+  width: auto;
+  margin-top: 6px;
+}
+.lnav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline: auto;
+}
+.lnav-item {
+  position: relative;
+}
+.lnav-item > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d1b33;
+  white-space: nowrap;
+  transition: color 0.2s, background 0.2s;
+}
+.lnav-item > a svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+.lnav-item > a:hover {
+  color: var(--landing-blue);
+  background: #eef5ff;
+}
+.lnav-item > a.is-active {
+  color: #fff;
+  background: var(--landing-blue);
+  box-shadow: 0 6px 16px #0066ff40;
+}
+/* Dropdown: opens on hover and when a link inside has keyboard focus. */
+.lnav-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #e3edf7;
+  box-shadow: 0 18px 40px #0a1f3d1f;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.18s, transform 0.18s, visibility 0.18s;
+}
+.lnav-menu::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0 auto;
+  height: 10px;
+}
+.lnav-has-menu:hover .lnav-menu,
+.lnav-has-menu:focus-within .lnav-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.lnav-has-menu:hover > a svg,
+.lnav-has-menu:focus-within > a svg {
+  transform: rotate(180deg);
+}
+.lnav-menu a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 550;
+  color: #1c2a44;
+  white-space: nowrap;
+}
+.lnav-menu a:hover,
+.lnav-menu a:focus-visible {
+  background: #eef5ff;
+  color: var(--landing-blue);
+}
+.lnav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lnav-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: #0d1b33;
+}
+.lnav-icon:hover {
+  background: #eef5ff;
+  color: var(--landing-blue);
+}
+.lnav-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.lnav-divider {
+  width: 1px;
+  height: 28px;
+  background: #d9e3ee;
+}
+.lnav-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d1b33;
+  white-space: nowrap;
+}
+.lnav-login:hover {
+  color: var(--landing-blue);
+}
+.lnav-login svg {
+  width: 22px;
+  height: 22px;
+}
+.lnav-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  background: var(--landing-blue);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 650;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px #0066ff33;
+  transition: background 0.2s, transform 0.2s;
+}
+.lnav-book:hover {
+  background: #0055d8;
+  transform: translateY(-1px);
+}
+.lnav-book svg {
+  width: 19px;
+  height: 19px;
+}
+.lnav-menu-button {
+  display: none;
+}
+.lnav-mobile {
+  border-top: 1px solid #e6eef7;
+  background: #fff;
+  max-height: calc(100svh - 80px);
+  overflow-y: auto;
+  animation: landing-fade 0.2s ease both;
+}
+.lnav-mobile .landing-container > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0d1b33;
+  border-bottom: 1px solid #edf2f8;
+}
+.lnav-mobile .landing-container > a svg {
+  width: 18px;
+  height: 18px;
+  color: #9fb2c8;
+}
+.lnav-mobile .landing-container > a.is-active {
+  color: var(--landing-blue);
+}
+.lnav-mobile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 4px 22px;
+}
+/* Search popup. */
+.lnav-search {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12vh 16px 16px;
+  background: #00172f73;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: landing-fade 0.15s ease both;
+}
+.lnav-search-box {
+  width: min(100%, 560px);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 60px #0a1f3d40;
+  overflow: hidden;
+  animation: landing-rise 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.lnav-search-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e6eef7;
+}
+.lnav-search-field > svg {
+  width: 20px;
+  height: 20px;
+  color: #7b92ad;
+}
+.lnav-search-field input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font-size: 17px;
+  font-family: inherit;
+  color: #0d1b33;
+  background: transparent;
+}
+.lnav-search-field button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #34445f;
+}
+.lnav-search-field button:hover {
+  background: #eef5ff;
+}
+.lnav-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+.lnav-search-results button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-align: left;
+}
+.lnav-search-results button:hover,
+.lnav-search-results button:focus-visible {
+  background: #eef5ff;
+}
+.lnav-search-results strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 650;
+  color: #0d1b33;
+}
+.lnav-search-results small {
+  font-size: 13px;
+  color: #7b92ad;
+}
+.lnav-search-results svg {
+  width: 18px;
+  height: 18px;
+  color: var(--landing-blue);
+  flex-shrink: 0;
+}
+.lnav-search-empty {
+  padding: 18px 14px;
+  font-size: 15px;
+  color: #617189;
+}
+@media (max-width: 1360px) {
+  .lnav-item > a {
+    padding-inline: 12px;
+  }
+  .lnav-row {
+    gap: 16px;
+  }
+}
+/* Below this width the links and Login move into the menu. */
+@media (max-width: 1200px) {
+  .lnav-links,
+  .lnav-divider,
+  .lnav-actions > .lnav-login {
+    display: none;
+  }
+  .lnav-actions {
+    margin-left: auto;
+  }
+  .lnav-menu-button {
+    display: grid;
+  }
+  .lnav .landing-brand {
+    align-self: center;
+    align-items: center;
+    height: auto;
+  }
+  .lnav .landing-brand img {
+    height: 80px;
+    margin-top: 0;
+  }
+}
+@media (max-width: 640px) {
+  .lnav-row {
+    min-height: 76px;
+  }
+  .lnav .landing-brand img {
+    height: 64px;
+  }
+  .lnav-actions {
+    gap: 6px;
+  }
+  .lnav-actions > .lnav-book {
+    display: none;
+  }
+}
+
+/* Hero feature row (Expert Care, All Riders Welcome, Friendly Support): larger text. */
+.landing-hero-features {
+  max-width: 760px;
+  gap: 28px;
+}
+.landing-hero-features h3 {
+  font-size: 19px;
+}
+.landing-hero-features p {
+  font-size: 16px;
+  line-height: 1.45;
+  max-width: 210px;
+}
+.landing-hero-features .landing-feature-icon,
+.landing-hero-features .landing-feature-icon svg {
+  width: 34px;
+  height: 34px;
+}
+@media (max-width: 1150px) {
+  .landing-hero-features {
+    max-width: 660px;
+    gap: 20px;
+  }
+  .landing-hero-features h3 {
+    font-size: 17px;
+  }
+  .landing-hero-features p {
+    font-size: 15px;
+  }
+}
+@media (max-width: 900px) {
+  .landing-hero-features {
+    max-width: 580px;
+  }
+  .landing-hero-features h3 {
+    font-size: 16px;
+  }
+  .landing-hero-features p {
+    font-size: 14.5px;
+  }
+}
+@media (max-width: 480px) {
+  .landing-hero-features {
+    gap: 12px;
+  }
+  .landing-hero-features h3 {
+    font-size: 15px;
+  }
+  .landing-hero-features p {
+    font-size: 13.5px;
+  }
+}
+
+/* Sections reached from the navigation dropdowns stop below the sticky navbar. */
+.landing-page [id] {
+  scroll-margin-top: 112px;
 }
 
 /* ── Motion ── */
@@ -2666,19 +2895,15 @@
 .landing-subhero-image {
   animation: landing-fade 0.9s ease both;
 }
-.landing-header {
-  animation: landing-fade 0.6s ease both;
-}
 @media (prefers-reduced-motion: reduce) {
   .landing-page .reveal {
     opacity: 1;
     transform: none;
   }
   .landing-hero-content > *,
-  .landing-subhero-content > *,
-  .landing-hero-image,
-  .landing-subhero-image,
-  .landing-header {
+.landing-subhero-content > *,
+.landing-hero-image,
+.landing-subhero-image {
     animation: none;
   }
 }

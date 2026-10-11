@@ -130,7 +130,6 @@ function Settings() {
       <div className="grid max-w-3xl gap-3 sm:grid-cols-2">
         {([
           ["/admin/team", "Team & Roles", "Staff accounts, roles and permissions"],
-          ["/admin/card-terminal", "Card Terminal", "Pair and manage the shop card machine"],
           ["/admin/recycle", "Recycle Bin", "Restore deleted records"],
         ] as const).map(([to, title, desc]) => (
           <Link

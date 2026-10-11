@@ -132,7 +132,7 @@ function Contact() {
         description="Sales, servicing, repairs, rentals or a claim call, email or send an enquiry and the team will get back to you."
         image={images.hero}
         imageAlt="Classic cream scooter parked outside a café"
-        imagePosition="65% 70%"
+        imagePosition="65% 10%"
       >
         <div className="landing-actions">
           <a href="#enquiry" className="landing-button landing-button-blue">

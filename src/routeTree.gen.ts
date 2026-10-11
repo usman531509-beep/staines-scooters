@@ -25,7 +25,6 @@ import { Route as PayTokenRouteImport } from './routes/pay.$token'
 import { Route as PlanTokenRouteImport } from './routes/plan.$token'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin/activity'
-import { Route as AuthenticatedAdminCardTerminalRouteImport } from './routes/_authenticated/admin/card-terminal'
 import { Route as AuthenticatedAdminClaimsRouteImport } from './routes/_authenticated/admin/claims'
 import { Route as AuthenticatedAdminEnquiriesRouteImport } from './routes/_authenticated/admin/enquiries'
 import { Route as AuthenticatedAdminFinanceRouteImport } from './routes/_authenticated/admin/finance'
@@ -58,7 +57,6 @@ import { Route as ApiPublicCronFixedMonthlyExpensesRouteImport } from './routes/
 import { Route as ApiPublicCronRecurringExpensesRouteImport } from './routes/api/public/cron/recurring-expenses'
 import { Route as ApiPublicPaymentsConnectWebhookRouteImport } from './routes/api/public/payments/connect-webhook'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
-import { Route as ApiPublicTerminalCallbackRouteImport } from './routes/api/public/terminal/callback'
 import { Route as AuthenticatedAdminRentalBikeBikeIdRouteImport } from './routes/_authenticated/admin/rental_.bike.$bikeId'
 import { Route as AuthenticatedAdminRentalCustomerCustomerIdRouteImport } from './routes/_authenticated/admin/rental_.customer.$customerId'
 
@@ -140,12 +138,6 @@ const AuthenticatedAdminActivityRoute =
   AuthenticatedAdminActivityRouteImport.update({
     id: '/admin/activity',
     path: '/admin/activity',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedAdminCardTerminalRoute =
-  AuthenticatedAdminCardTerminalRouteImport.update({
-    id: '/admin/card-terminal',
-    path: '/admin/card-terminal',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminClaimsRoute =
@@ -335,12 +327,6 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicTerminalCallbackRoute =
-  ApiPublicTerminalCallbackRouteImport.update({
-    id: '/api/public/terminal/callback',
-    path: '/api/public/terminal/callback',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const AuthenticatedAdminRentalBikeBikeIdRoute =
   AuthenticatedAdminRentalBikeBikeIdRouteImport.update({
     id: '/admin/rental_/bike/$bikeId',
@@ -369,7 +355,6 @@ export interface FileRoutesByFullPath {
   '/pay/$token': typeof PayTokenRoute
   '/plan/$token': typeof PlanTokenRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/admin/card-terminal': typeof AuthenticatedAdminCardTerminalRoute
   '/admin/claims': typeof AuthenticatedAdminClaimsRoute
   '/admin/enquiries': typeof AuthenticatedAdminEnquiriesRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -401,7 +386,6 @@ export interface FileRoutesByFullPath {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/terminal/callback': typeof ApiPublicTerminalCallbackRoute
   '/staff/categories/': typeof AuthenticatedStaffCategoriesIndexRoute
   '/staff/sales/': typeof AuthenticatedStaffSalesIndexRoute
   '/admin/rental/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -422,7 +406,6 @@ export interface FileRoutesByTo {
   '/pay/$token': typeof PayTokenRoute
   '/plan/$token': typeof PlanTokenRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/admin/card-terminal': typeof AuthenticatedAdminCardTerminalRoute
   '/admin/claims': typeof AuthenticatedAdminClaimsRoute
   '/admin/enquiries': typeof AuthenticatedAdminEnquiriesRoute
   '/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -452,7 +435,6 @@ export interface FileRoutesByTo {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/terminal/callback': typeof ApiPublicTerminalCallbackRoute
   '/staff/categories': typeof AuthenticatedStaffCategoriesIndexRoute
   '/staff/sales': typeof AuthenticatedStaffSalesIndexRoute
   '/admin/rental/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -475,7 +457,6 @@ export interface FileRoutesById {
   '/pay/$token': typeof PayTokenRoute
   '/plan/$token': typeof PlanTokenRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
-  '/_authenticated/admin/card-terminal': typeof AuthenticatedAdminCardTerminalRoute
   '/_authenticated/admin/claims': typeof AuthenticatedAdminClaimsRoute
   '/_authenticated/admin/enquiries': typeof AuthenticatedAdminEnquiriesRoute
   '/_authenticated/admin/finance': typeof AuthenticatedAdminFinanceRoute
@@ -507,7 +488,6 @@ export interface FileRoutesById {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
-  '/api/public/terminal/callback': typeof ApiPublicTerminalCallbackRoute
   '/_authenticated/staff/categories/': typeof AuthenticatedStaffCategoriesIndexRoute
   '/_authenticated/staff/sales/': typeof AuthenticatedStaffSalesIndexRoute
   '/_authenticated/admin/rental_/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -530,7 +510,6 @@ export interface FileRouteTypes {
     | '/pay/$token'
     | '/plan/$token'
     | '/admin/activity'
-    | '/admin/card-terminal'
     | '/admin/claims'
     | '/admin/enquiries'
     | '/admin/finance'
@@ -562,7 +541,6 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
-    | '/api/public/terminal/callback'
     | '/staff/categories/'
     | '/staff/sales/'
     | '/admin/rental/bike/$bikeId'
@@ -583,7 +561,6 @@ export interface FileRouteTypes {
     | '/pay/$token'
     | '/plan/$token'
     | '/admin/activity'
-    | '/admin/card-terminal'
     | '/admin/claims'
     | '/admin/enquiries'
     | '/admin/finance'
@@ -613,7 +590,6 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
-    | '/api/public/terminal/callback'
     | '/staff/categories'
     | '/staff/sales'
     | '/admin/rental/bike/$bikeId'
@@ -635,7 +611,6 @@ export interface FileRouteTypes {
     | '/pay/$token'
     | '/plan/$token'
     | '/_authenticated/admin/activity'
-    | '/_authenticated/admin/card-terminal'
     | '/_authenticated/admin/claims'
     | '/_authenticated/admin/enquiries'
     | '/_authenticated/admin/finance'
@@ -667,7 +642,6 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
-    | '/api/public/terminal/callback'
     | '/_authenticated/staff/categories/'
     | '/_authenticated/staff/sales/'
     | '/_authenticated/admin/rental_/bike/$bikeId'
@@ -695,7 +669,6 @@ export interface RootRouteChildren {
   ApiPublicCronRecurringExpensesRoute: typeof ApiPublicCronRecurringExpensesRoute
   ApiPublicPaymentsConnectWebhookRoute: typeof ApiPublicPaymentsConnectWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
-  ApiPublicTerminalCallbackRoute: typeof ApiPublicTerminalCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -810,13 +783,6 @@ declare module '@tanstack/react-router' {
       path: '/admin/activity'
       fullPath: '/admin/activity'
       preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/card-terminal': {
-      id: '/_authenticated/admin/card-terminal'
-      path: '/admin/card-terminal'
-      fullPath: '/admin/card-terminal'
-      preLoaderRoute: typeof AuthenticatedAdminCardTerminalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/claims': {
@@ -1043,13 +1009,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/terminal/callback': {
-      id: '/api/public/terminal/callback'
-      path: '/api/public/terminal/callback'
-      fullPath: '/api/public/terminal/callback'
-      preLoaderRoute: typeof ApiPublicTerminalCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/admin/rental_/bike/$bikeId': {
       id: '/_authenticated/admin/rental_/bike/$bikeId'
       path: '/admin/rental/bike/$bikeId'
@@ -1105,7 +1064,6 @@ const AuthenticatedStaffSalesRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
-  AuthenticatedAdminCardTerminalRoute: typeof AuthenticatedAdminCardTerminalRoute
   AuthenticatedAdminClaimsRoute: typeof AuthenticatedAdminClaimsRoute
   AuthenticatedAdminEnquiriesRoute: typeof AuthenticatedAdminEnquiriesRoute
   AuthenticatedAdminFinanceRoute: typeof AuthenticatedAdminFinanceRoute
@@ -1134,7 +1092,6 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
-  AuthenticatedAdminCardTerminalRoute: AuthenticatedAdminCardTerminalRoute,
   AuthenticatedAdminClaimsRoute: AuthenticatedAdminClaimsRoute,
   AuthenticatedAdminEnquiriesRoute: AuthenticatedAdminEnquiriesRoute,
   AuthenticatedAdminFinanceRoute: AuthenticatedAdminFinanceRoute,
@@ -1189,7 +1146,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCronRecurringExpensesRoute: ApiPublicCronRecurringExpensesRoute,
   ApiPublicPaymentsConnectWebhookRoute: ApiPublicPaymentsConnectWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
-  ApiPublicTerminalCallbackRoute: ApiPublicTerminalCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

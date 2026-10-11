@@ -84,8 +84,12 @@ export function UpdateAppButton() {
 
   return (
     <>
-      <button onClick={run} className={BTN} title="Update the installed app to the newest version">
-        Update app
+      <button
+        onClick={run}
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-accent hover:text-accent-foreground [&_svg]:size-4"
+        title="Update the installed app to the newest version"
+      >
+        <RefreshCw /> Update
       </button>
 
       {open && (

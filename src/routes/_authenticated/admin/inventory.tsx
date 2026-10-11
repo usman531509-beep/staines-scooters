@@ -173,7 +173,7 @@ function InventoryPage() {
   const { data, isLoading, error } = useStockData();
   const catsFn = useServerFn(listCategories);
   const upsertFn = useServerFn(upsertProduct);
-  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn() });
+  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn({ data: { includeHidden: true } }) });
   const [tab, setTab] = useState<"active" | "adjust" | "audit" | "bin">("active");
   const [modal, setModal] = useState<null | "history" | "receive" | "waste" | "count" | "product">(null);
   const [adjustFor, setAdjustFor] = useState<string | null>(null);

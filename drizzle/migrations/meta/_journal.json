@@ -92,6 +92,27 @@
       "when": 1791637601956,
       "tag": "0012_sale_items_detail_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791744402375,
+      "tag": "0013_card_terminal_ecr_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791745011737,
+      "tag": "0014_drop_card_terminal",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1791745071737,
+      "tag": "0015_till_sessions_staff_policy",
+      "breakpoints": true
     }
   ]
 }

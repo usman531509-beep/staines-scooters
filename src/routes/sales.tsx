@@ -101,7 +101,7 @@ function Sales() {
         description="New and used scooters and motorcycles, each one checked over by our own workshop before it leaves with honest advice from people who ride."
         image={images.hero}
         imageAlt="Maxi scooter parked by the river"
-        imagePosition="60% center"
+        imagePosition="60% 25%"
       >
         <div className="landing-actions">
           <Link to="/contact" search={{ service: "Scooter Sales" }} className="landing-button landing-button-blue">
@@ -153,7 +153,7 @@ function Sales() {
         </p>
       </section>
 
-      <section className="landing-container landing-block" aria-labelledby="styles-title">
+      <section id="styles" className="landing-container landing-block" aria-labelledby="styles-title">
         <div className="landing-block-heading">
           <p className="landing-eyebrow">Something for every rider</p>
           <h2 id="styles-title">Pick your style.</h2>
@@ -180,7 +180,7 @@ function Sales() {
         </div>
       </section>
 
-      <section className="landing-container landing-block" aria-labelledby="why-title">
+      <section id="buying" className="landing-container landing-block" aria-labelledby="why-title">
         <div className="landing-split">
           <div className="landing-split-photo">
             <img src={images.workshop} alt="Technician preparing a scooter for sale" loading="lazy" />

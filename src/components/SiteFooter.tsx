@@ -29,7 +29,7 @@ export function SiteFooter({ appearance = "default" }: { appearance?: "default" 
           <nav aria-label="Our services" className="landing-footer-col">
             <h2>Services</h2>
             {landingNav
-              .filter((item) => item.to !== "/")
+              .filter((item) => !["/", "/contact"].includes(item.to))
               .map((item) => (
                 <Link key={item.label} to={item.to}>
                   {item.label}

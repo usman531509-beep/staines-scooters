@@ -6,11 +6,11 @@ import { AccountShell } from "./AccountShell";
 import type { PermKey } from "@/lib/loyalty.functions";
 
 export function StaffGuard({ perm, children }: { perm: PermKey; children: ReactNode }) {
-  const { isStaff, loading } = useAuth();
+  const { isStaff, loading, rolesLoading } = useAuth();
   const { perms, isLoading } = useMyStaffPermissions();
   const navigate = useNavigate();
 
-  if (loading || isLoading) {
+  if (loading || rolesLoading || isLoading) {
     return (
       <AccountShell title="Loading…">
         <p className="text-sm text-ink-muted">Checking access…</p>

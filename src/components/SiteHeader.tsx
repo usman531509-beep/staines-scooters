@@ -1,11 +1,12 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu } from "lucide-react";
+import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, Search, ChevronDown, LayoutDashboard } from "lucide-react";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
 import { BRAND } from "@/lib/brand";
 
 import { LandingBrand, landingNav } from "./LandingBrand";
+import { SiteSearch } from "./SiteSearch";
 
 const nav = [
   { to: "/", label: "Home", icon: Home },
@@ -16,6 +17,7 @@ const nav = [
 
 export function SiteHeader({ appearance = "default" }: { appearance?: "default" | "landing" }) {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -24,83 +26,92 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
     router.navigate({ to: "/" });
   }
 
-  if (user && isAdmin) return null;
+  // Signed-in staff keep the website navbar, with a link back to their portal.
+  const portal = isAdmin ? "/admin" : "/staff/pos";
 
   if (appearance === "landing")
     return (
-      <header className="landing-header">
-        <div className="landing-container landing-header-row">
+      <header className="lnav">
+        <div className="landing-container lnav-row">
           <LandingBrand />
-          <nav className="landing-desktop-nav" aria-label="Main navigation">
+          <nav className="lnav-links" aria-label="Main navigation">
             {landingNav.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                activeOptions={{ exact: item.to === "/", includeSearch: false }}
-                activeProps={{ className: "is-active", "aria-current": "page" }}
-              >
-                {item.label}
-              </Link>
+              <div key={item.label} className={`lnav-item${item.children ? " lnav-has-menu" : ""}`}>
+                <Link
+                  to={item.to}
+                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: false }}
+                  activeProps={{ className: "is-active", "aria-current": "page" }}
+                >
+                  {item.label}
+                  {item.children && <ChevronDown aria-hidden="true" />}
+                </Link>
+                {item.children && (
+                  <div className="lnav-menu">
+                    {item.children.map((c) => (
+                      <Link key={c.label} to={c.to} hash={c.hash} search={c.search ?? {}}>
+                        {c.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
-          <div className="landing-header-actions">
-            <Link
-              to={user ? "/staff/pos" : "/auth"}
-              className="landing-button landing-button-outline landing-header-book landing-header-login"
-            >
-              {user ? "Workshop" : "Login"}
+          <div className="lnav-actions">
+            <button type="button" className="lnav-icon" onClick={() => setSearchOpen(true)} aria-label="Search">
+              <Search />
+            </button>
+            <span className="lnav-divider" aria-hidden="true" />
+            <Link to={user ? portal : "/auth"} className="lnav-login">
+              {user ? <LayoutDashboard aria-hidden="true" /> : <User aria-hidden="true" />} {user ? "Dashboard" : "Login"}
             </Link>
-            <Link
-              to="/contact"
-              search={{ service: "Servicing" }}
-              className="landing-button landing-button-blue landing-header-book"
-            >
-              Book a Service
+            <Link to="/contact" search={{ service: "Servicing" }} className="lnav-book">
+              <Wrench aria-hidden="true" /> Book a Service
             </Link>
+            <button
+              type="button"
+              className="lnav-icon lnav-menu-button"
+              onClick={() => setOpen(!open)}
+              aria-expanded={open}
+              aria-controls="lnav-mobile"
+              aria-label={open ? "Close navigation" : "Open navigation"}
+            >
+              {open ? <X /> : <Menu />}
+            </button>
           </div>
-          <button
-            type="button"
-            className="landing-menu-button"
-            onClick={() => setOpen(!open)}
-            aria-expanded={open}
-            aria-controls="landing-mobile-nav"
-            aria-label={open ? "Close navigation" : "Open navigation"}
-          >
-            {open ? <X /> : <Menu />}
-          </button>
         </div>
         {open && (
-          <nav
-            id="landing-mobile-nav"
-            className="landing-mobile-nav landing-container"
-            aria-label="Mobile navigation"
-          >
-            {landingNav.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                activeOptions={{ exact: item.to === "/", includeSearch: false }}
-                activeProps={{ className: "is-active", "aria-current": "page" }}
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-                <ArrowRight size={16} />
-              </Link>
-            ))}
-            <Link
-              to="/contact"
-              search={{ service: "Servicing" }}
-              className="landing-mobile-book"
-              onClick={() => setOpen(false)}
-            >
-              Book a Service
-              <ArrowRight size={16} />
-            </Link>
-            <Link to={user ? "/staff/pos" : "/auth"} onClick={() => setOpen(false)}>
-              {user ? "Workshop" : "Login"}
-            </Link>
+          <nav id="lnav-mobile" className="lnav-mobile" aria-label="Mobile navigation">
+            <div className="landing-container">
+              {landingNav.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: false }}
+                  activeProps={{ className: "is-active", "aria-current": "page" }}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              ))}
+              <div className="lnav-mobile-actions">
+                <Link to={user ? portal : "/auth"} className="lnav-login" onClick={() => setOpen(false)}>
+                  {user ? <LayoutDashboard aria-hidden="true" /> : <User aria-hidden="true" />} {user ? "Dashboard" : "Login"}
+                </Link>
+                <Link
+                  to="/contact"
+                  search={{ service: "Servicing" }}
+                  className="lnav-book"
+                  onClick={() => setOpen(false)}
+                >
+                  <Wrench aria-hidden="true" /> Book a Service
+                </Link>
+              </div>
+            </div>
           </nav>
         )}
+        {searchOpen && <SiteSearch onClose={() => setSearchOpen(false)} />}
       </header>
     );
 

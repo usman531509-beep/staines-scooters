@@ -41,7 +41,7 @@ function ProductsPage() {
     queryKey: ["all-products", search],
     queryFn: () => listFn({ data: { search, includeInactive: true } }),
   });
-  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn() });
+  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn({ data: { includeHidden: true } }) });
 
   const categoryImageById = useMemo(
     () => new Map((categories as any[]).map((c) => [c.id, c.image_url])),

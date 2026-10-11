@@ -9,7 +9,7 @@ const ALL_FALSE = Object.fromEntries(PERM_KEYS.map((k) => [k, false])) as StaffP
 const ALL_TRUE = Object.fromEntries(PERM_KEYS.map((k) => [k, true])) as StaffPerms;
 
 export function useMyStaffPermissions() {
-  const { user, isStaff, isAdmin } = useAuth();
+  const { user, isStaff, isAdmin, loading, rolesLoading } = useAuth();
   const fn = useServerFn(getMyStaffPermissions);
   const { data, isLoading } = useQuery({
     queryKey: ["my-staff-perms", user?.id],
@@ -17,6 +17,8 @@ export function useMyStaffPermissions() {
     enabled: !!user && isStaff,
     staleTime: 60_000,
   });
+  // Until the user's roles are known, report loading rather than "no access".
+  if (loading || rolesLoading) return { perms: ALL_FALSE, isAdmin: false, isLoading: true };
   if (!isStaff) return { perms: ALL_FALSE, isAdmin: false, isLoading: false };
   if (isAdmin) return { perms: ALL_TRUE, isAdmin: true, isLoading: false };
   return {

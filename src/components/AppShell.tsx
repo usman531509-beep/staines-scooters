@@ -42,6 +42,10 @@ const STAFF_TABS: NavEntry[] = [
 
 const ADMIN_MENU = [
   {
+    title: "Overview",
+    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
     title: "Till & Sales",
     items: [
       { to: "/staff/pos", label: "POS", icon: Wrench },
@@ -49,7 +53,6 @@ const ADMIN_MENU = [
       { to: "/staff/refunds", label: "Refunds", icon: Undo2 },
       { to: "/staff/customers", label: "Customers", icon: UserRound },
       { to: "/admin/enquiries", label: "Enquiries", icon: Inbox },
-      { to: "/admin/card-terminal", label: "Card Terminal", icon: CreditCard },
     ],
   },
   {
@@ -78,7 +81,6 @@ const ADMIN_MENU = [
   {
     title: "System",
     items: [
-      { to: "/admin", label: "Dashboard", icon: ShieldCheck },
       { to: "/admin/team", label: "Team & Roles", icon: Users },
       { to: "/admin/activity", label: "Activity", icon: History },
       { to: "/admin/recycle", label: "Recycle Bin", icon: Trash2 },
@@ -379,7 +381,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
             </button>
           ) : (
             <Link to="/" className="min-w-0 flex-1" aria-label={`${BRAND.name} home`}>
-              <img src="/images/brand/staines-logo.png" alt={BRAND.name} className="h-11 w-auto" />
+              <img src="/images/brand/staines-badge.webp" alt={BRAND.name} className="h-11 w-auto" />
             </Link>
           )}
           <div className="flex shrink-0 items-center gap-2">

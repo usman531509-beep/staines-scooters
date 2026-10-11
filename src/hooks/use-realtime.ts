@@ -38,6 +38,8 @@ export function useCatalogueRealtime() {
         { event: "*", schema: "public", table: "categories" },
         () => {
           qc.invalidateQueries({ queryKey: ["pos-cats"] });
+          qc.invalidateQueries({ queryKey: ["cats-all"] });
+          qc.invalidateQueries({ queryKey: ["all-cats"] });
         },
       )
       .subscribe();

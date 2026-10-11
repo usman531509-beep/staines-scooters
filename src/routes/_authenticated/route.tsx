@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { AccountShellLayout } from "@/components/AccountShell";
 
 // Only staff / admin / owner accounts have a signed-in area. Remember which
 // user was last confirmed so the role lookup runs once per sign-in, not on
@@ -31,5 +32,10 @@ export const Route = createFileRoute("/_authenticated")({
     }
     return { user };
   },
-  component: () => <Outlet />,
+  // One shell for every signed-in page, so navigating swaps only the content.
+  component: () => (
+    <AccountShellLayout>
+      <Outlet />
+    </AccountShellLayout>
+  ),
 });

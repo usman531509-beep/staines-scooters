@@ -45,7 +45,7 @@ function CategoryDetailPage() {
       return next;
     });
 
-  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn() });
+  const { data: categories = [] } = useQuery({ queryKey: ["all-cats"], queryFn: () => catsFn({ data: { includeHidden: true } }) });
   const { data: products = [] } = useQuery({
     queryKey: ["cat-products", categoryId],
     queryFn: () => listFn({ data: { categoryId, includeInactive: true } }),

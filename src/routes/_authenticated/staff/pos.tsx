@@ -4,8 +4,10 @@ import { markSaleEdited } from "@/lib/last-edited-sale";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp } from "lucide-react";
+import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp, SlidersHorizontal, Maximize2, Minimize2, ShoppingCart, Check } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { z } from "zod";
+import { printInPlace } from "@/lib/print-in-place";
 import { AccountShell } from "@/components/AccountShell";
 import { useAppChrome } from "@/components/AppShell";
 import { useSidebarHidden } from "@/hooks/use-sidebar-hidden";
@@ -115,7 +117,7 @@ function POS() {
   });
   const toggleCatHidden = useMutation({
     mutationFn: (v: { id: string; hidden: boolean }) => setCatHiddenFn({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["pos-cats"] }); qc.invalidateQueries({ queryKey: ["cats-all"] }); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["pos-cats"] }); qc.invalidateQueries({ queryKey: ["cats-all"] }); qc.invalidateQueries({ queryKey: ["all-cats"] }); },
     onError: (e: any) => alert(e?.message ?? "Failed to update category"),
   });
 
@@ -403,7 +405,7 @@ function POS() {
     if (isLabourProduct(p)) {
       beep();
       setFlashProductId(p.id);
-      window.setTimeout(() => setFlashProductId((cur) => (cur === p.id ? null : cur)), 1400);
+      window.setTimeout(() => setFlashProductId((cur) => (cur === p.id ? null : cur)), 900);
       setLabourModal({ product: p });
       return;
     }
@@ -418,7 +420,7 @@ function POS() {
     setFlashProductId(p.id);
     window.setTimeout(() => {
       setFlashProductId((cur) => (cur === p.id ? null : cur));
-    }, 1400);
+    }, 900);
 
     // Clear the search box so all products display normally again after adding.
     setSearch("");
@@ -670,14 +672,14 @@ function POS() {
                   onClick={() => { if (chrome) chrome.toggleMenu(); else toggle(); }}
                   title={chrome ? (chrome.menuOpen ? "Close navigation" : "Open navigation") : hidden ? "Show menu" : "Hide menu"}
                   aria-label={chrome ? (chrome.menuOpen ? "Close navigation" : "Open navigation") : hidden ? "Show menu" : "Hide menu"}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-surface-elevated hover:border-primary hover:text-primary"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-elevated hover:bg-accent hover:text-accent-foreground"
                 >
                   {chrome ? (chrome.menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />) : hidden ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
                 </button>
               )}
 
               <div className="relative flex-1 min-w-[200px]">
-                <ScanLine className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
+                <ScanLine className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
                 <input
                   ref={scanInputRef}
                   value={search}
@@ -690,15 +692,101 @@ function POS() {
                       setSearch("");
                     }
                   }}
-                  className="w-full rounded-sm border border-border bg-input px-8 py-2.5 text-sm"
+                  className="h-10 w-full rounded-lg border border-border bg-input pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
                 />
               </div>
+              {isAdmin && (
+                <button
+                  type="button"
+                  title="Record a sale manually"
+                  onClick={() => navigate({ to: "/staff/sales/new" })}
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  <Plus className="h-4 w-4" /> New sale
+                </button>
+              )}
+              {isAdmin && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      title="Display options"
+                      className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface-elevated px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                    >
+                      <SlidersHorizontal className="h-4 w-4" /> View
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-72 rounded-xl p-4">
+                    <p className="text-sm font-semibold">Display</p>
+                    <div className="mt-3 grid gap-3 text-sm">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-ink-muted">Product text</span>
+                        <span className="inline-flex items-center gap-1">
+                          <button
+                            type="button"
+                            title="Decrease product text size"
+                            onClick={() => changeFontScale(-0.1)}
+                            className="grid h-8 w-8 place-items-center rounded-lg border border-border hover:bg-accent"
+                          >
+                            <AArrowDown className="h-4 w-4" />
+                          </button>
+                          <span className="w-12 text-center font-semibold tabular-nums">{Math.round(fontScale * 100)}%</span>
+                          <button
+                            type="button"
+                            title="Increase product text size"
+                            onClick={() => changeFontScale(0.1)}
+                            className="grid h-8 w-8 place-items-center rounded-lg border border-border hover:bg-accent"
+                          >
+                            <AArrowUp className="h-4 w-4" />
+                          </button>
+                        </span>
+                      </div>
+                      <label className="flex items-center justify-between gap-2">
+                        <span className="text-ink-muted">Products per row</span>
+                        <select
+                          value={colCount}
+                          onChange={(e) => changeColCount(parseInt(e.target.value, 10))}
+                          className="h-8 rounded-lg border border-border bg-surface-elevated px-2 text-sm"
+                        >
+                          {[5, 6, 7, 8, 9].map((n) => (
+                            <option key={n} value={n}>{n} columns</option>
+                          ))}
+                        </select>
+                      </label>
+                      {sortedCategories.length > 0 && (
+                        <div className="grid gap-2 border-t border-border pt-3">
+                          <span className="text-ink-muted">Categories on the till</span>
+                          <span className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              title="Hide every category from POS (Best Sellers and All always stay)"
+                              onClick={() => sortedCategories.filter((c: any) => !c.hidden).forEach((c: any) => toggleCatHidden.mutate({ id: c.id, hidden: true }))}
+                              className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-border px-3 font-medium hover:bg-accent"
+                            >
+                              <EyeOff className="h-4 w-4 shrink-0" /> Hide all
+                            </button>
+                            <button
+                              type="button"
+                              title="Show every category in POS"
+                              onClick={() => sortedCategories.filter((c: any) => c.hidden).forEach((c: any) => toggleCatHidden.mutate({ id: c.id, hidden: false }))}
+                              className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-border px-3 font-medium hover:bg-accent"
+                            >
+                              <Eye className="h-4 w-4 shrink-0" /> Show all
+                            </button>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
               <button
                 onClick={toggleFullscreen}
-                className="rounded-sm border border-border bg-surface-elevated px-3 py-2 text-[11px] font-semibold uppercase tracking-widest hover:border-primary hover:text-primary"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-elevated hover:bg-accent hover:text-accent-foreground"
                 title={isFullscreen ? "Exit full screen" : "Full screen"}
+                aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
               >
-                {isFullscreen ? "Exit Full Screen" : "Full Screen"}
+                {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
               </button>
               {chromeless && chrome && (
                 <button
@@ -711,87 +799,33 @@ function POS() {
 
             </div>
             <div className="mt-2 flex flex-nowrap items-center gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
-              <CatChip active={isBestSellers} onClick={() => setCategoryId("__best_sellers__")}>★ Best Sellers</CatChip>
+              <CatChip active={isBestSellers} onClick={() => setCategoryId("__best_sellers__")}><Star className="h-3.5 w-3.5" /> Best sellers</CatChip>
               <CatChip active={categoryId === null} onClick={() => setCategoryId(null)}>All</CatChip>
               {sortedCategories.filter((c: any) => !c.hidden).map((c) => (
-                <div key={c.id} className="relative inline-flex shrink-0 items-stretch">
-                  <CatChip active={categoryId === c.id} onClick={() => setCategoryId(c.id)}>
+                <div
+                  key={c.id}
+                  className={`inline-flex shrink-0 items-center overflow-hidden rounded-full text-sm font-semibold transition-colors ${categoryId === c.id ? "bg-primary text-primary-foreground shadow-sm" : "border border-border bg-surface-elevated text-foreground"}`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setCategoryId(c.id)}
+                    className={`whitespace-nowrap py-2 ${isAdmin ? "pl-4 pr-2.5" : "px-4"} ${categoryId === c.id ? "" : "hover:bg-accent hover:text-accent-foreground"}`}
+                  >
                     {c.name}
-                  </CatChip>
+                  </button>
                   {isAdmin && (
                     <button
                       type="button"
                       title="Hide from POS"
+                      aria-label={`Hide ${c.name} from POS`}
                       onClick={(e) => { e.stopPropagation(); toggleCatHidden.mutate({ id: c.id, hidden: true }); }}
-                      className="-ml-1 flex items-center rounded-r-full border border-l-0 border-border bg-surface-elevated px-1.5 text-ink-muted hover:text-primary"
+                      className={`flex items-center self-stretch border-l py-2 pl-2 pr-3 ${categoryId === c.id ? "border-primary-foreground/30 text-primary-foreground/80 hover:text-primary-foreground" : "border-border text-ink-muted hover:bg-accent hover:text-primary"}`}
                     >
-                      <EyeOff className="h-3 w-3" />
+                      <EyeOff className="h-3.5 w-3.5" />
                     </button>
                   )}
                 </div>
               ))}
-              {isAdmin && sortedCategories.length > 0 && (
-                <div className="ml-1 inline-flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    title="Hide every category from POS (Best Sellers and All always stay)"
-                    onClick={() => sortedCategories.filter((c: any) => !c.hidden).forEach((c: any) => toggleCatHidden.mutate({ id: c.id, hidden: true }))}
-                    className="rounded-full border border-border bg-surface-elevated px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-ink-muted hover:border-primary hover:text-primary"
-                  >
-                    <EyeOff className="mr-1 inline h-3 w-3" /> Hide all
-                  </button>
-                  <button
-                    type="button"
-                    title="Show every category in POS"
-                    onClick={() => sortedCategories.filter((c: any) => c.hidden).forEach((c: any) => toggleCatHidden.mutate({ id: c.id, hidden: false }))}
-                    className="rounded-full border border-border bg-surface-elevated px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-ink-muted hover:border-primary hover:text-primary"
-                  >
-                    <Eye className="mr-1 inline h-3 w-3" /> Show all
-                  </button>
-                </div>
-              )}
-              {isAdmin && (
-                <div className="ml-1 inline-flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    title="Record a sale manually"
-                    onClick={() => navigate({ to: "/staff/sales/new" })}
-                    className="rounded-full border border-border bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
-                  >
-                    Add New Sale
-                  </button>
-                  <span className="ml-1 inline-flex items-center gap-1 rounded-full border border-border bg-surface-elevated px-1.5 py-0.5">
-                    <span className="px-1 text-[9px] font-semibold uppercase tracking-widest text-ink-muted">Font</span>
-                    <button
-                      type="button"
-                      title="Decrease product text size"
-                      onClick={() => changeFontScale(-0.1)}
-                      className="grid h-6 w-6 place-items-center rounded-full border border-border text-ink-muted hover:border-primary hover:text-primary"
-                    >
-                      <AArrowDown className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="w-8 text-center text-[10px] font-semibold tabular-nums text-foreground">{Math.round(fontScale * 100)}%</span>
-                    <button
-                      type="button"
-                      title="Increase product text size"
-                      onClick={() => changeFontScale(0.1)}
-                      className="grid h-6 w-6 place-items-center rounded-full border border-border text-ink-muted hover:border-primary hover:text-primary"
-                    >
-                       <AArrowUp className="h-3.5 w-3.5" />
-                     </button>
-                   </span>
-                   <select
-                     title="Products per row"
-                     value={colCount}
-                     onChange={(e) => changeColCount(parseInt(e.target.value, 10))}
-                     className="ml-1 h-7 rounded-full border border-border bg-surface-elevated px-2 text-[10px] font-semibold uppercase tracking-widest text-foreground"
-                   >
-                     {[5, 6, 7, 8, 9].map((n) => (
-                       <option key={n} value={n}>{n} columns</option>
-                     ))}
-                   </select>
-                 </div>
-              )}
             </div>
           </div>
 
@@ -817,17 +851,18 @@ function POS() {
                       if (draggedRef.current) { draggedRef.current = false; return; }
                       addProduct(p);
                     }}
-                    className={`group relative flex flex-col overflow-hidden rounded-xl border-2 border-primary bg-white text-left transition-transform duration-200 hover:shadow-[var(--shadow-card)] ${isFlashing ? "animate-pos-pop scale-[1.08] z-20" : ""} ${dragId === p.id ? "scale-95 opacity-70 ring-4 ring-primary/60" : ""}`}
-                    style={isFlashing ? { boxShadow: "0 0 0 10px hsl(var(--primary)/0.55), 0 0 60px 18px hsl(var(--primary)/0.85), 0 0 120px 40px hsl(var(--primary)/0.4)" } : undefined}
+                    className={`group relative flex flex-col overflow-hidden rounded-xl border-2 border-primary bg-white text-left transition-transform duration-200 hover:shadow-[var(--shadow-card)] ${isFlashing ? "animate-pos-pop ring-4 ring-primary/40" : ""} ${dragId === p.id ? "scale-95 opacity-70 ring-4 ring-primary/60" : ""}`}
                   >
                     {isFlashing && (
-                      <span className="pointer-events-none absolute inset-0 z-10 rounded-xl bg-primary/25 mix-blend-multiply" aria-hidden />
+                      <span className="pointer-events-none absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-lg animate-in fade-in zoom-in-90" aria-hidden>
+                        <Check className="h-3.5 w-3.5" /> Added
+                      </span>
                     )}
                     <div className="relative aspect-square w-full overflow-hidden bg-white p-1.5 sm:p-3">
                       <CloudImage
                         src={productImage(p)}
                         alt={p.name}
-                        className={`h-full w-full object-contain transition ${isFlashing ? "scale-110 brightness-110" : "group-hover:scale-105"}`}
+                        className={`h-full w-full object-contain transition ${isFlashing ? "opacity-60" : "group-hover:scale-105"}`}
                         fallback={
                           <span className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-widest text-ink-muted">No image</span>
                         }
@@ -888,8 +923,8 @@ function POS() {
         <div className="flex min-h-0 flex-col space-y-4 overflow-y-auto pr-1">
           <PosCustomerPicker value={customer} onChange={setCustomer} disabled={checkout.isPending} />
           {/* Payment + Totals + Charge (top of basket) */}
-          <div className="rounded-md border border-border bg-surface-elevated p-4">
-            <div className="grid grid-cols-4 gap-1.5">
+          <div className="rounded-xl border border-border bg-surface-elevated p-4 shadow-sm">
+            <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
               <PayBtn active={paymentMethod === "cash"} onClick={() => setPaymentMethod("cash")} icon={Banknote}>Cash</PayBtn>
               <PayBtn active={paymentMethod === "card"} onClick={() => setPaymentMethod("card")} icon={CreditCard}>Card</PayBtn>
               <PayBtn active={paymentMethod === "bank_transfer"} onClick={() => setPaymentMethod("bank_transfer")} icon={ArrowRightLeft}>Bank</PayBtn>
@@ -899,10 +934,22 @@ function POS() {
               <Totals label="Subtotal" value={fmt(subtotal)} />
               {lineDiscounts > 0 && <Totals label="Line discounts" value={`− ${fmt(lineDiscounts)}`} muted />}
               {orderDiscountPence > 0 && <Totals label="Order discount" value={`− ${fmt(orderDiscountPence)}`} muted />}
+              <label className="flex items-center justify-between gap-3 pt-1 text-sm">
+                <span className="text-ink-muted">Discount (£)</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  value={discountInput}
+                  onChange={(e) => { const raw = e.target.value.replace(/[^0-9.]/g, ""); setDiscountInput(raw); const p = Math.max(0, Math.round((parseFloat(raw) || 0) * 100)); lastDiscountInputPence.current = p; setOrderDiscountFixedPence(p); }}
+                  onBlur={() => { const p = orderDiscountFixedPence; lastDiscountInputPence.current = p; setDiscountInput(p === 0 ? "" : String((p / 100).toFixed(2))); }}
+                  className="h-9 w-28 rounded-lg border border-border bg-input px-3 text-right text-sm outline-none focus:border-primary"
+                />
+              </label>
               <div className="my-2 border-t border-border" />
               <div className="flex items-baseline justify-between">
-                <span className="eyebrow">Total</span>
-                <span className="font-display text-3xl">{fmt(chargeTotal)}</span>
+                <span className="text-sm font-medium text-ink-muted">Total</span>
+                <span className="text-3xl font-bold tracking-tight tabular-nums">{fmt(chargeTotal)}</span>
               </div>
               {orderDiscountFixedPence > 0 && (
                 <p className="-mt-0.5 text-right text-[10px] font-medium text-ink-muted">
@@ -925,7 +972,7 @@ function POS() {
               <button
                 disabled={cart.length === 0 || checkout.isPending}
                 onClick={() => onChargeClick()}
-                className="mt-3 w-full rounded-sm bg-primary px-4 py-3 text-sm font-semibold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+                className="mt-3 h-12 w-full rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
               >
                 {checkout.isPending ? "Saving…" : isEditMode ? `Save changes · ${fmt(chargeTotal)}` : `Charge ${fmt(chargeTotal)}`}
               </button>
@@ -938,23 +985,23 @@ function POS() {
                   type="button"
                   disabled={cart.length === 0 || checkout.isPending}
                   onClick={payByCard}
-                  className="rounded-sm bg-primary px-2 py-3 text-xs font-semibold uppercase tracking-widest text-primary-foreground disabled:opacity-50"
+                  className="inline-flex h-12 items-center justify-center gap-1.5 rounded-lg bg-primary px-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
-                  Card
+                  <CreditCard className="h-4 w-4" /> Card
                 </button>
                 <button
                   type="button"
                   disabled={cart.length === 0 || checkout.isPending}
                   onClick={() => { setPaymentMethod("cash"); setError(null); void onChargeClick({ method: "cash" }); }}
-                  className="rounded-sm border-2 border-primary bg-background px-2 py-3 text-xs font-semibold uppercase tracking-widest text-primary disabled:opacity-50"
+                  className="inline-flex h-12 items-center justify-center gap-1.5 rounded-lg border-2 border-primary bg-background px-2 text-sm font-semibold text-primary hover:bg-accent disabled:opacity-50"
                 >
-                  Cash
+                  <Banknote className="h-4 w-4" /> Cash
                 </button>
                 <button
                   type="button"
                   disabled={cart.length === 0 || checkout.isPending}
                   onClick={() => { setPaymentMethod("split"); setError(null); setPayDialog("split"); }}
-                  className="rounded-sm border-2 border-foreground bg-background px-2 py-3 text-[11px] font-semibold uppercase tracking-widest text-foreground disabled:opacity-50"
+                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-background px-2 text-sm font-semibold text-foreground hover:bg-accent disabled:opacity-50"
                 >
                   Card + Cash
                 </button>
@@ -994,13 +1041,13 @@ function POS() {
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <a
-                      href={`/staff/receipt/${lastSale.id}`}
-                      target="_blank"
+                    <button
+                      type="button"
+                      onClick={() => printInPlace(`/staff/receipt/${lastSale.id}`)}
                       className="inline-flex items-center gap-1.5 rounded-sm bg-sale-foreground px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-sale hover:opacity-90"
                     >
                       <Printer className="h-3.5 w-3.5" /> Print
-                    </a>
+                    </button>
                     {isAdmin && (
                       <button
                         onClick={async () => {
@@ -1029,20 +1076,28 @@ function POS() {
           </div>
 
           {/* Cart */}
-          <div className="rounded-md border border-border bg-surface-elevated">
-            <div className="border-b border-border px-4 py-2">
-              <p className="eyebrow">Cart ({cart.length})</p>
+          <div className="rounded-xl border border-border bg-surface-elevated shadow-sm">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <p className="text-sm font-semibold">Cart</p>
+              <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold tabular-nums text-ink-muted">
+                {cart.length} {cart.length === 1 ? "item" : "items"}
+              </span>
             </div>
             <div className="max-h-[340px] divide-y divide-border overflow-auto">
-              {cart.length === 0 && <p className="px-4 py-6 text-center text-base text-ink-muted">Empty</p>}
+              {cart.length === 0 && (
+                <div className="flex flex-col items-center gap-2 px-4 py-8 text-center text-sm text-ink-muted">
+                  <ShoppingCart className="h-6 w-6 opacity-50" />
+                  Scan a barcode or tap a product to add it.
+                </div>
+              )}
               {cart.map((l, i) => {
                 const isFreeOil = /^\s*free\s+engine\s+oil\s*$/i.test(l.name);
                 return (
                 <div key={i} className="space-y-2 px-4 py-3 text-base">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="min-w-0 flex-1 text-lg font-bold leading-tight text-foreground break-words">{l.name}</p>
+                    <p className="min-w-0 flex-1 text-base font-semibold leading-snug text-foreground break-words">{l.name}</p>
                     <div className="flex items-center gap-2">
-                      {!isFreeOil && <span className="font-display text-2xl font-bold text-foreground">{fmt(Math.max(0, Math.round(l.unitPricePence * l.qty) - l.discountPence))}</span>}
+                      {!isFreeOil && <span className="text-lg font-bold tabular-nums text-foreground">{fmt(Math.max(0, Math.round(l.unitPricePence * l.qty) - l.discountPence))}</span>}
                       <button onClick={() => setCart((c) => c.filter((_, j) => j !== i))} className="text-ink-muted hover:text-primary"><X className="h-5 w-5" /></button>
                     </div>
                   </div>
@@ -1077,15 +1132,6 @@ function POS() {
                 );
               })}
 
-            </div>
-          </div>
-
-          {/* Discounts & payment */}
-          <div className="rounded-md border border-border bg-surface-elevated p-4">
-            <div className="grid gap-3">
-              <Row label="Discount £">
-                <input type="text" inputMode="decimal" value={discountInput} onChange={(e) => { const raw = e.target.value.replace(/[^0-9.]/g, ""); setDiscountInput(raw); const p = Math.max(0, Math.round((parseFloat(raw) || 0) * 100)); lastDiscountInputPence.current = p; setOrderDiscountFixedPence(p); }} onBlur={() => { const p = orderDiscountFixedPence; lastDiscountInputPence.current = p; setDiscountInput(p === 0 ? "" : String((p / 100).toFixed(2))); }} className="w-24 rounded-sm border border-border bg-input px-2 py-1 text-right text-sm" />
-              </Row>
             </div>
           </div>
 
@@ -1225,20 +1271,12 @@ function LabourModal({
 
 function CatChip({ active, onClick, children }: any) {
   return (
-    <button onClick={onClick} className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[18px] font-bold uppercase tracking-widest ${active ? "bg-primary text-primary-foreground" : "border border-border hover:border-primary"}`}>{children}</button>
-  );
-}
-function Row({ label, children }: any) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-widest text-ink-muted">{label}</span>
-      {children}
-    </div>
+    <button onClick={onClick} className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${active ? "bg-primary text-primary-foreground shadow-sm" : "border border-border bg-surface-elevated text-foreground hover:bg-accent hover:text-accent-foreground"}`}>{children}</button>
   );
 }
 function PayBtn({ active, onClick, icon: Icon, children }: any) {
   return (
-    <button onClick={onClick} className={`flex items-center justify-center gap-1 rounded-sm border px-2 py-2 text-[11px] font-semibold uppercase tracking-widest ${active ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>
+    <button onClick={onClick} className={`flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium transition-colors ${active ? "bg-surface-elevated text-primary shadow-sm" : "text-ink-muted hover:text-foreground"}`}>
       <Icon className="h-3.5 w-3.5" /> {children}
     </button>
   );

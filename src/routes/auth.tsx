@@ -326,7 +326,7 @@ function AuthPage() {
             </form>
 
             <p className="landing-login-foot">
-              No public sign-up — accounts are created by an administrator.
+              No public sign-up accounts are created by an administrator.
             </p>
           </div>
         </div>

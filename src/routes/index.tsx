@@ -343,7 +343,7 @@ function Home() {
             <Feature
               icon={Phone}
               title="Get in touch"
-              body="Tell us what you need — sales, service, repair, rental or a claim."
+              body="Tell us what you need sales, service, repair, rental or a claim."
             />
             <ArrowRight className="landing-step-arrow" aria-hidden="true" />
           </li>

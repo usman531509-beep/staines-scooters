@@ -45,6 +45,8 @@ export const Route = createFileRoute("/services")({
 });
 
 type Block = {
+  /** Anchor used by the navigation dropdown. */
+  id: string;
   icon: LucideIcon;
   title: string;
   service: string;
@@ -57,6 +59,7 @@ type Block = {
 
 const blocks: Block[] = [
   {
+    id: "servicing",
     icon: Droplets,
     title: "Servicing",
     service: "Servicing",
@@ -67,6 +70,7 @@ const blocks: Block[] = [
     points: ["Oil & filter change", "Brake check & adjust", "Belt & roller inspection", "Tyre pressures & wear", "Lights & electrics", "Road test"],
   },
   {
+    id: "repairs",
     icon: Wrench,
     title: "Repairs",
     service: "Motorbike Repair",
@@ -77,6 +81,7 @@ const blocks: Block[] = [
     points: ["Engine running problems", "Brakes", "Tyres", "Belts & transmission", "Electrical faults", "Bodywork & panels"],
   },
   {
+    id: "fault-finding",
     icon: Search,
     title: "Fault Finding",
     service: "Fault Finding",
@@ -87,6 +92,7 @@ const blocks: Block[] = [
     points: ["Starting issues", "Warning lights", "Sensor faults", "Poor running", "Battery & charging", "Intermittent faults"],
   },
   {
+    id: "key-fobs",
     icon: KeyRound,
     title: "Key Fobs for Keyless Bikes",
     service: "Key Fob for Keyless Bikes",
@@ -97,6 +103,7 @@ const blocks: Block[] = [
     points: ["Fob not recognised", "Keyless start faults", "Damaged or lost fobs", "Smart key system checks"],
   },
   {
+    id: "pre-mot-checks",
     icon: ShieldCheck,
     title: "Pre-MOT Checks",
     service: "Pre-MOT Checks",
@@ -120,7 +127,7 @@ function Services() {
         description="Servicing, repairs, fault finding, key fobs and pre-MOT checks for scooters and motorcycles every make and model, by technicians who ride."
         image={images.hero}
         imageAlt="Technician servicing a blue scooter in our workshop"
-        imagePosition="65% center"
+        imagePosition="65% 8%"
       >
         <div className="landing-actions">
           <Link to="/contact" search={{ service: "Servicing" }} className="landing-button landing-button-blue">
@@ -150,7 +157,7 @@ function Services() {
         </div>
         <div className="landing-split-list">
           {blocks.map((b, i) => (
-            <article key={b.title} className={`landing-split${i % 2 ? " landing-split-reverse" : ""}`}>
+            <article key={b.title} id={b.id} className={`landing-split${i % 2 ? " landing-split-reverse" : ""}`}>
               <div className="landing-split-photo">
                 <img src={b.image} alt={b.imageAlt} loading="lazy" />
                 <span className="landing-photo-badge">
@@ -175,7 +182,7 @@ function Services() {
         </div>
       </section>
 
-      <section className="landing-container landing-block" aria-labelledby="parts-title">
+      <section id="parts" className="landing-container landing-block" aria-labelledby="parts-title">
         <div className="landing-panel">
           <div className="landing-split">
             <div className="landing-split-copy">

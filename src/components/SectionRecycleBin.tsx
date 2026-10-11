@@ -81,12 +81,12 @@ export function SectionRecycleBin({
   const [detail, setDetail] = useState<any | null>(null);
 
   return (
-    <section className="mb-5 rounded-md border border-border bg-surface-elevated">
+    <section className="mb-5 rounded-xl border border-border bg-surface-elevated shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-2 text-left text-xs font-semibold uppercase tracking-widest text-foreground hover:text-primary"
+          className="inline-flex items-center gap-2 text-left text-sm font-medium text-ink-muted hover:text-primary"
         >
           <Trash2 className="h-4 w-4" /> {title ?? `${LABELS[type]} Recycle Bin`} {open && rows.length > 0 ? `(${rows.length})` : ""}
         </button>
@@ -94,7 +94,7 @@ export function SectionRecycleBin({
           <button
             type="button"
             onClick={() => items.refetch()}
-            className="inline-flex items-center gap-1 rounded-sm border border-border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest hover:border-primary hover:text-primary"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
           >
             <RefreshCw className="h-3.5 w-3.5" /> Refresh
           </button>

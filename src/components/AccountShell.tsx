@@ -1,9 +1,12 @@
-import { useState, createContext, useContext, type ReactNode } from "react";
+import { useState, useLayoutEffect, createContext, useContext, type ReactNode } from "react";
 import { Link, useRouter, useLocation } from "@tanstack/react-router";
 import { BRAND } from "@/lib/brand";
-import { CreditCard, History, LogOut, Wrench, ShieldCheck, Users, Settings, FileBarChart, Package, FolderTree, ClipboardList, Undo2, Receipt, ChevronDown, ChevronRight, PanelLeftOpen, ShoppingBag, Menu, X, LayoutDashboard, FileText, Bike, Trash2, ChartNoAxesCombined, UserRound, Inbox } from "lucide-react";
+import {
+  History, LogOut, Wrench, Users, Settings, FileBarChart, Package, FolderTree,
+  ClipboardList, Undo2, Receipt, ChevronDown, ShoppingBag, Menu, LayoutDashboard, FileText, Bike, Trash2,
+  ChartNoAxesCombined, UserRound, Inbox, Globe, ChevronsUpDown, type LucideIcon,
+} from "lucide-react";
 import { UserAvatarImg, useMyAvatarUrl } from "./UserAvatar";
-import { SiteLayout } from "./SiteLayout";
 import { AppShell } from "./AppShell";
 import { BackButton } from "./BackButton";
 import { useAppMode } from "@/lib/app-mode";
@@ -12,8 +15,19 @@ import { useMyStaffPermissions } from "@/hooks/use-staff-permissions";
 import { setSidebarHidden, useSidebarHidden } from "@/hooks/use-sidebar-hidden";
 import { isActivityBlocked } from "@/lib/activity-access";
 import { TillToolbar } from "@/components/till/TillModules";
-import { Button } from "@/components/ui/button";
 import { FEATURES } from "@/lib/features";
+import { cn } from "@/lib/utils";
+import {
+  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
+  SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import { RouteProgress } from "./RouteProgress";
 
 function useCollapsed(key: string, initial = false) {
   const [open, setOpen] = useState<boolean>(() => {
@@ -31,218 +45,327 @@ function useCollapsed(key: string, initial = false) {
   return [open, toggle] as const;
 }
 
-type SidebarContextType = { hidden: boolean; toggle: () => void };
-const SidebarContext = createContext<SidebarContextType>({ hidden: false, toggle: () => {} });
+type ShellOptions = {
+  title?: string;
+  hideHeader?: boolean;
+  compact?: boolean;
+  fullWidth?: boolean;
+  hideFooter?: boolean;
+  hideFloating?: boolean;
+  hideLastSignIn?: boolean;
+};
 
-export function useSidebar() {
-  return useContext(SidebarContext);
+// Set by AccountShellLayout: pages hand it their shell options instead of
+// rendering their own shell, so the sidebar, header and toolbars stay mounted
+// while only the page content changes on navigation.
+const ShellRegistry = createContext<((options: ShellOptions | null) => void) | null>(null);
+
+/** Persistent signed-in layout; wraps the authenticated route's <Outlet />. */
+export function AccountShellLayout({ children }: { children: ReactNode }) {
+  const [options, setOptions] = useState<ShellOptions | null>(null);
+  return (
+    <ShellRegistry.Provider value={setOptions}>
+      <AccountShellFrame options={options}>{children}</AccountShellFrame>
+    </ShellRegistry.Provider>
+  );
 }
 
-export function AccountShell({ children, title, hideHeader = false, compact = false, hideFooter = false, hideFloating = true, hideLastSignIn = false }: { children: ReactNode; title?: string; hideHeader?: boolean; compact?: boolean; fullWidth?: boolean; hideFooter?: boolean; hideFloating?: boolean; hideLastSignIn?: boolean }) {
-  const auth = useAuth();
-  const { loading, rolesLoading, user, isStaff, isAdmin } = auth;
-  const { data: avatarUrl } = useMyAvatarUrl(!!user);
-  const { perms } = useMyStaffPermissions();
-  const router = useRouter();
+/**
+ * Page wrapper. Inside AccountShellLayout it only reports its title/options to
+ * the persistent shell; on its own it renders the full shell.
+ */
+export function AccountShell({ children, ...options }: ShellOptions & { children: ReactNode }) {
+  const register = useContext(ShellRegistry);
+  const { title, hideHeader, compact, hideFooter, hideFloating, hideLastSignIn } = options;
+  useLayoutEffect(() => {
+    if (!register) return;
+    register({ title, hideHeader, compact, hideFooter, hideFloating, hideLastSignIn });
+    return () => register(null);
+  }, [register, title, hideHeader, compact, hideFooter, hideFloating, hideLastSignIn]);
+  if (register) return <>{children}</>;
+  return <AccountShellFrame options={options}>{children}</AccountShellFrame>;
+}
+
+/**
+ * The shell itself (shadcn sidebar + inset). `options === null` means the
+ * current page has no shell (receipts, invoices); the element tree stays the
+ * same so the page never remounts, only the chrome is left out.
+ */
+function AccountShellFrame({ children, options }: { children: ReactNode; options: ShellOptions | null }) {
+  const bare = options === null;
+  const { title, compact = false, hideLastSignIn = false } = options ?? {};
+  const { user, isAdmin, loading, rolesLoading } = useAuth();
   const { pathname } = useLocation();
-  const isPosPage = pathname === "/staff/pos";
-  const [staffOpen, toggleStaff] = useCollapsed("staff");
-  const [tillOpen, toggleTill] = useCollapsed("admin-till");
-  const [catOpen, toggleCat] = useCollapsed("admin-catalogue");
-  const [rentalOpen, toggleRental] = useCollapsed("admin-rental");
-  const [moneyOpen, toggleMoney] = useCollapsed("admin-money");
-  const [sysOpen, toggleSys] = useCollapsed("admin-system");
-  const { hidden, toggle: toggleHidden } = useSidebarHidden();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { hidden } = useSidebarHidden();
   const appMode = useAppMode();
   const rolesReady = !loading && !rolesLoading;
 
-  // Native app: replace the entire sidebar/header shell with the compact
-  // AppShell (top bar + bottom tab nav). Desktop and mobile-web are unchanged.
+  // Native app: the compact AppShell (top bar + bottom tab nav) replaces this shell.
   if (appMode) {
-    return <AppShell title={title}>{children}</AppShell>;
+    return bare ? <>{children}</> : <AppShell title={title}>{children}</AppShell>;
   }
+
+  return (
+    <SidebarProvider open={!hidden} onOpenChange={(open) => setSidebarHidden(!open)}>
+      <RouteProgress />
+      {!bare && <AdminSidebar />}
+      <SidebarInset className={bare ? undefined : "min-w-0"}>
+        {!bare && (
+          <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/85 px-4 backdrop-blur md:rounded-t-xl">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-1 h-5" />
+            <BackButton compact />
+            {title && <h1 className="truncate text-lg font-semibold tracking-tight">{title}</h1>}
+            <Link
+              to="/"
+              className="ml-auto hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-ink-muted hover:bg-accent hover:text-accent-foreground sm:inline-flex"
+            >
+              <Globe className="h-4 w-4" /> Website
+            </Link>
+          </header>
+        )}
+        <div
+          data-account-workspace={bare ? undefined : ""}
+          className={bare ? undefined : cn("min-w-0 flex-1", compact ? "p-3 md:p-4" : "p-4 md:p-6", rolesReady && isAdmin && "pb-24 lg:pb-6")}
+        >
+          {!bare && pathname === "/staff/pos" && (
+            <div className="mb-3 flex flex-wrap items-center gap-1.5">
+              <TillToolbar />
+            </div>
+          )}
+          {!bare && !hideLastSignIn && <LastSignInBanner user={user} emphasized={isAdmin} />}
+          {children}
+        </div>
+        {!bare && rolesReady && isAdmin && <AdminBottomNav pathname={pathname} />}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+type NavLink = { to: string; label: string; icon: LucideIcon; show?: boolean };
+type NavGroup = { key: string; title: string; links: NavLink[] };
+
+function AdminSidebar() {
+  const auth = useAuth();
+  const { user, isStaff, isAdmin, loading, rolesLoading } = auth;
+  const { perms } = useMyStaffPermissions();
+  const { data: avatarUrl } = useMyAvatarUrl(!!user);
+  const router = useRouter();
+  const { pathname } = useLocation();
+  const { isMobile, setOpenMobile, state } = useSidebar();
+  const rolesReady = !loading && !rolesLoading;
+
+  const groups: NavGroup[] = !rolesReady
+    ? []
+    : isAdmin
+      ? [
+          {
+            key: "admin-till",
+            title: "Till & Sales",
+            links: [
+              { to: "/staff/pos", label: "POS", icon: Wrench },
+              { to: "/staff/sales", label: "Sales", icon: ShoppingBag },
+              { to: "/staff/refunds", label: "Refunds", icon: Undo2 },
+              { to: "/staff/customers", label: "Customers", icon: UserRound },
+              { to: "/admin/enquiries", label: "Enquiries", icon: Inbox },
+            ],
+          },
+          {
+            key: "admin-catalogue",
+            title: "Catalogue & Stock",
+            links: [
+              { to: "/staff/products", label: "Products", icon: Package },
+              { to: "/staff/categories", label: "Categories", icon: FolderTree },
+              { to: "/admin/inventory", label: "Stock / Inventory", icon: Package },
+              { to: "/admin/lost-damaged", label: "Lost & Damaged", icon: ClipboardList },
+            ],
+          },
+          {
+            key: "admin-rental",
+            title: "Rental & Claims",
+            links: [
+              { to: "/admin/rental", label: "Rental", icon: Bike },
+              { to: "/admin/finance", label: "Motorbike Financing", icon: Bike, show: FEATURES.finance },
+              { to: "/admin/claims", label: "Claims", icon: FileText },
+            ],
+          },
+          {
+            key: "admin-money",
+            title: "Money & Reports",
+            links: [
+              { to: "/staff/expenses", label: "Expenses", icon: Receipt },
+              { to: "/admin/profit-loss", label: "Profit & Loss", icon: ChartNoAxesCombined },
+              { to: "/admin/reports", label: "Admin Reports", icon: FileBarChart },
+            ],
+          },
+          {
+            key: "admin-system",
+            title: "System",
+            links: [
+              { to: "/admin/team", label: "Team & Roles", icon: Users },
+              { to: "/admin/activity", label: "Activity", icon: History, show: !isActivityBlocked(user?.email) },
+              { to: "/admin/recycle", label: "Recycle Bin", icon: Trash2 },
+              { to: "/admin/settings", label: "Settings", icon: Settings },
+            ],
+          },
+        ]
+      : isStaff
+        ? [
+            {
+              key: "staff",
+              title: "Staff",
+              links: [
+                { to: "/staff/pos", label: "POS", icon: Wrench, show: perms.pos },
+                { to: "/staff/sales", label: "Sales", icon: ShoppingBag, show: perms.sales },
+                { to: "/staff/customers", label: "Customers", icon: UserRound, show: perms.pos },
+                { to: "/staff/products", label: "Products", icon: Package, show: perms.products },
+                { to: "/staff/categories", label: "Categories", icon: FolderTree, show: perms.categories },
+                { to: "/staff/refunds", label: "Refunds", icon: Undo2, show: perms.refunds },
+                { to: "/staff/expenses", label: "Expenses", icon: Receipt, show: perms.expenses },
+              ],
+            },
+          ]
+        : [];
 
   async function handleSignOut() {
     await signOut();
     router.navigate({ to: "/auth" });
   }
 
-  function requestPosFullscreen() {
-    // Auto fullscreen disabled per user request. Use the in-POS button to toggle.
-  }
-
-  const sidebarContent = (
-    <>
-      <Link to="/" className="mb-4 block px-2" aria-label={`${BRAND.name} home`}>
-        <img src="/images/brand/staines-logo.png" alt={BRAND.name} className="h-16 w-auto" />
-      </Link>
-      <div className="mb-3 flex items-center justify-between gap-2 px-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-muted">Navigation</span>
-        <button
-          onClick={handleSignOut}
-          className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-surface-elevated px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground hover:border-primary hover:text-primary"
-        >
-          <LogOut className="h-3.5 w-3.5" /> Sign out
-        </button>
-      </div>
-
-      {rolesReady && isStaff && !isAdmin && (
-        <Section title="Staff" open={staffOpen} onToggle={toggleStaff} className="mt-6">
-          {perms.pos && <NavItem to="/staff/pos" icon={Wrench} onNavigate={() => { setMobileOpen(false); requestPosFullscreen(); }}>POS</NavItem>}
-          {perms.sales && <NavItem to="/staff/sales" icon={ShoppingBag} onNavigate={() => setMobileOpen(false)}>Sales</NavItem>}
-          {perms.pos && <NavItem to="/staff/customers" icon={UserRound} onNavigate={() => setMobileOpen(false)}>Customers</NavItem>}
-          {perms.products && <NavItem to="/staff/products" icon={Package} onNavigate={() => setMobileOpen(false)}>Products</NavItem>}
-          {perms.categories && <NavItem to="/staff/categories" icon={FolderTree} onNavigate={() => setMobileOpen(false)}>Categories</NavItem>}
-          {perms.refunds && <NavItem to="/staff/refunds" icon={Undo2} onNavigate={() => setMobileOpen(false)}>Refunds</NavItem>}
-          {perms.expenses && <NavItem to="/staff/expenses" icon={Receipt} onNavigate={() => setMobileOpen(false)}>Expenses</NavItem>}
-        </Section>
-      )}
-
-      {rolesReady && isAdmin && (
-        <>
-          <Section title="Till & Sales" open={tillOpen} onToggle={toggleTill} className="mt-6">
-            <NavItem to="/staff/pos" icon={Wrench} onNavigate={() => { setMobileOpen(false); requestPosFullscreen(); }}>POS</NavItem>
-            <NavItem to="/staff/sales" icon={ShoppingBag} onNavigate={() => setMobileOpen(false)}>Sales</NavItem>
-            <NavItem to="/staff/refunds" icon={Undo2} onNavigate={() => setMobileOpen(false)}>Refunds</NavItem>
-            <NavItem to="/staff/customers" icon={UserRound} onNavigate={() => setMobileOpen(false)}>Customers</NavItem>
-            <NavItem to="/admin/enquiries" icon={Inbox} onNavigate={() => setMobileOpen(false)}>Enquiries</NavItem>
-            <NavItem to="/admin/card-terminal" icon={CreditCard} onNavigate={() => setMobileOpen(false)}>Card Terminal</NavItem>
-          </Section>
-
-          <Section title="Catalogue & Stock" open={catOpen} onToggle={toggleCat} className="mt-6">
-            <NavItem to="/staff/products" icon={Package} onNavigate={() => setMobileOpen(false)}>Products</NavItem>
-            <NavItem to="/staff/categories" icon={FolderTree} onNavigate={() => setMobileOpen(false)}>Categories</NavItem>
-            <NavItem to="/admin/inventory" icon={Package} onNavigate={() => setMobileOpen(false)}>Stock/Inventory</NavItem>
-            <NavItem to="/admin/lost-damaged" icon={ClipboardList} onNavigate={() => setMobileOpen(false)}>Lost &amp; Damaged</NavItem>
-          </Section>
-
-          <Section title="Rental & Claims" open={rentalOpen} onToggle={toggleRental} className="mt-6">
-            <NavItem to="/admin/rental" icon={Bike} onNavigate={() => setMobileOpen(false)}>Rental</NavItem>
-            {FEATURES.finance && <NavItem to="/admin/finance" icon={Bike} onNavigate={() => setMobileOpen(false)}>Motorbike Financing</NavItem>}
-            <NavItem to="/admin/claims" icon={FileText} onNavigate={() => setMobileOpen(false)}>Claims</NavItem>
-          </Section>
-
-          <Section title="Money & Reports" open={moneyOpen} onToggle={toggleMoney} className="mt-6">
-            <NavItem to="/staff/expenses" icon={Receipt} onNavigate={() => setMobileOpen(false)}>Expenses</NavItem>
-            <NavItem to="/admin/profit-loss" icon={FileBarChart} onNavigate={() => setMobileOpen(false)}>Profit &amp; Loss</NavItem>
-            <NavItem to="/admin/reports" icon={FileBarChart} onNavigate={() => setMobileOpen(false)}>Admin Reports</NavItem>
-          </Section>
-
-          <Section title="System" open={sysOpen} onToggle={toggleSys} className="mt-6">
-            <NavItem to="/admin" icon={ShieldCheck} onNavigate={() => setMobileOpen(false)}>Dashboard</NavItem>
-            <NavItem to="/admin/team" icon={Users} onNavigate={() => setMobileOpen(false)}>Team &amp; Roles</NavItem>
-            {!isActivityBlocked(user?.email) && <NavItem to="/admin/activity" icon={History} onNavigate={() => setMobileOpen(false)}>Activity</NavItem>}
-            <NavItem to="/admin/recycle" icon={Trash2} onNavigate={() => setMobileOpen(false)}>Recycle Bin</NavItem>
-            <NavItem to="/admin/settings" icon={Settings} onNavigate={() => setMobileOpen(false)}>Settings</NavItem>
-          </Section>
-        </>
-      )}
-
-      <button
-        onClick={handleSignOut}
-        className="mt-6 flex w-full items-center gap-3 rounded-sm border border-border bg-surface-elevated px-3 py-3 text-xs font-semibold uppercase tracking-widest text-foreground hover:border-primary hover:text-primary"
-      >
-        <LogOut className="h-4 w-4" /> Sign out
-      </button>
-    </>
-  );
+  const roleLabel = auth.isOwner ? "Owner" : isAdmin ? "Admin" : "Staff";
 
   return (
-    <SidebarContext.Provider value={{ hidden, toggle: toggleHidden }}>
-      <SiteLayout hideHeader={hideHeader || (!!user && auth.isAdmin)} hideFooter={hideFooter} hideFloating={hideFloating}>
-        <div data-account-workspace className={`w-full max-w-none px-0 grid grid-cols-[minmax(0,1fr)] gap-6 ${compact ? "" : "pt-2 pb-6 lg:pb-10"} ${rolesReady && isAdmin ? "pb-[4.75rem]" : ""} ${hidden ? "" : "lg:grid-cols-[260px_minmax(0,1fr)]"}`}>
-          {/* Desktop sidebar */}
-          {!hidden && (
-            <aside className={`hidden lg:sticky lg:block lg:self-start ${isAdmin ? "lg:top-2" : "lg:top-24"}`}>
-              {sidebarContent}
-            </aside>
-          )}
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild tooltip={BRAND.name}>
+              <Link to={isAdmin ? "/admin" : "/staff/pos"}>
+                <img
+                  src="/images/brand/staines-badge.webp"
+                  alt=""
+                  className="size-8 shrink-0 rounded-full object-contain"
+                />
+                <span className="grid min-w-0 flex-1 text-left leading-tight">
+                  <span className="truncate text-sm font-semibold">{BRAND.name}</span>
+                  <span className="truncate text-xs text-sidebar-foreground/70">Workshop admin</span>
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-          <section className="min-w-0">
-            <div className={`flex flex-wrap items-center gap-3 ${compact ? "" : "mb-4"}`}>
-              {isPosPage && (
-                <div className="order-first flex flex-wrap items-center gap-1.5">
-                  <TillToolbar />
-                </div>
-              )}
-              {/* Back button — hidden on root/home pages via BackButton logic */}
-              <BackButton />
-              {/* Desktop show-sidebar */}
-              {hidden && !compact && (
-                <button
-                  onClick={toggleHidden}
-                  title="Show sidebar"
-                  className="hidden items-center gap-1 rounded-sm border border-border bg-surface-elevated px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:border-primary hover:text-primary lg:inline-flex"
+      <SidebarContent>
+        {rolesReady && isAdmin && (
+          <SidebarGroup>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/admin"} tooltip="Dashboard">
+                  <Link to="/admin" onClick={() => isMobile && setOpenMobile(false)}>
+                    <LayoutDashboard />
+                    <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+        {groups.map((g) => (
+          <NavSection
+            key={g.key}
+            group={g}
+            pathname={pathname}
+            forceOpen={state === "collapsed" && !isMobile}
+            onNavigate={() => isMobile && setOpenMobile(false)}
+          />
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={user?.email ?? "Account"}
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <PanelLeftOpen className="h-4 w-4" /> Show menu
-                </button>
-              )}
-              {title && <h1 className="font-display text-2xl uppercase leading-none sm:text-3xl md:text-4xl">{title}</h1>}
-              {/* Admin actions stay together alongside the page heading. */}
-              <div className={`flex items-center gap-2 ${isAdmin ? "ml-auto w-auto shrink-0" : "w-full lg:ml-auto lg:w-auto"}`}>
-                {/* Mobile hamburger — first item in this row on mobile */}
-                <button
-                  onClick={() => setMobileOpen(true)}
-                  aria-label="Open menu"
-                  className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface-elevated px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:border-primary hover:text-primary lg:hidden"
-                >
-                  <Menu className="h-5 w-5" /> Menu
-                </button>
-                <div className="ml-auto flex items-center gap-2 lg:ml-0">
-                  <span title={user?.email ?? undefined} className="rounded-full">
+                  <span className="shrink-0">
                     <UserAvatarImg url={avatarUrl} name={user?.email ?? undefined} size={32} />
                   </span>
-                  {isAdmin && (
-                    <Button asChild variant="outline" size="sm" className="h-9 px-2 text-[10px] font-semibold uppercase sm:px-3">
-                      <Link to="/staff/pos" title="Workshop">
-                        <Wrench className="h-4 w-4" /> Workshop
-                      </Link>
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSignOut}
-                    title="Sign out"
-                    className="h-9 px-2 text-[10px] font-semibold uppercase sm:px-3"
-                  >
-                    <LogOut className="h-4 w-4" /> Sign out
-                  </Button>
-                </div>
-              </div>
+                  <span className="grid min-w-0 flex-1 text-left leading-tight">
+                    <span className="truncate text-sm font-semibold">{user?.email}</span>
+                    <span className="truncate text-xs text-sidebar-foreground/70">{roleLabel}</span>
+                  </span>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side={isMobile ? "bottom" : "right"} align="end" className="min-w-56 rounded-lg">
+                <DropdownMenuLabel className="truncate font-normal text-ink-muted">{user?.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/staff/pos"><Wrench /> Workshop (POS)</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/"><Globe /> View website</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
 
-            </div>
-            {!hideLastSignIn && <LastSignInBanner user={user} emphasized={isAdmin} />}
-            {children}
-          </section>
-        </div>
-
-        {rolesReady && isAdmin && (
-          <AdminBrowserBottomNav pathname={pathname} onMenuOpen={() => setMobileOpen(true)} />
-        )}
-
-      {/* Mobile drawer overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-[85%] max-w-[320px] overflow-y-auto bg-background p-4 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-muted">Menu</span>
-              <button
-                onClick={() => setMobileOpen(false)}
-                aria-label="Close menu"
-                className="rounded-sm border border-border bg-surface-elevated p-1.5 hover:border-primary hover:text-primary"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            {sidebarContent}
-          </aside>
-        </div>
-      )}
-    </SiteLayout>
-    </SidebarContext.Provider>
+function NavSection({
+  group,
+  pathname,
+  forceOpen,
+  onNavigate,
+}: {
+  group: NavGroup;
+  pathname: string;
+  forceOpen: boolean;
+  onNavigate: () => void;
+}) {
+  const [open, toggle] = useCollapsed(group.key);
+  const links = group.links.filter((l) => l.show !== false);
+  if (links.length === 0) return null;
+  return (
+    <Collapsible open={open || forceOpen} onOpenChange={toggle} className="group/collapsible">
+      <SidebarGroup>
+        <SidebarGroupLabel asChild>
+          <CollapsibleTrigger className="w-full">
+            {group.title}
+            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180 group-data-[collapsible=icon]:hidden" />
+          </CollapsibleTrigger>
+        </SidebarGroupLabel>
+        <CollapsibleContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {links.map(({ to, label, icon: Icon }) => (
+                <SidebarMenuItem key={to}>
+                  <SidebarMenuButton asChild isActive={pathname === to} tooltip={label}>
+                    <Link to={to} onClick={onNavigate}>
+                      <Icon />
+                      <span>{label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </CollapsibleContent>
+      </SidebarGroup>
+    </Collapsible>
   );
 }
 
@@ -263,22 +386,24 @@ const ADMIN_BOTTOM_LINKS = [
   { to: "/admin/profit-loss", label: "Profit & Loss", icon: ChartNoAxesCombined },
 ];
 
-function AdminBrowserBottomNav({ pathname, onMenuOpen }: { pathname: string; onMenuOpen: () => void }) {
-  const isActive = (to: string) => to === "/admin" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`);
+/** Phone/tablet tab bar for administrators; on large screens the sidebar is enough. */
+function AdminBottomNav({ pathname }: { pathname: string }) {
+  const { setOpenMobile } = useSidebar();
+  const isActive = (to: string) => (to === "/admin" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`));
 
   return (
     <nav
       aria-label="Administrator navigation"
-      className="fixed inset-x-0 bottom-0 z-[70] h-[4.25rem] overflow-x-auto border-t border-border bg-surface-elevated shadow-[0_-3px_14px_color-mix(in_oklab,var(--foreground)_10%,transparent)]"
+      className="fixed inset-x-0 bottom-0 z-[70] h-[4.25rem] overflow-x-auto border-t border-border bg-surface-elevated shadow-[0_-3px_14px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:hidden"
     >
-      <div className="flex h-full min-w-max items-stretch lg:min-w-full">
+      <div className="flex h-full min-w-max items-stretch">
         <button
           type="button"
-          onClick={onMenuOpen}
-          className="flex w-[5.75rem] shrink-0 flex-col items-center justify-center gap-1 text-foreground transition-colors hover:bg-surface hover:text-primary lg:flex-1"
+          onClick={() => setOpenMobile(true)}
+          className="flex w-[5.75rem] shrink-0 flex-col items-center justify-center gap-1 text-foreground transition-colors hover:bg-surface hover:text-primary"
         >
           <Menu className="h-[18px] w-[18px]" strokeWidth={1.8} />
-          <span className="whitespace-nowrap text-[10px] font-medium leading-none">Menu</span>
+          <span className="whitespace-nowrap text-[11px] font-medium leading-none">Menu</span>
         </button>
         {ADMIN_BOTTOM_LINKS.map(({ to, label, icon: Icon }) => {
           const active = isActive(to);
@@ -287,10 +412,10 @@ function AdminBrowserBottomNav({ pathname, onMenuOpen }: { pathname: string; onM
               key={to}
               to={to}
               aria-current={active ? "page" : undefined}
-              className={`flex w-[5.75rem] shrink-0 flex-col items-center justify-center gap-1 transition-colors lg:flex-1 ${active ? "text-primary" : "text-foreground hover:bg-surface hover:text-primary"}`}
+              className={`flex w-[5.75rem] shrink-0 flex-col items-center justify-center gap-1 transition-colors ${active ? "text-primary" : "text-foreground hover:bg-surface hover:text-primary"}`}
             >
               <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
-              <span className="whitespace-nowrap text-[10px] font-medium leading-none">{label}</span>
+              <span className="whitespace-nowrap text-[11px] font-medium leading-none">{label}</span>
             </Link>
           );
         })}
@@ -298,45 +423,6 @@ function AdminBrowserBottomNav({ pathname, onMenuOpen }: { pathname: string; onM
     </nav>
   );
 }
-
-function Section({ title, open, onToggle, children, className = "" }: { title: string; open: boolean; onToggle: () => void; children: ReactNode; className?: string }) {
-  return (
-    <div className={className}>
-      <button
-        onClick={onToggle}
-        className="mb-3 flex w-full items-center justify-between px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary hover:opacity-80"
-      >
-        <span>{title}</span>
-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-      </button>
-      {open && (
-        <nav className="grid gap-1 p-2">
-          {children}
-        </nav>
-      )}
-    </div>
-  );
-}
-
-function NavItem({ to, icon: Icon, children, onNavigate }: { to: string; icon: React.ComponentType<{ className?: string }>; children: ReactNode; onNavigate?: () => void }) {
-  return (
-    <Link
-      to={to}
-      onClick={onNavigate}
-      activeOptions={{ exact: true }}
-      activeProps={{ className: "bg-primary text-primary-foreground" }}
-      inactiveProps={{ className: "text-foreground hover:bg-surface" }}
-      className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-xs font-semibold uppercase tracking-widest"
-    >
-      <Icon className="h-4 w-4" />
-      {children}
-    </Link>
-  );
-}
-
-// Keep some imports referenced to avoid unused warnings on future edits
-void ClipboardList;
-
 
 function LastSignInBanner({ user, emphasized }: { user: { last_sign_in_at?: string | null } | null; emphasized: boolean }) {
   const raw = user?.last_sign_in_at;
@@ -358,20 +444,16 @@ function LastSignInBanner({ user, emphasized }: { user: { last_sign_in_at?: stri
     hour: "2-digit", minute: "2-digit",
   });
 
-  if (emphasized) {
-    return (
-      <div className="mb-4 rounded-sm border border-primary/60 bg-surface-elevated px-3 py-2">
-        <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">Last sign-in</p>
-        <p className="mt-0.5 text-xs font-semibold text-foreground">{dateLabel}</p>
-        <p className="text-[11px] text-ink-muted">{sinceLabel}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="mb-4 rounded-sm border border-border bg-surface-elevated px-3 py-1.5 text-[11px] text-ink-muted">
-      Last signed in <span className="font-semibold text-foreground">{dateLabel}</span> · <span className="font-semibold text-foreground">{sinceLabel}</span>
+    <div
+      className={cn(
+        "mb-4 inline-flex flex-wrap items-center gap-x-2 rounded-lg border bg-surface-elevated px-3 py-1.5 text-xs text-ink-muted",
+        emphasized ? "border-primary/30" : "border-border",
+      )}
+    >
+      <span className="font-medium text-primary">Last sign-in</span>
+      <span className="font-semibold text-foreground">{dateLabel}</span>
+      <span>· {sinceLabel}</span>
     </div>
   );
-
 }

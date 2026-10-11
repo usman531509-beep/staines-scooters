@@ -111,7 +111,7 @@ function Rental() {
         description="Honda 125s on simple weekly terms ideal for commuters, delivery riders and cover while your own bike is in for repair."
         image={images.hero}
         imageAlt="Rider on a rental scooter in the city"
-        imagePosition="70% center"
+        imagePosition="70% 8%"
       >
         <div className="landing-chips">
           <div className="landing-chip">
@@ -137,7 +137,7 @@ function Rental() {
         </div>
       </PageHero>
 
-      <section className="landing-container landing-block" aria-labelledby="fleet-title">
+      <section id="fleet" className="landing-container landing-block" aria-labelledby="fleet-title">
         <div className="landing-section-heading">
           <div>
             <p className="landing-eyebrow">The fleet</p>
@@ -174,7 +174,7 @@ function Rental() {
         </div>
       </section>
 
-      <section className="landing-container landing-block" aria-labelledby="need-title">
+      <section id="requirements" className="landing-container landing-block" aria-labelledby="need-title">
         <div className="landing-split">
           <div className="landing-split-photo">
             <img src={images.urban} alt="Maxi scooter parked by the river, ready to ride" loading="lazy" />
@@ -196,7 +196,7 @@ function Rental() {
         </div>
       </section>
 
-      <section className="landing-container landing-block" aria-labelledby="terms-title">
+      <section id="terms" className="landing-container landing-block" aria-labelledby="terms-title">
         <div className="landing-panel">
           <div className="landing-block-heading">
             <p className="landing-eyebrow">Simple terms</p>

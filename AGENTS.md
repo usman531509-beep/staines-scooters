@@ -1,8 +1,9 @@
 > [!IMPORTANT]
 > This project is deployed on Vercel (not Lovable). `vite.config.ts` switches the Nitro preset to `vercel` when `VERCEL` is set, and `vercel.json` holds the install/build commands and the cron schedule. Keep the main branch in a working state; avoid rewriting pushed history.
 
-- Render the browser-only administrator bottom navigation in `AccountShell`; this keeps it consistent across admin pages while leaving installed-app navigation independent.
-- Suppress website chrome for authenticated admins in SiteHeader and the shared account shells, keeping account actions in the shell header so individual pages cannot restore the public header.
+- The signed-in shell (shadcn `Sidebar` + `SidebarInset`) is mounted once by `AccountShellLayout` in `_authenticated/route.tsx`; a page's `<AccountShell title=…>` only registers its options with it, so navigating swaps the page content without remounting the sidebar, header or till toolbar. Pages without `AccountShell` (receipts, invoices) render bare.
+- Render the browser-only administrator bottom navigation in `AccountShell` (phones/tablets only; the sidebar covers large screens); this keeps it consistent across admin pages while leaving installed-app navigation independent.
+- The signed-in shell never renders the public website header; on the public website, signed-in staff still see the navbar, with "Dashboard" (admins → /admin, staff → /staff/pos) in place of "Login".
 - Keep AccountShell and AppShell page workspaces full-width without outer horizontal gutters; shared shell sizing prevents individual signed-in pages reverting to a centred layout.
 - Rental rent for admins other than the exempt original owner is charged as direct charges on that admin's own Stripe Connect account (stripe-connect.server.ts); the exempt owner keeps the built-in Stripe flow so existing payments are untouched.
 - Motorbike finance maths lives in `src/lib/finance-calc.ts` (pure, integer pence) and is recomputed server-side in `finance.server.ts` on every save; the browser only previews, so stored schedules are always server-authoritative.

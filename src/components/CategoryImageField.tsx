@@ -34,8 +34,8 @@ export function CategoryImageField({
   const box = size === "sm" ? "h-8 w-8" : "h-12 w-12";
   const icon = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
   const btn = size === "sm"
-    ? "inline-flex cursor-pointer items-center gap-1 rounded-sm border border-border px-2 py-1 text-[10px] uppercase tracking-widest hover:bg-surface-elevated"
-    : "inline-flex cursor-pointer items-center gap-2 rounded-sm border border-border px-3 py-2 text-[10px] font-semibold uppercase tracking-widest hover:bg-surface-elevated";
+    ? "inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground"
+    : "inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground";
 
   async function uploadBlob(blob: Blob) {
     const path = `${pathPrefix}/${crypto.randomUUID()}.jpg`;

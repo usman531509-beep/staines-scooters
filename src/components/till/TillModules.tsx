@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { X } from "lucide-react";
+import { Banknote, CreditCard, History, Printer, Receipt, ShoppingBag, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-client";
 import { isCostHidden } from "@/lib/cost-visibility";
 import { money, tillPrint, tillPrintThermalSales } from "@/lib/till-print";
@@ -18,9 +18,14 @@ import { upsertExpense } from "@/lib/garage.functions";
 import { UpdateAppButton } from "@/components/till/UpdateAppButton";
 
 const BTN =
-  "inline-flex h-7 items-center rounded-sm border border-border bg-surface-elevated px-2.5 text-[10px] font-semibold uppercase tracking-wider text-foreground transition-colors hover:border-primary hover:text-primary disabled:opacity-50";
+  "inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-elevated px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50 [&_svg]:size-4";
 const BTN_RED =
-  "inline-flex h-7 items-center rounded-sm border border-primary bg-primary px-2.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50";
+  "inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 [&_svg]:size-4";
+// Toolbar-only styles: stat tiles and quiet icon buttons.
+const TILE =
+  "inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-surface-elevated px-3 text-sm transition-colors hover:bg-accent [&_svg]:size-4";
+const GHOST =
+  "inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-accent hover:text-accent-foreground [&_svg]:size-4";
 const FIELD =
   "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
 const LABEL = "mb-1 block text-[10px] font-semibold uppercase tracking-widest text-ink-muted";
@@ -858,29 +863,40 @@ export function TillToolbar() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-1.5">
-        <button onClick={() => navigate({ to: "/staff/sales" })} className={BTN}>
-          Orders
-        </button>
-        <button onClick={() => setDialog("reports")} className={BTN}>
-          Print Reports
-        </button>
-        <button onClick={() => setDialog("expense")} className={BTN}>
-          Expenses
-        </button>
-        <button onClick={() => setDialog("till")} className={o.session ? BTN : BTN_RED}>
-          {o.session ? "Close Till" : "Open Till"}
-        </button>
-        <button onClick={() => setDialog("closed")} className={BTN}>
-          Closed Tills
-        </button>
-        <button onClick={() => setDialog("cash")} className={BTN}>
-          Cash in Till {pounds(o.inDrawerPence ?? 0)}
-        </button>
-        <button onClick={() => setDialog("card")} className={BTN}>
-          Cash with Card {pounds(o.cardTodayPence ?? 0)}
-        </button>
-        <UpdateAppButton />
+      <div className="flex w-full flex-wrap items-center gap-2">
+        {/* Till status and today's takings */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={() => setDialog("till")} className={o.session ? BTN : BTN_RED}>
+            <span className={`size-2 rounded-full ${o.session ? "bg-emerald-500" : "bg-white/80"}`} aria-hidden="true" />
+            {o.session ? "Till open · Close" : "Open till"}
+          </button>
+          <button onClick={() => setDialog("cash")} className={TILE} title="Cash in the drawer">
+            <Banknote className="text-emerald-600" />
+            <span className="text-ink-muted">Cash in till</span>
+            <span className="font-semibold tabular-nums">{pounds(o.inDrawerPence ?? 0)}</span>
+          </button>
+          <button onClick={() => setDialog("card")} className={TILE} title="Card takings today">
+            <CreditCard className="text-primary" />
+            <span className="text-ink-muted">Card today</span>
+            <span className="font-semibold tabular-nums">{pounds(o.cardTodayPence ?? 0)}</span>
+          </button>
+        </div>
+        {/* Till actions */}
+        <div className="ml-auto flex flex-wrap items-center gap-1.5">
+          <button onClick={() => navigate({ to: "/staff/sales" })} className={GHOST}>
+            <ShoppingBag /> Sales
+          </button>
+          <button onClick={() => setDialog("reports")} className={GHOST}>
+            <Printer /> Reports
+          </button>
+          <button onClick={() => setDialog("expense")} className={GHOST}>
+            <Receipt /> Expense
+          </button>
+          <button onClick={() => setDialog("closed")} className={GHOST}>
+            <History /> Closed tills
+          </button>
+          <UpdateAppButton />
+        </div>
       </div>
 
       {dialog === "reports" && <ReportsDialog onClose={() => setDialog(null)} />}

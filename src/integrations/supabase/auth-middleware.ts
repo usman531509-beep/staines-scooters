@@ -30,6 +30,18 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
+// One long-lived client just for verifying tokens: it caches the project's
+// signing keys (JWKS), so each server call verifies the JWT locally instead of
+// fetching the keys from Supabase again on every request.
+let verifier: ReturnType<typeof createClient<Database>> | null = null;
+function getVerifier(url: string, key: string) {
+  verifier ??= createClient<Database>(url, key, {
+    global: { fetch: createSupabaseFetch(key) },
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  return verifier;
+}
+
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
@@ -89,7 +101,7 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       }
     );
 
-    const { data, error } = await supabase.auth.getClaims(token);
+    const { data, error } = await getVerifier(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!).auth.getClaims(token);
     if (error || !data?.claims) {
       throw new Error('Unauthorized: Invalid token');
     }

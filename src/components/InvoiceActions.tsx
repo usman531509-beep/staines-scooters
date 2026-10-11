@@ -1,12 +1,12 @@
 import { Printer } from "lucide-react";
+import { printInPlace } from "@/lib/print-in-place";
 
 /**
- * "Print Invoice" opens the printable invoice page (which triggers the browser
- * print dialogue).
+ * "Print Invoice" prints the invoice page in place (no new tab).
  */
 export function InvoiceActions({ saleId }: { saleId: string }) {
   function print() {
-    window.open(`/staff/invoice/${saleId}`, "_blank", "noopener,noreferrer");
+    printInPlace(`/staff/invoice/${saleId}`);
   }
 
   const btn =

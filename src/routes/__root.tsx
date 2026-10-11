@@ -101,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
       },
     ],
   }),
@@ -126,23 +126,14 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  // Every single page in the app — POS, Sales, bottom-bar tabs, every menu
-  // module, sub-module and tab — re-checks for a newer build the moment it is
-  // opened, and reloads itself if anything changed (the Ctrl+F5 effect).
+  // Check for a newer build once on start. Further checks run on a timer and
+  // when the tab regains focus (UpdateAppPrompt), not on every navigation:
+  // each check fetches a full page, which made switching sections slow.
   useEffect(() => {
-    let unsub: (() => void) | undefined;
     import("../lib/app-updater")
-      .then(({ checkForUpdateNow }) => {
-        checkForUpdateNow(0);
-        unsub = router.subscribe("onResolved", () => {
-          checkForUpdateNow();
-        });
-      })
+      .then(({ checkForUpdateNow }) => checkForUpdateNow(0))
       .catch(() => {});
-    return () => unsub?.();
-  }, [router]);
+  }, []);
 
   useEffect(() => {
 
