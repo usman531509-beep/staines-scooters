@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -216,7 +217,7 @@ export const deleteClaimDocument = createServerFn({ method: "POST" })
     const { error } = await supabase.from("claim_documents").delete().eq("id", data.id);
     if (error) throw error;
     if (doc?.file_path) {
-      await supabase.storage.from("claim-documents").remove([doc.file_path]);
+      await supabase.storage.from(STORAGE_BUCKET).remove([doc.file_path]);
     }
     return { ok: true };
   });
@@ -228,7 +229,7 @@ export const getClaimDocumentSignedUrl = createServerFn({ method: "POST" })
     const { supabase, userId } = context as any;
     await assertStaff(supabase, userId);
     const { data: signed, error } = await supabase.storage
-      .from("claim-documents")
+      .from(STORAGE_BUCKET)
       .createSignedUrl(data.file_path, 60 * 60);
     if (error) throw error;
     return { url: signed?.signedUrl ?? "" };

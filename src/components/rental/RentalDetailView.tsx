@@ -1,4 +1,5 @@
 import { ukDate, ukDateTime, isoDay } from "@/lib/format-date";
+import { STORAGE_BUCKET, safeName } from "@/lib/storage-bucket";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -132,8 +133,10 @@ export function RentalDetailView({ id, onDeleted }: { id: string; onDeleted?: ()
   async function upload(f: File) {
     setUploading(true);
     try {
-      const path = `${id}/${crypto.randomUUID()}-${f.name}`;
-      const { error } = await supabase.storage.from("rental-documents").upload(path, f);
+      const { compressDocument } = await import("@/lib/image-compress");
+      const body = await compressDocument(f);
+      const path = `rentals/${id}/${crypto.randomUUID()}-${safeName(f.name, body)}`;
+      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, body, { contentType: body.type || f.type || undefined });
       if (error) throw error;
       await addDocFn({ data: { rental_id: id, doc_type: uploadType as any, storage_path: path, file_name: f.name, expires_at: uploadExpiry || null } });
       toast.success("Uploaded");

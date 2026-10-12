@@ -1,4 +1,5 @@
 import { ukDate, isoDay } from "@/lib/format-date";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -280,11 +281,13 @@ function ClaimsPage() {
                         }
                       }}
                       onUpload={async (doc_type, file) => {
-                        const ext = file.name.split(".").pop() || "pdf";
-                        const path = `${claim.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+                        const { compressDocument, imageExt } = await import("@/lib/image-compress");
+                        const body = await compressDocument(file);
+                        const ext = body !== file ? imageExt(body) : file.name.split(".").pop() || "pdf";
+                        const path = `claims/${claim.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
                         const { error } = await supabase.storage
-                          .from("claim-documents")
-                          .upload(path, file, { contentType: file.type || "application/pdf" });
+                          .from(STORAGE_BUCKET)
+                          .upload(path, body, { contentType: body.type || file.type || "application/pdf" });
                         if (error) {
                           toast.error(error.message);
                           return;

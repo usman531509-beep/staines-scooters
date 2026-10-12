@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { STORAGE_BUCKET, safeName } from "@/lib/storage-bucket";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useMemo, useState, useEffect, type ReactNode } from "react";
@@ -146,8 +147,10 @@ const unitsOf = (d: Data, pid: string) => batchesOf(d, pid).reduce((s, b) => s +
 
 async function uploadEvidence(file: File | null): Promise<string | null> {
   if (!file) return null;
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/[^\w.]+/g, "_")}`;
-  const { error } = await supabase.storage.from("stock-evidence").upload(path, file);
+  const { compressDocument } = await import("@/lib/image-compress");
+  const body = await compressDocument(file);
+  const path = `stock-evidence/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName(file.name, body)}`;
+  const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, body, { contentType: body.type || file.type || undefined });
   if (error) throw error;
   return path;
 }

@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// Signs a product-images bucket path (product OR category thumbnails) for the
+// Signs an uploads-bucket path (product OR category thumbnails) for the
 // caller. Uses the service-role client so signing can't be blocked by a
 // transient RLS/auth hiccup — the caller is already an authenticated staff
 // member (middleware) and the objects are private assets of the shop.
@@ -15,12 +16,12 @@ export const getSignedProductImageUrl = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error } = await supabaseAdmin
       .storage
-      .from("product-images")
+      .from(STORAGE_BUCKET)
       .createSignedUrl(data.path, 60 * 60 * 24 * 365);
     if (error || !signed?.signedUrl) {
       // Fall back to the public URL — if the bucket is private the browser
       // shows the tile's "No image" fallback instead of erroring out.
-      const { data: pub } = supabaseAdmin.storage.from("product-images").getPublicUrl(data.path);
+      const { data: pub } = supabaseAdmin.storage.from(STORAGE_BUCKET).getPublicUrl(data.path);
       return pub?.publicUrl ?? "";
     }
     return signed.signedUrl;

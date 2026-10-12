@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -20,9 +21,9 @@ export const uploadMyAvatar = createServerFn({ method: "POST" })
     const bytes = Buffer.from(m[3], "base64");
     if (bytes.byteLength > 3_000_000) throw new Error("Image too large (max 3MB)");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const path = `${userId}/${Date.now()}.${ext}`;
+    const path = `avatars/${userId}/${Date.now()}.${ext}`;
     const up = await supabaseAdmin.storage
-      .from("user-avatars")
+      .from(STORAGE_BUCKET)
       .upload(path, bytes, { contentType: m[1], upsert: true });
     if (up.error) throw new Error(up.error.message);
     const { error } = await supabaseAdmin
@@ -31,7 +32,7 @@ export const uploadMyAvatar = createServerFn({ method: "POST" })
       .eq("id", userId);
     if (error) throw new Error(error.message);
     const signed = await supabaseAdmin.storage
-      .from("user-avatars")
+      .from(STORAGE_BUCKET)
       .createSignedUrl(path, 60 * 60 * 24 * 365);
     return { ok: true, path, url: signed.data?.signedUrl ?? "" };
   });
@@ -65,7 +66,7 @@ export const getMyAvatarUrl = createServerFn({ method: "POST" })
     if (!path) return { url: "" };
     if (/^https?:/i.test(path)) return { url: path };
     const signed = await supabaseAdmin.storage
-      .from("user-avatars")
+      .from(STORAGE_BUCKET)
       .createSignedUrl(path, 60 * 60 * 24 * 365);
     return { url: signed.data?.signedUrl ?? "" };
   });

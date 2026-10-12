@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createStripeClient, getStripeErrorMessage, type StripeEnv } from "@/lib/stripe.server";
@@ -409,7 +410,7 @@ export const purgeRental = createServerFn({ method: "POST" })
       .eq("rental_id", id);
     const paths = (docs ?? []).map((d: any) => d.storage_path).filter(Boolean);
     if (paths.length) {
-      await supabaseAdmin.storage.from("rental-documents").remove(paths);
+      await supabaseAdmin.storage.from(STORAGE_BUCKET).remove(paths);
     }
 
     for (const table of ["rental_documents", "rental_weeks", "rental_payments", "rental_pcns"] as const) {
@@ -558,7 +559,7 @@ export const deleteRentalDocument = createServerFn({ method: "POST" })
     const { data: doc } = await supabase.from("rental_documents").select("storage_path").eq("id", data.id).maybeSingle();
     const { error } = await supabase.from("rental_documents").delete().eq("id", data.id);
     if (error) throw error;
-    if (doc?.storage_path) await supabase.storage.from("rental-documents").remove([doc.storage_path]);
+    if (doc?.storage_path) await supabase.storage.from(STORAGE_BUCKET).remove([doc.storage_path]);
     return { ok: true };
   });
 
@@ -567,7 +568,7 @@ export const getRentalDocumentSignedUrl = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ storage_path: z.string().min(1) }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
-    const { data: signed, error } = await supabase.storage.from("rental-documents").createSignedUrl(data.storage_path, 60 * 60);
+    const { data: signed, error } = await supabase.storage.from(STORAGE_BUCKET).createSignedUrl(data.storage_path, 60 * 60);
     if (error) throw error;
     return { url: signed?.signedUrl ?? "" };
   });

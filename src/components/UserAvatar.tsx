@@ -79,7 +79,7 @@ export function UserAvatarUploader({
     setErr(null);
     setBusy(true);
     try {
-      const compressed = await compressImage(file, { maxDim: 512, quality: 0.85, targetBytes: 250 * 1024 });
+      const compressed = await compressImage(file, { maxDim: 256, quality: 0.75, targetBytes: 25 * 1024, minQuality: 0.4 });
       const dataUrl = await fileToDataUrl(compressed);
       const res = await upload({ data: { dataUrl } });
       setPreview(res.url);

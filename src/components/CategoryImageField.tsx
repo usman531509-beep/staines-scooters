@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { Upload, ImageIcon, Crop, Undo2, Eraser } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,9 +39,10 @@ export function CategoryImageField({
     : "inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground";
 
   async function uploadBlob(blob: Blob) {
-    const path = `${pathPrefix}/${crypto.randomUUID()}.jpg`;
+    const { imageExt } = await import("@/lib/image-compress");
+    const path = `${pathPrefix}/${crypto.randomUUID()}.${imageExt(blob)}`;
     const { error } = await supabase.storage
-      .from("product-images")
+      .from(STORAGE_BUCKET)
       .upload(path, blob, { contentType: blob.type || "image/jpeg", upsert: false });
     if (error) throw error;
     return path;

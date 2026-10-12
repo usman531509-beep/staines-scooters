@@ -1,5 +1,6 @@
-// Client-side image compression using canvas. Returns a JPEG Blob (with .name preserved
-// where possible) sized down to `maxDim` and iteratively re-encoded until it fits `targetBytes`.
+// Client-side image compression using canvas. Returns a WebP Blob (JPEG on browsers
+// that can't encode WebP) sized down to `maxDim` and iteratively re-encoded until it
+// fits `targetBytes`. Storage is on Supabase's free tier, so uploads are kept small.
 export async function compressImage(
   file: File,
   opts: { maxDim?: number; quality?: number; targetBytes?: number; minQuality?: number } = {}
@@ -19,8 +20,17 @@ export async function compressImage(
     canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext("2d");
     if (!ctx) return Promise.resolve(null);
+    // White behind transparent PNGs, so JPEG output doesn't turn them black.
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
     ctx.drawImage(bitmap, 0, 0, width, height);
-    return new Promise((res) => canvas.toBlob(res, "image/jpeg", q));
+    return new Promise((res) =>
+      canvas.toBlob((blob) => {
+        // Browsers without a WebP encoder silently return PNG; use JPEG instead.
+        if (blob && blob.type === "image/webp") return res(blob);
+        canvas.toBlob(res, "image/jpeg", q);
+      }, "image/webp", q),
+    );
   };
 
   let q = quality;
@@ -45,6 +55,24 @@ export async function compressImage(
 
   if (!out) return file;
   return out.size < file.size ? out : file;
+}
+
+/** File extension matching a compressed blob's format. */
+export function imageExt(blob: Blob): string {
+  if (blob.type === "image/webp") return "webp";
+  if (blob.type === "image/png") return "png";
+  return "jpg";
+}
+
+// Product photos: about 50KB each, plenty for till tiles and the product form.
+export async function compressProductImage(file: File): Promise<Blob> {
+  return compressImage(file, { maxDim: 900, quality: 0.72, targetBytes: 50 * 1024, minQuality: 0.4 });
+}
+
+// Photos of documents (licences, receipts, damage): readable but small (~150KB).
+// Anything that isn't an image (PDFs) uploads as it is.
+export async function compressDocument(file: File): Promise<Blob> {
+  return compressImage(file, { maxDim: 1600, quality: 0.7, targetBytes: 150 * 1024, minQuality: 0.4 });
 }
 
 // Aggressive thumbnail compression (target ~10KB) for tiny UI thumbnails like category icons.

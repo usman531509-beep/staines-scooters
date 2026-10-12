@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { STORAGE_BUCKET } from "@/lib/storage-bucket";
 import { Upload, ImageIcon, Crop, Undo2, Eraser, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,11 +51,11 @@ export function ProductForm({
   const [editing, setEditing] = useState<string | null>(null);
 
   async function uploadBlob(blob: Blob, ext: string) {
-    const contentType = blob.type || (ext === "png" ? "image/png" : "image/jpeg");
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from("product-images").upload(path, blob, { contentType, upsert: false });
+    const contentType = blob.type || (ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg");
+    const path = `products/${crypto.randomUUID()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType, upsert: false });
     if (upErr) throw upErr;
-    const { data, error } = await supabase.storage.from("product-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
     if (error) throw error;
     return data.signedUrl;
   }
@@ -64,11 +65,11 @@ export function ProductForm({
     if (file.size > 15 * 1024 * 1024) { alert("Image must be under 15MB."); return; }
     setUploading(true);
     try {
-      const { compressImage } = await import("@/lib/image-compress");
+      const { compressProductImage, imageExt } = await import("@/lib/image-compress");
       setStatus("Uploading…");
-      // Upload exactly what was picked — the background is only removed on request.
-      const compressed = await compressImage(file, { maxDim: 1200, quality: 0.82, targetBytes: 120 * 1024, minQuality: 0.55 });
-      const url = await uploadBlob(compressed, "jpg");
+      // Upload what was picked (compressed) — the background is only removed on request.
+      const compressed = await compressProductImage(file);
+      const url = await uploadBlob(compressed, imageExt(compressed));
       setForm((f) => ({ ...f, image_url: url }));
     } catch (e: any) {
       alert(e?.message ?? "Upload failed");
@@ -87,10 +88,10 @@ export function ProductForm({
       if (!res.ok) throw new Error("Could not load that image");
       const source = await removeBg(await res.blob());
       setStatus("Uploading…");
-      const { compressImage } = await import("@/lib/image-compress");
+      const { compressProductImage, imageExt } = await import("@/lib/image-compress");
       const asFile = new File([source], "product.jpg", { type: source.type || "image/jpeg" });
-      const compressed = await compressImage(asFile, { maxDim: 1200, quality: 0.82, targetBytes: 120 * 1024, minQuality: 0.55 });
-      const url = await uploadBlob(compressed, "jpg");
+      const compressed = await compressProductImage(asFile);
+      const url = await uploadBlob(compressed, imageExt(compressed));
       const previous = getOriginal(form.image_url) || form.image_url;
       rememberOriginal(url, previous);
       setForm((f) => ({ ...f, image_url: url }));

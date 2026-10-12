@@ -1,4 +1,5 @@
 import { ukDate, ukDateTime, isoDay } from "@/lib/format-date";
+import { STORAGE_BUCKET, safeName } from "@/lib/storage-bucket";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -888,8 +889,10 @@ function CustomerFormDialog({ customer, onClose }: { customer: any; onClose: () 
   async function uploadPhoto(f: File) {
     setUploading(true);
     try {
-      const path = `customers/${crypto.randomUUID()}-${f.name}`;
-      const { error } = await supabase.storage.from("rental-documents").upload(path, f);
+      const { compressDocument } = await import("@/lib/image-compress");
+      const body = await compressDocument(f);
+      const path = `rental-customers/${crypto.randomUUID()}-${safeName(f.name, body)}`;
+      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, body, { contentType: body.type || f.type || undefined });
       if (error) throw error;
       setPhotoPath(path);
       toast.success("Photo uploaded");
