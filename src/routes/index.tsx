@@ -9,12 +9,11 @@ import {
   Wrench,
   Phone,
   ClipboardList,
+  Bike,
 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Feature } from "@/components/LandingParts";
 import { RotatingWords } from "@/components/ui/animated-hero";
-import sportsBike from "@/assets/app-hero-bike.jpg";
-import workshopScooter from "@/assets/hero-workshop.jpg";
 import { BRAND, siteLink } from "@/lib/brand";
 import "@/styles/landing.css";
 
@@ -22,10 +21,9 @@ const images = {
   hero: "/images/landing/hero.webp",
   workshop: "/images/landing/workshop.webp",
   claims: "/images/landing/claims.webp",
-  classic: "/images/landing/classic.webp",
   rental: "/images/landing/rental.webp",
   service: "/images/landing/service.webp",
-  maxi: "/images/landing/maxi.webp",
+  salesScooter: "/images/landing/sales-scooter.webp",
 };
 
 export const Route = createFileRoute("/")({
@@ -84,8 +82,8 @@ const services = [
     number: "01",
     title: "Sales",
     body: "A great range of new and used scooters and motorcycles for every ride.",
-    image: sportsBike,
-    alt: "White and red motorcycle on a city road",
+    image: images.salesScooter,
+    alt: "White scooter",
     to: "/sales",
     className: "landing-service-sales",
   },
@@ -128,25 +126,13 @@ const services = [
   },
 ] as const;
 
-const scooters = [
-  {
-    name: "Urban Commuter",
-    body: "Stylish, practical and perfect for everyday riding.",
-    image: workshopScooter,
-    className: "landing-scooter-urban",
-  },
-  {
-    name: "Everyday Classic",
-    body: "Timeless style with modern performance.",
-    image: images.classic,
-    className: "landing-scooter-classic",
-  },
-  {
-    name: "Maxi Scooter",
-    body: "More space, more comfort, more possibilities.",
-    image: images.maxi,
-    className: "landing-scooter-maxi",
-  },
+// Rental fleet shown on the home page; photos live in public/images/fleet/
+// (a card without `image` shows a placeholder).
+const fleet: Array<{ name: string; body: string; image?: string }> = [
+  { name: "Honda PCX 125", body: "Smooth, economical and comfortable for daily London riding.", image: "/images/fleet/honda-pcx.webp" },
+  { name: "Honda Vision 110", body: "Light and easy to handle, ideal for new riders and short trips.", image: "/images/fleet/honda-vision.webp" },
+  { name: "Honda SH Mode 125", body: "Slim step-through style that slips through city traffic.", image: "/images/fleet/honda-sh-mode.webp" },
+  { name: "Yamaha NMAX 125", body: "Sporty maxi-style comfort with plenty of storage.", image: "/images/fleet/yamaha-nmax.webp" },
 ];
 const trust = [
   {
@@ -264,41 +250,41 @@ function Home() {
       >
         <div className="landing-section-heading">
           <div>
-            <p className="landing-eyebrow">Our range</p>
-            <h2 id="range-title">Featured Scooters</h2>
+            <p className="landing-eyebrow">Rentals</p>
+            <h2 id="range-title">Rental Fleet</h2>
           </div>
-          <Link to="/sales" className="landing-text-link">
-            View All Scooters <ArrowRight />
+          <Link to="/rental" className="landing-text-link">
+            View Rentals <ArrowRight />
           </Link>
         </div>
-        <div className="landing-scooter-grid">
-          {scooters.map((scooter) => (
-            <article key={scooter.name} className={`landing-scooter-card ${scooter.className}`}>
+        <div className="landing-scooter-grid landing-fleet-grid">
+          {fleet.map((scooter) => (
+            <article key={scooter.name} className="landing-scooter-card">
               <div className="landing-scooter-photo">
-                <img
-                  src={scooter.image}
-                  alt={`${scooter.name} scooter style`}
-                  loading="lazy"
-                  width={800}
-                  height={500}
-                />
+                {scooter.image ? (
+                  <img src={scooter.image} alt={scooter.name} loading="lazy" width={800} height={500} />
+                ) : (
+                  <div className="landing-fleet-placeholder" aria-hidden="true">
+                    <Bike />
+                  </div>
+                )}
               </div>
               <div className="landing-scooter-copy">
                 <h3>{scooter.name}</h3>
                 <p>{scooter.body}</p>
                 <Link
                   to="/contact"
-                  search={{ service: "Scooter Sales", bike: scooter.name }}
+                  search={{ service: "Motorbike Rental", bike: scooter.name }}
                   className="landing-button landing-button-outline"
                 >
-                  View Details <ArrowRight />
+                  Rent this scooter <ArrowRight />
                 </Link>
               </div>
             </article>
           ))}
         </div>
         <p className="landing-availability">
-          Explore our scooter styles. Get in touch for current models and availability.
+          Weekly rentals, serviced and ready to ride. Get in touch to check availability.
         </p>
       </section>
 

@@ -7,7 +7,7 @@ import { BRAND, BRAND_ADDRESS, siteLink, whatsappLink } from "@/lib/brand";
 import "@/styles/landing.css";
 
 const images = {
-  hero: "/images/landing/classic.webp",
+  hero: "/images/landing/nmax-hero.webp",
   workshop: "/images/landing/workshop.webp",
 };
 
@@ -131,8 +131,8 @@ function Contact() {
         accent="moving."
         description="Sales, servicing, repairs, rentals or a claim call, email or send an enquiry and the team will get back to you."
         image={images.hero}
-        imageAlt="Classic cream scooter parked outside a café"
-        imagePosition="65% 10%"
+        imageAlt="Yamaha NMAX scooter"
+        cutout
       >
         <div className="landing-actions">
           <a href="#enquiry" className="landing-button landing-button-blue">

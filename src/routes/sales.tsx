@@ -18,7 +18,6 @@ import pcx from "@/assets/honda-pcx-125.jpg";
 import forza from "@/assets/honda-forza.jpg";
 import vision from "@/assets/honda-vision.jpg";
 import nmax from "@/assets/yamaha-nmax.jpg";
-import sportsBike from "@/assets/app-hero-bike.jpg";
 import "@/styles/landing.css";
 
 const images = {
@@ -75,19 +74,24 @@ const models = [
 
 const styles = [
   {
-    name: "Urban Commuter",
-    body: "Practical 125s built for the daily run into town.",
-    image: images.urban,
+    name: "Honda PCX 125",
+    body: "Smooth, economical and comfortable for the daily commute.",
+    image: "/images/fleet/honda-pcx.webp",
   },
   {
-    name: "Everyday Classic",
-    body: "Retro looks with modern, reliable running gear.",
-    image: images.classic,
+    name: "Honda Vision 110",
+    body: "Light and easy to handle, ideal for new riders.",
+    image: "/images/fleet/honda-vision.webp",
   },
   {
-    name: "Motorcycles",
-    body: "Geared bikes for riders ready to step up.",
-    image: sportsBike,
+    name: "Honda SH Mode 125",
+    body: "Slim step-through style that slips through city traffic.",
+    image: "/images/fleet/honda-sh-mode.webp",
+  },
+  {
+    name: "Yamaha NMAX 125",
+    body: "Sporty maxi-style comfort with plenty of storage.",
+    image: "/images/fleet/yamaha-nmax.webp",
   },
 ];
 
@@ -158,11 +162,11 @@ function Sales() {
           <p className="landing-eyebrow">Something for every rider</p>
           <h2 id="styles-title">Pick your style.</h2>
         </div>
-        <div className="landing-card-grid">
+        <div className="landing-card-grid landing-card-grid-4">
           {styles.map((s) => (
             <article key={s.name} className="landing-card">
-              <div className="landing-card-photo">
-                <img src={s.image} alt={`${s.name} style`} loading="lazy" width={1536} height={1024} />
+              <div className="landing-card-photo landing-card-photo-studio">
+                <img src={s.image} alt={s.name} loading="lazy" width={800} height={500} />
               </div>
               <div className="landing-card-body">
                 <h3>{s.name}</h3>

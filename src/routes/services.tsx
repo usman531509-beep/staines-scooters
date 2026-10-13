@@ -17,7 +17,6 @@ import { Checklist, CtaBand, Feature, PageHero } from "@/components/LandingParts
 import { BRAND, siteLink } from "@/lib/brand";
 import keyfob from "@/assets/keyfob.jpg";
 import workshopDark from "@/assets/hero-workshop.jpg";
-import sportsBike from "@/assets/app-hero-bike.jpg";
 import "@/styles/landing.css";
 
 const images = {
@@ -77,7 +76,7 @@ const blocks: Block[] = [
     image: workshopDark,
     imageAlt: "Motorcycle on a lift in the workshop",
     badge: "Every make & model",
-    body: "From a scooter that won't start to a motorcycle that needs new brakes — we repair every make and model, and explain the work before we start.",
+    body: "From a scooter that won't start to a motorcycle that needs new brakes we repair every make and model, and explain the work before we start.",
     points: ["Engine running problems", "Brakes", "Tyres", "Belts & transmission", "Electrical faults", "Bodywork & panels"],
   },
   {
@@ -85,8 +84,8 @@ const blocks: Block[] = [
     icon: Search,
     title: "Fault Finding",
     service: "Fault Finding",
-    image: sportsBike,
-    imageAlt: "Motorcycle ready for diagnostics",
+    image: "/images/landing/fault-finding-scooter.webp",
+    imageAlt: "Black maxi scooter ready for diagnostics",
     badge: "Diagnostics",
     body: "Cutting out, failing to start or showing a warning light? We investigate the cause properly instead of guessing, so you only pay for the fix you need.",
     points: ["Starting issues", "Warning lights", "Sensor faults", "Poor running", "Battery & charging", "Intermittent faults"],
@@ -191,7 +190,7 @@ function Services() {
               </span>
               <h2 id="parts-title">Parts & consumables.</h2>
               <p>
-                We supply parts for repair and maintenance on common commuters and beyond — ask us and we'll
+                We supply parts for repair and maintenance on common commuters and beyond ask us and we'll
                 source the right one for your bike.
               </p>
               <Checklist items={parts} />
@@ -202,7 +201,7 @@ function Services() {
               </div>
             </div>
             <div className="landing-split-photo">
-              <img src={workshopDark} alt="Parts and tools in the workshop" loading="lazy" />
+              <img src="/images/landing/parts.webp" alt="Motorcycle chain and sprocket on a workshop shelf" loading="lazy" />
             </div>
           </div>
         </div>

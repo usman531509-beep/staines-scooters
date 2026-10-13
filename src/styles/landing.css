@@ -2805,3 +2805,131 @@
     animation: none;
   }
 }
+
+/* Pages that open with a hero photo: the navbar floats transparently over the
+   hero and turns white once the page scrolls (or the menu opens). The hero is
+   pulled up under the bar and padded by the bar's height so nothing overlaps. */
+:root {
+  --lnav-h: 96px;
+}
+@media (max-width: 640px) {
+  :root {
+    --lnav-h: 76px;
+  }
+}
+.lnav {
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.lnav.lnav-overlay {
+  margin-bottom: calc(-1 * var(--lnav-h));
+}
+.lnav.lnav-overlay:not(.is-solid) {
+  background: transparent;
+  box-shadow: none;
+}
+.lnav.lnav-overlay ~ main .landing-hero,
+.lnav.lnav-overlay ~ main .landing-subhero {
+  --landing-header-height: var(--lnav-h) !important;
+}
+/* Sit the photo a little lower so the scooter clears the floating navbar. Its
+   top edge fades into the blurred sky behind it, so the shift leaves no seam. */
+@media (min-width: 821px) {
+  .lnav.lnav-overlay ~ main .landing-hero-image,
+  .lnav.lnav-overlay ~ main .landing-subhero-image {
+    transform: translateY(56px);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%), linear-gradient(180deg, transparent 0, #000 150px);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 34%), linear-gradient(180deg, transparent 0, #000 150px);
+    mask-composite: intersect;
+  }
+}
+
+/* Home page rental fleet: four scooters across, two on tablets, one on phones. */
+.landing-fleet-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 1150px) {
+  .landing-fleet-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .landing-fleet-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.landing-scooter-photo:has(img[src*="/images/fleet/"]) {
+  background: #fff;
+}
+.landing-scooter-photo img[src*="/images/fleet/"] {
+  object-fit: contain;
+  padding: 12px;
+}
+.landing-fleet-placeholder {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  background: linear-gradient(135deg, #eaf3fe, #f6f9fd);
+  color: #9db7d8;
+}
+.landing-fleet-placeholder svg {
+  width: 64px;
+  height: 64px;
+  stroke-width: 1.4;
+}
+
+/* Studio photos on white: show the whole scooter instead of cropping it. */
+.landing-card-photo-studio {
+  background: #fff;
+}
+.landing-card-photo-studio img {
+  object-fit: contain;
+  padding: 12px;
+}
+
+/* Hero with a cut-out scooter (no photo scene): the whole scooter stands on
+   the right, sitting on a soft shadow, with no fade masks. */
+.landing-subhero-image.landing-subhero-cutout {
+  top: auto;
+  bottom: 70px;
+  right: max(24px, calc((100vw - 1340px) / 2));
+  width: min(46%, 640px);
+  height: auto;
+  max-width: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+  transform: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  filter: drop-shadow(0 28px 22px #0a1f3d29);
+}
+@media (max-width: 820px) {
+  /* Phones: centred in the space under the copy, like the other heroes' photos. */
+  .landing-subhero-image.landing-subhero-cutout {
+    bottom: 16px;
+    right: auto;
+    left: 50%;
+    width: auto;
+    height: 230px;
+    transform: translateX(-50%);
+  }
+}
+/* The cut-out never takes the photo fades or the under-navbar shift. */
+.lnav.lnav-overlay ~ main .landing-subhero-image.landing-subhero-cutout {
+  transform: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+@media (max-width: 820px) {
+  .lnav.lnav-overlay ~ main .landing-subhero-image.landing-subhero-cutout {
+    transform: translateX(-50%);
+  }
+}
+
+/* Split photo holding a transparent cut-out: show the whole scooter on the
+   soft tinted panel instead of cropping it. */
+.landing-split-photo-cutout img {
+  object-fit: contain;
+  padding: 28px 28px 56px;
+  filter: drop-shadow(0 20px 16px #0a1f3d2e);
+}

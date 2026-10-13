@@ -1,7 +1,7 @@
 {
-  "name": "Stainess Scooter",
-  "short_name": "Stainess Scooter",
-  "description": "Till, rentals and back-office app for Stainess Scooter staff.",
+  "name": "Staines Scooters",
+  "short_name": "Staines Scooters",
+  "description": "Till, rentals and back-office app for Staines Scooters staff.",
   "start_url": "/appsign?app=1",
   "scope": "/",
   "display": "standalone",

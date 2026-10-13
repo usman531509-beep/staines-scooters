@@ -242,7 +242,7 @@ function AdminSidebar() {
             <SidebarMenuButton size="lg" asChild tooltip={BRAND.name}>
               <Link to={isAdmin ? "/admin" : "/staff/pos"}>
                 <img
-                  src="/images/brand/staines-badge.webp"
+                  src="/images/brand/staines-logo.webp"
                   alt=""
                   className="size-8 shrink-0 rounded-full object-contain"
                 />

@@ -23,6 +23,8 @@ const images = {
   hero: "/images/landing/claims.webp",
   workshop: "/images/landing/workshop.webp",
   rental: "/images/landing/rental.webp",
+  nmax: "/images/landing/nmax-red.webp",
+  riding: "/images/landing/pcx-riding.webp",
 };
 
 export const Route = createFileRoute("/accident-claims")({
@@ -84,8 +86,8 @@ function AccidentClaims() {
       <section className="landing-container landing-block" aria-labelledby="ready-title">
         <div className="landing-split-list">
           <div className="landing-split">
-            <div className="landing-split-photo">
-              <img src={images.workshop} alt="Technician inspecting accident damage on a scooter" loading="lazy" />
+            <div className="landing-split-photo landing-split-photo-cutout">
+              <img src={images.nmax} alt="Red Yamaha NMAX scooter" loading="lazy" />
               <span className="landing-photo-badge">
                 <Wrench aria-hidden="true" /> Inspected in-house
               </span>
@@ -124,7 +126,7 @@ function AccidentClaims() {
 
           <div className="landing-split landing-split-reverse">
             <div className="landing-split-photo">
-              <img src={images.rental} alt="Rider on a scooter in the city" loading="lazy" />
+              <img src={images.riding} alt="Rider on a red Honda PCX" loading="lazy" />
               <span className="landing-photo-badge">
                 <Bike aria-hidden="true" /> Keep riding
               </span>

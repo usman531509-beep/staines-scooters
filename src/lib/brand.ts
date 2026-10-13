@@ -1,12 +1,12 @@
 // Single source of truth for business identity shown across the site, emails,
 // invoices and payment links. Contact details are placeholders until the real
-// Stainess Scooter details are available; update them here only.
+// Staines Scooters details are available; update them here only.
 
 const env = import.meta.env as Record<string, string | undefined>;
 
 export const BRAND = {
-  name: "Stainess Scooter",
-  legalName: "Stainess Scooter Ltd",
+  name: "Staines Scooters",
+  legalName: "Staines Scooters Ltd",
   companyNumber: "00000000",
   /** Public site origin (no trailing slash); used for links in emails and payment pages. */
   siteUrl: (env.VITE_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),

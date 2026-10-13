@@ -26,6 +26,7 @@ export function PageHero({
   image,
   imageAlt,
   imagePosition = "center",
+  cutout = false,
   children,
 }: {
   eyebrow: string;
@@ -35,12 +36,14 @@ export function PageHero({
   image: string;
   imageAlt: string;
   imagePosition?: string;
+  /** The image is a transparent cut-out (e.g. a studio scooter), shown whole. */
+  cutout?: boolean;
   children?: ReactNode;
 }) {
   return (
     <section className="landing-subhero" aria-labelledby="page-title">
       <img
-        className="landing-subhero-image"
+        className={`landing-subhero-image${cutout ? " landing-subhero-cutout" : ""}`}
         src={image}
         alt={imageAlt}
         style={{ objectPosition: imagePosition }}

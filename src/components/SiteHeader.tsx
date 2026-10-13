@@ -1,5 +1,5 @@
-import { Link, useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard } from "lucide-react";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
@@ -14,6 +14,9 @@ const nav = [
   { to: "/contact", label: "Contact", icon: Mail },
 ] as const;
 
+// Pages that open with a hero photo; the navbar floats over it until scrolled.
+const HERO_PAGES = ["/", "/sales", "/services", "/rental", "/accident-claims", "/contact"];
+
 export function SiteHeader({ appearance = "default" }: { appearance?: "default" | "landing" }) {
   const [open, setOpen] = useState(false);
   const { user, isAdmin } = useAuth();
@@ -24,12 +27,23 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
     router.navigate({ to: "/" });
   }
 
+  const { pathname } = useLocation();
+  const overlay = appearance === "landing" && HERO_PAGES.includes(pathname);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!overlay) return;
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [overlay]);
+
   // Signed-in staff keep the website navbar, with a link back to their portal.
   const portal = isAdmin ? "/admin" : "/staff/pos";
 
   if (appearance === "landing")
     return (
-      <header className="lnav">
+      <header className={`lnav${overlay ? " lnav-overlay" : ""}${scrolled || open ? " is-solid" : ""}`}>
         <div className="landing-container lnav-row">
           <LandingBrand />
           <nav className="lnav-links" aria-label="Main navigation">

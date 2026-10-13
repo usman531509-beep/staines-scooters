@@ -42,7 +42,9 @@ function InvoicePrintPage() {
   if (!inv) return <p className="p-6 text-sm">Preparing invoice…</p>;
 
   return (
-    <div className="mx-auto max-w-[820px] bg-white p-10 text-black print:p-0">
+    <div className="mx-auto max-w-[820px] bg-white p-10 text-black print:px-[14mm] print:py-[12mm]">
+      {/* Zero page margins hide the browser's own title/date header and footer. */}
+      <style>{"@page { margin: 0; }"}</style>
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[19px] font-bold">{BRAND.legalName.toUpperCase()}</h1>

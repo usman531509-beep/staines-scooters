@@ -9,7 +9,7 @@ export function LandingBrand({ footer = false }: { footer?: boolean }) {
       className={`landing-brand${footer ? " landing-brand-footer" : ""}`}
       aria-label={`${BRAND.name} home`}
     >
-      <img src="/images/brand/staines-badge.webp" alt={BRAND.name} width={313} height={320} decoding="async" />
+      <img src="/images/brand/staines-logo.webp" alt={BRAND.name} width={640} height={640} decoding="async" />
       {footer && <small>SCOOTERS. MOTORCYCLES. PEOPLE.</small>}
     </Link>
   );
@@ -43,15 +43,6 @@ export const landingNav: NavItem[] = [
       { label: "Parts", to: "/services", hash: "parts" },
     ],
   },
-  {
-    label: "Rentals",
-    to: "/rental",
-    children: [
-      { label: "Our fleet", to: "/rental", hash: "fleet" },
-      { label: "What you'll need", to: "/rental", hash: "requirements" },
-      { label: "Rental terms", to: "/rental", hash: "terms" },
-      { label: "Reserve a scooter", to: "/contact", search: { service: "Motorbike Rental" } },
-    ],
-  },
+  { label: "Rentals", to: "/rental" },
   { label: "Accident Claims", to: "/accident-claims" },
 ];

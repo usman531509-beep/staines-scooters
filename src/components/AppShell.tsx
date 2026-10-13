@@ -381,7 +381,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
             </button>
           ) : (
             <Link to="/" className="min-w-0 flex-1" aria-label={`${BRAND.name} home`}>
-              <img src="/images/brand/staines-badge.webp" alt={BRAND.name} className="h-11 w-auto" />
+              <img src="/images/brand/staines-logo.webp" alt={BRAND.name} className="h-11 w-auto" />
             </Link>
           )}
           <div className="flex shrink-0 items-center gap-2">

@@ -4,6 +4,8 @@ import {
   Calendar,
   FileText,
   Phone,
+  PoundSterling,
+  Wallet,
   ShieldCheck,
   Wrench,
 } from "lucide-react";
@@ -17,7 +19,6 @@ import "@/styles/landing.css";
 
 const images = {
   hero: "/images/landing/rental.webp",
-  classic: "/images/landing/classic.webp",
   urban: "/images/landing/maxi.webp",
 };
 
@@ -80,8 +81,8 @@ const fleet = [
   },
   {
     name: "Honda SH Mode 125",
-    image: images.classic,
-    contain: false,
+    image: "/images/fleet/honda-sh-mode.webp",
+    contain: true,
     body: "Lighter and more agile — perfect for nipping through traffic.",
     tags: ["125cc", "Automatic", "Lightweight"],
   },
@@ -98,7 +99,7 @@ const documents = [
   "Full UK driving licence (photocard)",
   "Valid CBT certificate (DL196)",
   "Proof of address recent bill or bank statement",
-  "Refundable deposit",
+  "£200 refundable deposit",
 ];
 
 function Rental() {
@@ -199,12 +200,19 @@ function Rental() {
       <section id="terms" className="landing-container landing-block" aria-labelledby="terms-title">
         <div className="landing-panel">
           <div className="landing-block-heading">
-            <p className="landing-eyebrow">Simple terms</p>
+            <p className="landing-eyebrow">Rental requirements</p>
             <h2 id="terms-title">Rental without the runaround.</h2>
+            <p>
+              Bring your documents to the workshop and we'll go through the weekly rate, deposit and handover
+              with you.
+            </p>
           </div>
           <div className="landing-panel-grid">
-            <Feature icon={Calendar} title="Weekly terms" body="Rent by the week, then extend or return at the end of any week." />
-            <Feature icon={Wrench} title="Maintained by us" body={`Servicing and maintenance are covered by ${BRAND.name}.`} />
+            <Feature icon={Wallet} title="Deposit" body="£200, fully refundable when the scooter comes back as it went out." />
+            <Feature icon={PoundSterling} title="Weekly rent" body="£60 per week, the same for every model in the fleet." />
+            <Feature icon={Calendar} title="Weekly terms" body="Rent is paid weekly. Extend the hire or return the scooter at the end of any week." />
+            <Feature icon={FileText} title="Simple paperwork" body="A standard rental agreement is signed at the workshop when you collect." />
+            <Feature icon={Wrench} title="Maintained by us" body={`Full servicing and maintenance are included at no cost to you by ${BRAND.name}.`} />
             <Feature icon={ShieldCheck} title="Ready to ride" body="Every scooter is checked before each hire." />
           </div>
         </div>
