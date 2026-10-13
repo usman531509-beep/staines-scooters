@@ -2933,3 +2933,105 @@
   padding: 28px 28px 56px;
   filter: drop-shadow(0 20px 16px #0a1f3d2e);
 }
+
+/* Signed-in account menu in the navbar (Dashboard / Log out). */
+.lnav-account {
+  position: relative;
+}
+.lnav-account .lnav-caret {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.18s;
+}
+.lnav-account:hover .lnav-caret,
+.lnav-account:focus-within .lnav-caret {
+  transform: rotate(180deg);
+}
+.lnav-menu.lnav-menu-right {
+  left: auto;
+  right: 0;
+  min-width: 240px;
+}
+.lnav-menu a svg,
+.lnav-menu button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.lnav-account .lnav-menu a,
+.lnav-account .lnav-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 550;
+  color: #1c2a44;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+}
+.lnav-account .lnav-menu a:hover,
+.lnav-account .lnav-menu button:hover {
+  background: #eef5ff;
+  color: var(--landing-blue);
+}
+.lnav-account .lnav-menu button {
+  color: #c2410c;
+}
+.lnav-account .lnav-menu button:hover {
+  background: #fff1ec;
+  color: #c2410c;
+}
+@media (max-width: 1200px) {
+  .lnav-actions > .lnav-account {
+    display: none;
+  }
+}
+.lnav-avatar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 4px;
+  border-radius: 999px;
+  background: none;
+  color: #1c2a44;
+  cursor: pointer;
+}
+.lnav-avatar > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--landing-blue), #0a3fa8);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px #0066ff40;
+}
+.lnav-avatar:hover > span,
+.lnav-account:focus-within .lnav-avatar > span {
+  box-shadow: 0 0 0 3px #0066ff33, 0 6px 16px #0066ff40;
+}
+.lnav-account-head {
+  display: grid;
+  gap: 2px;
+  padding: 10px 14px 12px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e3edf7;
+}
+.lnav-account-head strong {
+  font-size: 15px;
+  color: #0d1b33;
+}
+.lnav-account-head small {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: #617189;
+}

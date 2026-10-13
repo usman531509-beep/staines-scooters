@@ -1,6 +1,6 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard } from "lucide-react";
+import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
 import { BRAND } from "@/lib/brand";
@@ -70,9 +70,31 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
             ))}
           </nav>
           <div className="lnav-actions">
-            <Link to={user ? portal : "/auth"} className="lnav-login">
-              {user ? <LayoutDashboard aria-hidden="true" /> : <User aria-hidden="true" />} {user ? "Dashboard" : "Login"}
-            </Link>
+            {user ? (
+              // Signed-in staff: account menu with their portal and sign out.
+              <div className="lnav-item lnav-has-menu lnav-account">
+                <button type="button" className="lnav-avatar" aria-label="Account menu" aria-haspopup="menu">
+                  <span>{(user.email ?? "?").charAt(0).toUpperCase()}</span>
+                  <ChevronDown aria-hidden="true" className="lnav-caret" />
+                </button>
+                <div className="lnav-menu lnav-menu-right" role="menu">
+                  <div className="lnav-account-head">
+                    <strong>{isAdmin ? "Admin" : "Staff"}</strong>
+                    <small>{user.email}</small>
+                  </div>
+                  <Link to={portal} role="menuitem">
+                    <LayoutDashboard aria-hidden="true" /> Dashboard
+                  </Link>
+                  <button type="button" role="menuitem" onClick={handleSignOut}>
+                    <LogOut aria-hidden="true" /> Log out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/auth" className="lnav-login">
+                <User aria-hidden="true" /> Login
+              </Link>
+            )}
             <Link to="/contact" search={{ service: "Servicing" }} className="lnav-book">
               <Wrench aria-hidden="true" /> Book a Service
             </Link>
