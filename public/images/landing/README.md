@@ -1,5 +1,23 @@
 # Landing page image assets
 
+## Reference homepage images (October 2026)
+
+`home-showroom.webp`, `home-sales.webp`, `home-rental.webp`, `home-repairs.webp` and
+`home-claims.webp` were generated for the supplied black-and-yellow homepage reference.
+These are illustrative marketing scenes, including the showroom, rather than photos
+of the actual premises or current stock. Existing manufacturer fleet images are used
+for the rental and sale listings. All new images are exported as WebP at quality 88;
+the showroom is 1920px wide and the service-card images are 720px wide.
+
+- Showroom: English high street with a black Staines Scooters fascia, yellow service
+  strip, and charcoal, white and red-trimmed scooters on the right; darker street on
+  the left leaves room for the HTML headline.
+- Sales / rental: white / red commuter scooter, fully visible in three-quarter view,
+  parked on an English residential street with a softly blurred background.
+- Repairs: close view of a grey scooter wheel on a workshop lift, with black-gloved
+  mechanic hands using a spanner.
+- Claims: damaged grey scooter lying on an urban street, with no people or injuries.
+
 Generated with the built-in imagegen tool for the supplied Staines Scooters design reference. These are illustrative marketing images, not photographs of current stock or the actual workshop. The page directs stock enquiries to the existing contact form and includes an availability note.
 
 The final WebP assets are saved in this directory. PNG generation originals remain in Codex's generated images directory. WebP export uses quality 88.

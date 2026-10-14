@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
-import { WhatsAppButton } from "./WhatsAppButton";
 import { ScrollReveal } from "./ScrollReveal";
 import { useAppMode } from "@/lib/app-mode";
 
@@ -9,14 +8,16 @@ export function SiteLayout({
   children,
   hideHeader = false,
   hideFooter = false,
-  hideFloating = false,
   appearance = "default",
+  className = "",
 }: {
   children: ReactNode;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  /** No longer used: the floating WhatsApp button was removed. */
   hideFloating?: boolean;
   appearance?: "default" | "landing";
+  className?: string;
 }) {
   // Inside the installed app, pages render exactly like the normal website:
   // site header, footer and floating buttons all stay. The app additionally
@@ -26,20 +27,18 @@ export function SiteLayout({
   const appMode = useAppMode();
   const showHeader = !hideHeader && !appMode;
   const showFooter = !hideFooter;
-  const showFloating = !hideFloating;
 
   return (
     <div
       className={
         appearance === "landing"
-          ? "landing-page flex min-h-screen flex-col"
-          : "flex min-h-screen flex-col bg-background"
+          ? `landing-page flex min-h-screen flex-col ${className}`
+          : `flex min-h-screen flex-col bg-background ${className}`
       }
     >
       {showHeader && <SiteHeader appearance={appearance} />}
       <main className="flex-1">{children}</main>
       {showFooter && <SiteFooter appearance={appearance} />}
-      {showFloating && <WhatsAppButton />}
       {appearance === "landing" && <ScrollReveal />}
     </div>
   );

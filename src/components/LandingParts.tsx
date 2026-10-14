@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { ArrowRight, Check, type LucideIcon } from "lucide-react";
+import { Check, Phone, type LucideIcon } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { BRAND, whatsappLink } from "@/lib/brand";
 
 /** Icon + title + short text, used across the public pages. */
 export function Feature({ icon: Icon, title, body }: { icon: LucideIcon; title: string; body: string }) {
@@ -17,9 +18,8 @@ export function Feature({ icon: Icon, title, body }: { icon: LucideIcon; title: 
   );
 }
 
-/** Photo-backed page header for the inner public pages; the site header floats over it. */
+/** Photo-backed page header for the inner public pages. */
 export function PageHero({
-  eyebrow,
   title,
   accent,
   description,
@@ -29,7 +29,8 @@ export function PageHero({
   cutout = false,
   children,
 }: {
-  eyebrow: string;
+  /** Page name; kept for callers, no longer shown (breadcrumbs were removed). */
+  eyebrow?: string;
   title: string;
   accent?: string;
   description: string;
@@ -50,11 +51,6 @@ export function PageHero({
         fetchPriority="high"
       />
       <div className="landing-container landing-subhero-content">
-        <nav className="landing-crumbs" aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span>{eyebrow}</span>
-        </nav>
         <h1 id="page-title">
           {title}
           {accent && (
@@ -84,13 +80,13 @@ export function Checklist({ items, single = false }: { items: readonly string[];
   );
 }
 
-/** Blue closing band with contact and booking buttons. */
+/** Closing band: WhatsApp the shop about this service, or call. */
 export function CtaBand({
   eyebrow = "Sales · Service · Repairs · Rentals · Accident Claims",
   title = "Your next ride starts here.",
   body = "Scooters, motorcycles, expert care and ongoing support all in one place.",
-  service = "Servicing",
-  primaryLabel = "Book a Service",
+  service = "Repairs & Service",
+  primaryLabel = "WhatsApp Us",
 }: {
   eyebrow?: string;
   title?: string;
@@ -106,12 +102,17 @@ export function CtaBand({
         <p>{body}</p>
       </div>
       <div className="landing-actions">
-        <Link to="/contact" className="landing-button landing-button-white">
-          Contact Us <ArrowRight />
-        </Link>
-        <Link to="/contact" search={{ service }} className="landing-button landing-button-navy">
-          {primaryLabel} <ArrowRight />
-        </Link>
+        <a
+          href={whatsappLink(`Hi ${BRAND.name}, I'd like to ask about ${service.toLowerCase()}.`)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ss-btn-whatsapp"
+        >
+          <WhatsAppIcon aria-hidden="true" /> {primaryLabel}
+        </a>
+        <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-yellow">
+          <Phone aria-hidden="true" /> Call {BRAND.phone}
+        </a>
       </div>
     </section>
   );

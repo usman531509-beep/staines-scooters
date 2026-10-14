@@ -12,11 +12,13 @@ import {
   Wrench,
   type LucideIcon,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Checklist, CtaBand, Feature, PageHero } from "@/components/LandingParts";
-import { BRAND, siteLink } from "@/lib/brand";
+import { BRAND, siteLink, whatsappLink } from "@/lib/brand";
 import keyfob from "@/assets/keyfob.jpg";
 import workshopDark from "@/assets/hero-workshop.jpg";
+import { enquire } from "@/lib/scooters";
 import "@/styles/landing.css";
 
 const images = {
@@ -84,8 +86,8 @@ const blocks: Block[] = [
     icon: Search,
     title: "Fault Finding",
     service: "Fault Finding",
-    image: "/images/landing/fault-finding-scooter.webp",
-    imageAlt: "Black maxi scooter ready for diagnostics",
+    image: "/images/fleet/yamaha-nmax.webp",
+    imageAlt: "Yamaha NMAX ready for diagnostics",
     badge: "Diagnostics",
     body: "Cutting out, failing to start or showing a warning light? We investigate the cause properly instead of guessing, so you only pay for the fix you need.",
     points: ["Starting issues", "Warning lights", "Sensor faults", "Poor running", "Battery & charging", "Intermittent faults"],
@@ -118,7 +120,7 @@ const parts = ["Brake pads", "Belts", "Tyres", "Spark plugs", "Filters", "Oils",
 
 function Services() {
   return (
-    <SiteLayout appearance="landing" hideFloating>
+    <SiteLayout appearance="landing">
       <PageHero
         eyebrow="Repairs & Servicing"
         title="Expert care for"
@@ -129,11 +131,11 @@ function Services() {
         imagePosition="65% 8%"
       >
         <div className="landing-actions">
-          <Link to="/contact" search={{ service: "Servicing" }} className="landing-button landing-button-blue">
-            Book a Service <ArrowRight />
-          </Link>
-          <a href={`tel:+${BRAND.phoneIntl}`} className="landing-button landing-button-outline">
-            <Phone /> Call {BRAND.phone}
+          <a href={enquire.repair()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+            <WhatsAppIcon aria-hidden="true" /> WhatsApp Us
+          </a>
+          <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-yellow">
+            <Phone aria-hidden="true" /> Call {BRAND.phone}
           </a>
         </div>
       </PageHero>
@@ -171,9 +173,14 @@ function Services() {
                 <p>{b.body}</p>
                 <Checklist items={b.points} />
                 <div className="landing-actions">
-                  <Link to="/contact" search={{ service: b.service }} className="landing-button landing-button-outline">
-                    Enquire about {b.title.toLowerCase()} <ArrowRight />
-                  </Link>
+                  <a
+                    href={whatsappLink(`Hi ${BRAND.name}, I'd like to ask about ${b.title.toLowerCase()}.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ss-btn-dark"
+                  >
+                    <WhatsAppIcon aria-hidden="true" /> Enquire about {b.title.toLowerCase()}
+                  </a>
                 </div>
               </div>
             </article>
@@ -195,9 +202,14 @@ function Services() {
               </p>
               <Checklist items={parts} />
               <div className="landing-actions">
-                <Link to="/contact" search={{ service: "Parts" }} className="landing-button landing-button-blue">
-                  Ask About a Part <ArrowRight />
-                </Link>
+                <a
+                  href={whatsappLink(`Hi ${BRAND.name}, I'm looking for a part for my scooter.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ss-btn-yellow"
+                >
+                  <WhatsAppIcon aria-hidden="true" /> Ask About a Part
+                </a>
               </div>
             </div>
             <div className="landing-split-photo">

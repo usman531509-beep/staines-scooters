@@ -1,44 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
-  Settings,
-  Users,
-  ShieldCheck,
-  Store,
-  MessageCircle,
-  Wrench,
-  Phone,
-  ClipboardList,
   Bike,
+  CalendarDays,
+  Check,
+  CircleCheck,
+  PoundSterling,
+  ShieldCheck,
+  ShoppingCart,
+  Wrench,
+  type LucideIcon,
 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
-import { Feature } from "@/components/LandingParts";
-import { RotatingWords } from "@/components/ui/animated-hero";
+import { ScooterDetails } from "@/components/ScooterDetails";
 import { BRAND, siteLink } from "@/lib/brand";
+import { RENTAL_FLEET, RENTAL_TERMS, SALE_SCOOTERS, enquire, gbp, type SaleScooter } from "@/lib/scooters";
 import "@/styles/landing.css";
 
 const images = {
-  hero: "/images/landing/hero.webp",
-  workshop: "/images/landing/workshop.webp",
-  claims: "/images/landing/claims.webp",
-  rental: "/images/landing/rental.webp",
-  service: "/images/landing/service.webp",
-  salesScooter: "/images/landing/sales-scooter.webp",
+  hero: "/images/landing/home-showroom.webp",
+  sales: "/images/landing/home-sales.webp",
+  rental: "/images/landing/home-rental.webp",
+  repairs: "/images/landing/home-repairs.webp",
+  claims: "/images/landing/home-claims.webp",
 };
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Staines Scooters | Sales, Repairs, Servicing & Rentals" },
+      { title: `${BRAND.name} | Scooter Sales, Rental, Repairs & Accident Claims in Staines` },
       {
         name: "description",
         content:
-          "Your ride. Our expertise. Scooter and motorcycle sales, repairs, servicing, rentals and accident claims all in one place at Staines Scooters.",
+          "Scooter sales, weekly scooter rental, repairs and accident claim support in Staines-upon-Thames. Honda Vision, SH Mode, PCX and Yamaha NMAX from £60 a week.",
       },
-      { property: "og:title", content: "Staines Scooters | Your ride. Our expertise." },
+      { property: "og:title", content: `${BRAND.name} | Your local scooter specialists` },
       {
         property: "og:description",
-        content: "Scooters, motorcycles, expert care and ongoing support all in one place.",
+        content: "Scooter sales, rental, repairs and accident claim support in Staines.",
       },
       { property: "og:url", content: siteLink("/") },
       { property: "og:type", content: "website" },
@@ -60,11 +60,12 @@ export const Route = createFileRoute("/")({
           url: siteLink("/"),
           image: siteLink(images.hero),
           telephone: `+${BRAND.phoneIntl}`,
+          email: BRAND.email,
           address: {
             "@type": "PostalAddress",
-            streetAddress: BRAND.addressLine || undefined,
+            streetAddress: BRAND.addressLine,
             addressLocality: BRAND.town,
-            postalCode: BRAND.postcode || undefined,
+            postalCode: BRAND.postcode,
             addressCountry: "GB",
           },
         }),
@@ -74,327 +75,217 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-// Second line of the hero heading; cycles one phrase at a time.
-const heroWords = ["Our expertise.", "Sold right.", "Fixed fast.", "Kept moving.", "Ready to rent."] as const;
+type ServiceCard = {
+  title: string;
+  body: string;
+  image: string;
+  icon: LucideIcon;
+  cta: string;
+  to?: "/sales" | "/rental" | "/services" | "/accident-claims";
+};
 
-const services = [
+const serviceCards: ServiceCard[] = [
   {
-    number: "01",
-    title: "Sales",
-    body: "A great range of new and used scooters and motorcycles for every ride.",
-    image: images.salesScooter,
-    alt: "White scooter",
+    title: "Scooter Sales",
+    body: "Wide range of new and used scooters from top brands.",
+    image: images.sales,
+    icon: ShoppingCart,
+    cta: "View Scooters",
     to: "/sales",
-    className: "landing-service-sales",
   },
   {
-    number: "02",
-    title: "Repairs",
-    body: "Get back on the road with expert diagnostics and reliable repairs.",
-    image: images.workshop,
-    alt: "Mechanic working on a scooter",
-    to: "/services",
-    className: "landing-service-repairs",
-  },
-  {
-    number: "03",
-    title: "Services",
-    body: "Keep your scooter running at its best with manufacturer-recommended care.",
-    image: images.service,
-    alt: "Fresh engine oil being added during servicing",
-    to: "/contact",
-    service: "Servicing",
-    className: "landing-service-servicing",
-  },
-  {
-    number: "04",
-    title: "Rentals",
-    body: "Flexible scooter rentals for work, leisure or while yours is being repaired.",
+    title: "Scooter Rental",
+    body: `Flexible weekly rentals from ${gbp(RENTAL_FLEET[0].weeklyPence)} a week.`,
     image: images.rental,
-    alt: "Helmeted rider on an urban scooter",
+    icon: CalendarDays,
+    cta: "View Rental Bikes",
     to: "/rental",
-    className: "landing-service-rentals",
   },
   {
-    number: "05",
-    title: "Accident Claims",
-    body: "Support to get you moving again quickly and with less hassle.",
-    image: images.claims,
-    alt: "Motorcycle helmet on the road",
-    to: "/accident-claims",
-    className: "landing-service-claims",
-  },
-] as const;
-
-// Rental fleet shown on the home page; photos live in public/images/fleet/
-// (a card without `image` shows a placeholder).
-const fleet: Array<{ name: string; body: string; image?: string }> = [
-  { name: "Honda PCX 125", body: "Smooth, economical and comfortable for daily London riding.", image: "/images/fleet/honda-pcx.webp" },
-  { name: "Honda Vision 110", body: "Light and easy to handle, ideal for new riders and short trips.", image: "/images/fleet/honda-vision.webp" },
-  { name: "Honda SH Mode 125", body: "Slim step-through style that slips through city traffic.", image: "/images/fleet/honda-sh-mode.webp" },
-  { name: "Yamaha NMAX 125", body: "Sporty maxi-style comfort with plenty of storage.", image: "/images/fleet/yamaha-nmax.webp" },
-];
-const trust = [
-  {
-    icon: Store,
-    title: "All your riding needs in one place",
-    body: "Sales, servicing, rentals and accident claims.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Friendly, practical advice",
-    body: "Honest guidance from people who ride.",
-  },
-  {
+    title: "Repairs & Service",
+    body: "Tyres, brakes, batteries, diagnostics and more.",
+    image: images.repairs,
     icon: Wrench,
-    title: "Care for scooters & motorcycles",
-    body: "Skilled technicians and the right equipment.",
+    cta: "Book a Repair",
+    to: "/services",
   },
-  { icon: Users, title: "Support from sales to servicing", body: "We're here for the long run." },
+  {
+    title: "Accident Claims",
+    body: "Support with scooter accident claims and repairs.",
+    image: images.claims,
+    icon: ShieldCheck,
+    cta: "Get Help",
+    to: "/accident-claims",
+  },
 ];
+
+const rentalBadges: Array<{ icon: LucideIcon; label: string; sub: string }> = [
+  { icon: CalendarDays, label: `Min. ${RENTAL_TERMS.minWeeks} weeks`, sub: "Flexible weekly plans" },
+  { icon: PoundSterling, label: `${gbp(RENTAL_TERMS.depositPence)} deposit`, sub: "Fully refundable" },
+  { icon: ShieldCheck, label: "Serviced", sub: "& road ready" },
+  { icon: Wrench, label: "Maintenance", sub: "Included" },
+];
+
+const whyChoose = [
+  "Local, friendly and trusted",
+  "Experienced technicians",
+  "Competitive prices",
+  "All makes and models",
+  "Sales, rental, repairs & claims",
+  "Convenient Staines location",
+];
+
+const featuredRentals = RENTAL_FLEET;
 
 function Home() {
+  const [details, setDetails] = useState<SaleScooter | null>(null);
+
   return (
-    <SiteLayout appearance="landing" hideFloating>
-      <section className="landing-hero" aria-labelledby="hero-title">
-        <img
-          className="landing-hero-image"
-          src={images.hero}
-          alt="Blue scooter beside the Thames"
-          width={1536}
-          height={1024}
-          fetchPriority="high"
-        />
-        <div className="landing-container landing-hero-content">
-          <p className="landing-eyebrow">Scooters & motorcycles in London</p>
+    <SiteLayout appearance="landing" className="ss-home" hideFloating>
+      {/* Hero */}
+      <section className="ss-hero" aria-labelledby="hero-title">
+        <img className="ss-hero-image" src={images.hero} alt="Illustration of three scooters outside a Staines Scooters showroom" fetchPriority="high" />
+        <div className="landing-container ss-hero-content">
           <h1 id="hero-title">
-            Your ride.
-            <RotatingWords words={heroWords} className="landing-hero-rotating" />
+            Scooter Sales, Rental, Repairs &amp; Accident Claim Support <span>in Staines</span>
           </h1>
-          <p className="landing-hero-description">
-            Scooter & motorcycle sales, repairs, servicing,
-            <br className="landing-desktop-break" /> rentals and accident claims all in one place.
-          </p>
-          <div className="landing-actions">
-            <Link to="/sales" className="landing-button landing-button-blue">
-              Explore Scooters <ArrowRight />
+          <p className="ss-hero-lead">Your local scooter specialists.</p>
+          <ul className="ss-hero-points">
+            <li><Bike aria-hidden="true" /> New &amp; Used Scooters</li>
+            <li><Wrench aria-hidden="true" /> Expert Repairs &amp; Service</li>
+            <li><CalendarDays aria-hidden="true" /> Flexible Rental Options</li>
+            <li><ShieldCheck aria-hidden="true" /> Accident Claim Support</li>
+          </ul>
+          <div className="ss-hero-actions">
+            <Link to="/sales" className="ss-btn-yellow">
+              Shop Scooters <ArrowRight aria-hidden="true" />
             </Link>
-            <Link
-              to="/contact"
-              search={{ service: "Servicing" }}
-              className="landing-button landing-button-outline"
-            >
-              Book a Service <ArrowRight />
+            <Link to="/rental" className="ss-btn-white">
+              Rent a Scooter <ArrowRight aria-hidden="true" />
             </Link>
-          </div>
-          <div className="landing-hero-features">
-            <Feature
-              icon={Settings}
-              title="Expert Care"
-              body="Skilled technicians, reliable service."
-            />
-            <Feature
-              icon={Users}
-              title="All Riders Welcome"
-              body="From new riders to experienced."
-            />
-            <Feature
-              icon={ShieldCheck}
-              title="Friendly Support"
-              body="A local team that keeps you moving."
-            />
           </div>
         </div>
       </section>
 
-      <section
-        id="our-services"
-        className="landing-container landing-section"
-        aria-labelledby="services-title"
-      >
-        <div className="landing-section-heading">
+      {/* What we do */}
+      <section className="landing-container ss-services" aria-label="Our services">
+        {serviceCards.map(({ title, body, image, icon: Icon, cta, to }) => (
+          <article key={title} className="ss-service-card">
+            <div className="ss-service-photo">
+              <img src={image} alt="" loading="lazy" />
+              <span className="ss-service-icon">
+                <Icon aria-hidden="true" />
+              </span>
+            </div>
+            <div className="ss-service-body">
+              <h2>{title}</h2>
+              <p>{body}</p>
+              <Link to={to!} className="ss-btn-dark ss-btn-block">
+                {cta} <ArrowRight aria-hidden="true" />
+              </Link>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      {/* Rental fleet */}
+      <section id="rent" className="landing-container ss-section" aria-labelledby="rent-title">
+        <div className="ss-section-head">
           <div>
-            <p className="landing-eyebrow">Our services</p>
-            <h2 id="services-title">Everything your ride needs.</h2>
+            <h2 id="rent-title" className="ss-title">
+              Rent a Scooter <span>in Staines</span>
+            </h2>
+            <p className="ss-subtitle">Affordable, reliable scooters for work, commuting or everyday use.</p>
           </div>
-          <Link to="/services" className="landing-text-link">
-            View All Services <ArrowRight />
-          </Link>
-        </div>
-        <div className="landing-service-grid">
-          {services.map((item) => (
-            <Link
-              key={item.number}
-              to={item.to}
-              search={"service" in item ? { service: item.service } : {}}
-              className={`landing-service-card ${item.className}`}
-            >
-              <img src={item.image} alt={item.alt} loading="lazy" width={800} height={600} />
-              <div className="landing-service-copy">
-                <span className="landing-service-number">{item.number}</span>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-                <span className="landing-round-arrow" aria-hidden="true">
-                  <ArrowRight />
+          <ul className="ss-badges">
+            {rentalBadges.map(({ icon: Icon, label, sub }) => (
+              <li key={label}>
+                <Icon aria-hidden="true" />
+                <span>
+                  {label}
+                  <small>{sub}</small>
                 </span>
-              </div>
-            </Link>
-          ))}
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
-
-      <section
-        id="scooters"
-        className="landing-container landing-section landing-range"
-        aria-labelledby="range-title"
-      >
-        <div className="landing-section-heading">
-          <div>
-            <p className="landing-eyebrow">Rentals</p>
-            <h2 id="range-title">Rental Fleet</h2>
-          </div>
-          <Link to="/rental" className="landing-text-link">
-            View Rentals <ArrowRight />
-          </Link>
-        </div>
-        <div className="landing-scooter-grid landing-fleet-grid">
-          {fleet.map((scooter) => (
-            <article key={scooter.name} className="landing-scooter-card">
-              <div className="landing-scooter-photo">
-                {scooter.image ? (
-                  <img src={scooter.image} alt={scooter.name} loading="lazy" width={800} height={500} />
-                ) : (
-                  <div className="landing-fleet-placeholder" aria-hidden="true">
-                    <Bike />
-                  </div>
-                )}
-              </div>
-              <div className="landing-scooter-copy">
-                <h3>{scooter.name}</h3>
-                <p>{scooter.body}</p>
-                <Link
-                  to="/contact"
-                  search={{ service: "Motorbike Rental", bike: scooter.name }}
-                  className="landing-button landing-button-outline"
-                >
-                  Rent this scooter <ArrowRight />
-                </Link>
+        <div className="ss-rent-grid">
+          {featuredRentals.map((s) => (
+            <article key={s.name} className="ss-rent-card">
+              <img src={s.image} alt={s.name} loading="lazy" />
+              <div className="ss-rent-body">
+                <h3>
+                  {s.name} <small>({s.cc})</small>
+                </h3>
+                <p className="ss-price">
+                  {gbp(s.weeklyPence)}
+                  <small>/week</small>
+                </p>
+                <ul>
+                  {s.points.map((p) => (
+                    <li key={p}>
+                      <CircleCheck aria-hidden="true" />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                <a href={enquire.rent(s.name)} target="_blank" rel="noopener noreferrer" className="ss-btn-yellow ss-btn-sm">
+                  Rent Now <ArrowRight aria-hidden="true" />
+                </a>
               </div>
             </article>
           ))}
         </div>
-        <p className="landing-availability">
-          Weekly rentals, serviced and ready to ride. Get in touch to check availability.
+        <p className="ss-note">
+          {gbp(RENTAL_TERMS.depositPence)} refundable deposit · Minimum rental period {RENTAL_TERMS.minWeeks} weeks ·{" "}
+          <Link to="/rental">Full rental details</Link>
         </p>
       </section>
 
-      <section className="landing-trust" aria-labelledby="trust-title">
-        <div className="landing-container landing-trust-inner">
-          <div className="landing-trust-copy">
-            <p className="landing-eyebrow">A local team you can trust</p>
-            <h2 id="trust-title">
-              Why choose
-              <br /> Staines Scooters?
-            </h2>
-            <p className="landing-trust-description">
-              Quality scooters and motorcycles, expert care and genuine support all from a local
-              team that keeps you moving.
-            </p>
-            <div className="landing-trust-features">
-              {trust.map((item) => (
-                <Feature key={item.title} {...item} />
-              ))}
-            </div>
-          </div>
-          <div className="landing-trust-photo">
-            <img
-              src={images.workshop}
-              alt="Our workshop team taking care of a blue scooter"
-              loading="lazy"
-              width={1024}
-              height={1024}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="landing-container landing-section landing-steps-section"
-        aria-labelledby="steps-title"
-      >
-        <p className="landing-eyebrow">It's easy to get started</p>
-        <h2 id="steps-title">Back on the road in 3 simple steps.</h2>
-        <ol className="landing-steps">
-          <li>
-            <Feature
-              icon={Phone}
-              title="Get in touch"
-              body="Tell us what you need sales, service, repair, rental or a claim."
-            />
-            <ArrowRight className="landing-step-arrow" aria-hidden="true" />
-          </li>
-          <li>
-            <Feature
-              icon={ClipboardList}
-              title="Tell us what you need"
-              body="Share a few details and we'll talk through the options."
-            />
-            <ArrowRight className="landing-step-arrow" aria-hidden="true" />
-          </li>
-          <li>
-            <Feature
-              icon={Settings}
-              title="Let us take care of your ride"
-              body="Our expert team gets to work so you can get back on the road."
-            />
-          </li>
-        </ol>
-      </section>
-
-      <section className="landing-wide-container landing-accident" aria-labelledby="accident-title">
-        <img
-          src={images.claims}
-          alt="Motorcycle helmet with a scooter in the background"
-          loading="lazy"
-          width={1536}
-          height={1024}
-        />
-        <div className="landing-accident-copy">
-          <p className="landing-eyebrow">Support when it matters</p>
-          <h2 id="accident-title">
-            Had an accident?
-            <br />
-            <span>We're here to help.</span>
-          </h2>
-          <p>
-            We'll guide you through the claims process and
-            <br className="landing-desktop-break" /> get you back on the road with expert support.
-          </p>
-          <Link to="/accident-claims" className="landing-button landing-button-white">
-            Get Claims Support <ArrowRight />
-          </Link>
-        </div>
-      </section>
-
-      <section className="landing-wide-container landing-cta" aria-labelledby="cta-title">
+      {/* Scooters for sale + why choose us */}
+      <section id="sale" className="landing-container ss-section ss-sale-layout" aria-labelledby="sale-title">
         <div>
-          <p className="landing-eyebrow">Sales · Service · Repairs · Rentals · Accident Claims</p>
-          <h2 id="cta-title">Your next ride starts here.</h2>
-          <p>Scooters, motorcycles, expert care and ongoing support all in one place.</p>
+          <div className="ss-section-head">
+            <div>
+              <h2 id="sale-title" className="ss-title">
+                Scooters for <span>Sale</span>
+              </h2>
+              <p className="ss-subtitle">Browse our latest new and used scooters.</p>
+            </div>
+            <Link to="/sales" className="ss-btn-yellow ss-btn-sm">
+              View All Scooters <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="ss-sale-grid">
+            {SALE_SCOOTERS.map((s) => (
+              <article key={s.name} className="ss-sale-card">
+                <img src={s.image} alt={s.name} loading="lazy" />
+                <h3>{s.name}</h3>
+                <button type="button" className="ss-btn-outline" onClick={() => setDetails(s)}>
+                  View Details
+                </button>
+              </article>
+            ))}
+          </div>
         </div>
-        <div className="landing-actions">
-          <Link to="/contact" className="landing-button landing-button-white">
-            Contact Us <ArrowRight />
-          </Link>
-          <Link
-            to="/contact"
-            search={{ service: "Servicing" }}
-            className="landing-button landing-button-navy"
-          >
-            Book a Service <ArrowRight />
-          </Link>
-        </div>
+        <aside id="about" className="ss-why" aria-labelledby="why-title">
+          <h2 id="why-title">
+            Why Choose <span>{BRAND.name}?</span>
+          </h2>
+          <ul>
+            {whyChoose.map((w) => (
+              <li key={w}>
+                <span className="ss-why-tick">
+                  <Check aria-hidden="true" />
+                </span>
+                {w}
+              </li>
+            ))}
+          </ul>
+        </aside>
       </section>
+
+      <ScooterDetails scooter={details} onClose={() => setDetails(null)} />
     </SiteLayout>
   );
 }

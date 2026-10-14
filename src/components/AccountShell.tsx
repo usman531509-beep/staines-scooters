@@ -242,9 +242,9 @@ function AdminSidebar() {
             <SidebarMenuButton size="lg" asChild tooltip={BRAND.name}>
               <Link to={isAdmin ? "/admin" : "/staff/pos"}>
                 <img
-                  src="/images/brand/staines-logo.webp"
+                  src="/images/brand/staines-logo-light.webp"
                   alt=""
-                  className="size-8 shrink-0 rounded-full object-contain"
+                  className="h-8 w-12 shrink-0 object-contain"
                 />
                 <span className="grid min-w-0 flex-1 text-left leading-tight">
                   <span className="truncate text-sm font-semibold">{BRAND.name}</span>

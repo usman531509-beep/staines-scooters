@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowRight, Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageCircle, type LucideIcon } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, CheckCircle2, Navigation, type LucideIcon } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/LandingParts";
-import { BRAND, BRAND_ADDRESS, siteLink, whatsappLink } from "@/lib/brand";
+import { BRAND, BRAND_ADDRESS, DIRECTIONS_URL, siteLink, whatsappLink } from "@/lib/brand";
 import "@/styles/landing.css";
 
 const images = {
-  hero: "/images/landing/nmax-hero.webp",
+  hero: "/images/landing/service.webp",
   workshop: "/images/landing/workshop.webp",
 };
 
@@ -54,15 +55,15 @@ export const Route = createFileRoute("/contact")({
           openingHoursSpecification: [
             {
               "@type": "OpeningHoursSpecification",
-              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-              opens: "09:30",
-              closes: "18:30",
+              dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              opens: "09:00",
+              closes: "18:00",
             },
             {
               "@type": "OpeningHoursSpecification",
-              dayOfWeek: "Sunday",
-              opens: "10:00",
-              closes: "16:00",
+              dayOfWeek: "Saturday",
+              opens: "09:00",
+              closes: "17:00",
             },
           ],
           priceRange: "££",
@@ -107,6 +108,22 @@ function Contact() {
       message: String(fd.get("message") ?? ""),
       website: String(fd.get("website") ?? ""),
     };
+    // Every enquiry goes to the shop's WhatsApp. Open it straight away, inside
+    // the submit gesture so the browser doesn't block it, then save a copy for
+    // the admin Enquiries list.
+    if (!payload.website) {
+      const lines = [
+        `Hi ${BRAND.name}, I'd like to make an enquiry.`,
+        payload.service && `Service: ${payload.service}`,
+        `Name: ${payload.name}`,
+        `Phone: ${payload.phone}`,
+        payload.email && `Email: ${payload.email}`,
+        payload.bike && `Bike: ${payload.bike}`,
+        payload.reg && `Reg: ${payload.reg}`,
+        payload.message && `\n${payload.message}`,
+      ].filter(Boolean);
+      window.open(whatsappLink(lines.join("\n")), "_blank", "noopener");
+    }
     try {
       const res = await fetch("/api/public/contact", {
         method: "POST",
@@ -124,25 +141,25 @@ function Contact() {
   }
 
   return (
-    <SiteLayout appearance="landing" hideFloating>
+    <SiteLayout appearance="landing">
       <PageHero
         eyebrow="Contact"
         title="Let's get you"
         accent="moving."
-        description="Sales, servicing, repairs, rentals or a claim call, email or send an enquiry and the team will get back to you."
+        description={`Sales, rentals, repairs or an accident claim WhatsApp or call us, or visit the shop at ${BRAND.addressLine}, ${BRAND.town}.`}
         image={images.hero}
-        imageAlt="Yamaha NMAX scooter"
-        cutout
+        imageAlt="Mechanic pouring fresh oil into a scooter engine"
+        imagePosition="60% center"
       >
         <div className="landing-actions">
-          <a href="#enquiry" className="landing-button landing-button-blue">
-            Send an Enquiry <ArrowRight />
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+            <WhatsAppIcon aria-hidden="true" /> WhatsApp Us
           </a>
-          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="landing-button landing-button-whatsapp">
-            <MessageCircle /> WhatsApp Us
+          <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-yellow">
+            <Phone aria-hidden="true" /> {BRAND.phone}
           </a>
-          <a href={`tel:+${BRAND.phoneIntl}`} className="landing-button landing-button-outline">
-            <Phone /> {BRAND.phone}
+          <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="ss-btn-dark">
+            <Navigation aria-hidden="true" /> Get Directions
           </a>
         </div>
       </PageHero>
@@ -161,13 +178,18 @@ function Contact() {
                 )}
                 {[BRAND.town, BRAND.postcode].filter(Boolean).join(", ")}
               </p>
+              <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="ss-btn-yellow ss-btn-sm ss-directions">
+                <Navigation aria-hidden="true" /> Get Directions
+              </a>
             </InfoCard>
             <InfoCard icon={Phone} label="Telephone">
               <a href={`tel:+${BRAND.phoneIntl}`}>{BRAND.phone}</a>
+              <br />
+              <a href={`tel:+${BRAND.phone2Intl}`}>{BRAND.phone2}</a>
             </InfoCard>
-            <InfoCard icon={MessageCircle} label="WhatsApp">
+            <InfoCard icon={WhatsAppIcon} label="WhatsApp">
               <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">
-                Chat with us on WhatsApp
+                {BRAND.phone} — chat with us
               </a>
             </InfoCard>
             <InfoCard icon={Mail} label="Email">
@@ -175,9 +197,11 @@ function Contact() {
             </InfoCard>
             <InfoCard icon={Clock} label="Opening hours">
               <p>
-                Mon – Sat: 9:30 – 18:30
+                Mon – Fri: 9:00am – 6:00pm
                 <br />
-                Sunday: 10:00 – 16:00
+                Saturday: 9:00am – 5:00pm
+                <br />
+                Sunday: Closed
               </p>
             </InfoCard>
             <div className="landing-info-photo">
@@ -192,9 +216,11 @@ function Contact() {
             {sent ? (
               <div className="landing-form-done" role="status">
                 <CheckCircle2 aria-hidden="true" />
-                <strong>Thanks — we'll be in touch.</strong>
+                <strong>Thanks — your enquiry is ready in WhatsApp.</strong>
                 <p>
-                  For anything urgent, call <a href={`tel:+${BRAND.phoneIntl}`}>{BRAND.phone}</a>.
+                  Press send in WhatsApp so it reaches us. If it didn't open,{" "}
+                  <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">message us here</a> or call{" "}
+                  <a href={`tel:+${BRAND.phoneIntl}`}>{BRAND.phone}</a>.
                 </p>
               </div>
             ) : (
@@ -234,8 +260,8 @@ function Contact() {
                 {err && <p className="landing-form-error" role="alert">{err}</p>}
 
                 <div className="landing-field-wide">
-                  <button type="submit" disabled={sending} className="landing-button landing-button-blue">
-                    <Send /> {sending ? "Sending…" : "Send Enquiry"}
+                  <button type="submit" disabled={sending} className="ss-btn-whatsapp ss-btn-block">
+                    <WhatsAppIcon aria-hidden="true" /> {sending ? "Sending…" : "Send via WhatsApp"}
                   </button>
                 </div>
               </form>
@@ -267,7 +293,7 @@ function InfoCard({
   label,
   children,
 }: {
-  icon: LucideIcon;
+  icon: LucideIcon | typeof WhatsAppIcon;
   label: string;
   children: React.ReactNode;
 }) {

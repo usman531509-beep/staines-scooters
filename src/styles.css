@@ -64,54 +64,56 @@
   --stock-later: oklch(0.78 0.17 78);
   --stock-badge-foreground: oklch(1 0 0);
 
-  /* Bright retina workshop palette — white & crisp */
-  --background: oklch(0.985 0.004 250);        /* cool off-white */
-  --foreground: oklch(0.2 0.04 268);           /* navy ink */
+  /* Garage palette: Staines Scooters yellow & black on clean neutral greys. */
+  --background: oklch(0.982 0.002 90);         /* warm off-white */
+  --foreground: oklch(0.18 0.005 90);          /* near-black ink */
 
-  --surface: oklch(0.975 0.007 250);           /* soft blue-grey */
+  --surface: oklch(0.968 0.003 90);            /* soft grey */
   --surface-elevated: oklch(1 0 0);            /* pure white */
-  --ink: oklch(0.2 0.04 268);
-  --ink-muted: oklch(0.5 0.03 258);
+  --ink: oklch(0.18 0.005 90);
+  --ink-muted: oklch(0.48 0.008 90);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.04 268);
+  --card-foreground: oklch(0.18 0.005 90);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.04 268);
+  --popover-foreground: oklch(0.18 0.005 90);
 
-  --primary: oklch(0.555 0.245 262);           /* brand blue #0066ff */
-  --primary-foreground: oklch(0.99 0.005 250);
+  --primary: oklch(0.85 0.17 86);              /* brand yellow #ffc400 */
+  --primary-foreground: oklch(0.16 0.005 90);  /* black text on yellow */
+  /* Readable gold for yellow text/links on white (yellow itself is too light). */
+  --primary-ink: oklch(0.58 0.13 75);
   --rust: oklch(0.55 0.16 40);
 
   --sale: oklch(0.88 0.17 95);                 /* sale banner yellow */
   --sale-foreground: oklch(0.24 0.05 70);      /* dark brown-ink text */
 
-  --secondary: oklch(0.955 0.012 255);
-  --secondary-foreground: oklch(0.2 0.04 268);
-  --muted: oklch(0.96 0.008 255);
-  --muted-foreground: oklch(0.5 0.03 258);
-  --accent: oklch(0.95 0.025 255);              /* hover tint */
-  --accent-foreground: oklch(0.3 0.12 262);
+  --secondary: oklch(0.955 0.004 90);
+  --secondary-foreground: oklch(0.18 0.005 90);
+  --muted: oklch(0.96 0.003 90);
+  --muted-foreground: oklch(0.48 0.008 90);
+  --accent: oklch(0.965 0.05 92);               /* soft yellow hover tint */
+  --accent-foreground: oklch(0.2 0.02 80);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0.005 80);
 
-  --border: oklch(0.915 0.012 255);
+  --border: oklch(0.91 0.004 90);
   --input: oklch(1 0 0);
-  --ring: oklch(0.555 0.245 262);
+  --ring: oklch(0.8 0.16 86);
 
-  --gradient-hero: linear-gradient(135deg, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.7) 50%, oklch(0.555 0.245 262 / 0.18));
-  --gradient-red: linear-gradient(135deg, oklch(0.6 0.22 258), oklch(0.5 0.24 264));
-  --shadow-card: 0 1px 2px oklch(0.2 0.04 268 / 0.04), 0 10px 30px -18px oklch(0.2 0.04 268 / 0.2);
-  --shadow-red: 0 10px 30px -10px oklch(0.555 0.245 262 / 0.4);
+  --gradient-hero: linear-gradient(135deg, oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.7) 50%, oklch(0.85 0.17 86 / 0.2));
+  --gradient-red: linear-gradient(135deg, oklch(0.88 0.17 90), oklch(0.8 0.17 80));
+  --shadow-card: 0 1px 2px oklch(0.18 0.005 90 / 0.05), 0 10px 30px -18px oklch(0.18 0.005 90 / 0.22);
+  --shadow-red: 0 10px 30px -10px oklch(0.85 0.17 86 / 0.45);
 
-  /* shadcn sidebar */
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.3 0.04 265);
-  --sidebar-primary: oklch(0.555 0.245 262);
-  --sidebar-primary-foreground: oklch(0.99 0.005 250);
-  --sidebar-accent: oklch(0.955 0.025 255);
-  --sidebar-accent-foreground: oklch(0.3 0.14 262);
-  --sidebar-border: oklch(0.925 0.01 255);
-  --sidebar-ring: oklch(0.555 0.245 262);
+  /* shadcn sidebar: black garage panel with a yellow active item */
+  --sidebar: oklch(0.17 0.004 90);
+  --sidebar-foreground: oklch(0.86 0.004 90);
+  --sidebar-primary: oklch(0.85 0.17 86);
+  --sidebar-primary-foreground: oklch(0.16 0.005 90);
+  --sidebar-accent: oklch(0.25 0.006 90);
+  --sidebar-accent-foreground: oklch(0.97 0.004 90);
+  --sidebar-border: oklch(0.27 0.006 90);
+  --sidebar-ring: oklch(0.85 0.17 86);
 }
 
 @layer base {
@@ -124,8 +126,8 @@
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     background-image:
-      radial-gradient(circle at 15% -5%, oklch(0.555 0.245 262 / 0.05), transparent 45%),
-      radial-gradient(circle at 90% 110%, oklch(0.7 0.12 230 / 0.05), transparent 50%);
+      radial-gradient(circle at 15% -5%, oklch(0.85 0.17 86 / 0.06), transparent 45%),
+      radial-gradient(circle at 90% 110%, oklch(0.5 0 0 / 0.03), transparent 50%);
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
@@ -325,6 +327,13 @@
 }
 [data-account-workspace] .font-display.uppercase {
   text-transform: none;
+}
+/* Yellow is too light for text on white, so "primary" text and links in the
+   signed-in area use the darker gold; yellow stays for fills and highlights. */
+[data-account-workspace] .text-primary,
+[data-account-workspace] .hover\:text-primary:hover,
+[data-account-workspace] .focus\:text-primary:focus {
+  color: var(--primary-ink);
 }
 
 /* RouteProgress: a short bar sliding across the top edge. */

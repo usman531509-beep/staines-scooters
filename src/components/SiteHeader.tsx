@@ -1,9 +1,11 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, ChevronDown, LayoutDashboard, LogOut, ShieldCheck } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
 import { BRAND } from "@/lib/brand";
+import { enquire } from "@/lib/scooters";
 
 import { LandingBrand, landingNav } from "./LandingBrand";
 
@@ -14,65 +16,107 @@ const nav = [
   { to: "/contact", label: "Contact", icon: Mail },
 ] as const;
 
-// Pages that open with a hero photo; the navbar floats over it until scrolled.
-const HERO_PAGES = ["/", "/sales", "/services", "/rental", "/accident-claims", "/contact"];
-
 export function SiteHeader({ appearance = "default" }: { appearance?: "default" | "landing" }) {
   const [open, setOpen] = useState(false);
   const { user, isAdmin } = useAuth();
   const router = useRouter();
+  const { pathname } = useLocation();
 
   async function handleSignOut() {
     await signOut();
     router.navigate({ to: "/" });
   }
 
-  const { pathname } = useLocation();
-  const overlay = appearance === "landing" && HERO_PAGES.includes(pathname);
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    if (!overlay) return;
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [overlay]);
+  // Close the mobile menu after navigating.
+  useEffect(() => setOpen(false), [pathname]);
 
   // Signed-in staff keep the website navbar, with a link back to their portal.
   const portal = isAdmin ? "/admin" : "/staff/pos";
 
   if (appearance === "landing")
     return (
-      <header className={`lnav${overlay ? " lnav-overlay" : ""}${scrolled || open ? " is-solid" : ""}`}>
-        <div className="landing-container lnav-row">
-          <LandingBrand />
-          <nav className="lnav-links" aria-label="Main navigation">
-            {landingNav.map((item) => (
-              <div key={item.label} className={`lnav-item${item.children ? " lnav-has-menu" : ""}`}>
+      <header className="ss-header">
+        {/* Top bar: logo, promises and the two ways to get in touch */}
+        <div className="ss-topbar">
+          <div className="landing-container ss-topbar-row">
+            <LandingBrand light className="ss-logo" />
+            <ul className="ss-promises" aria-label="Why choose us">
+              <li>
+                <MapPin aria-hidden="true" />
+                <span>
+                  Local to Staines
+                  <small>Friendly &amp; Trusted</small>
+                </span>
+              </li>
+              <li>
+                <Wrench aria-hidden="true" />
+                <span>
+                  Expert Technicians
+                  <small>All Makes &amp; Models</small>
+                </span>
+              </li>
+              <li>
+                <ShieldCheck aria-hidden="true" />
+                <span>
+                  Competitive Prices
+                  <small>Quality Service</small>
+                </span>
+              </li>
+            </ul>
+            <div className="ss-contact-buttons">
+              <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-call" aria-label={`Call us on ${BRAND.phone}`}>
+                <Phone aria-hidden="true" />
+                <span>
+                  Call Us
+                  <strong>{BRAND.phone}</strong>
+                </span>
+              </a>
+              <a
+                href={enquire.general()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ss-btn-whatsapp"
+                aria-label={`WhatsApp us on ${BRAND.phone}`}
+              >
+                <WhatsAppIcon aria-hidden="true" />
+                <span>
+                  WhatsApp
+                  <strong>{BRAND.phone}</strong>
+                </span>
+              </a>
+              <button
+                type="button"
+                className="ss-menu-button"
+                onClick={() => setOpen(!open)}
+                aria-expanded={open}
+                aria-controls="ss-mobile-nav"
+                aria-label={open ? "Close navigation" : "Open navigation"}
+              >
+                {open ? <X /> : <Menu />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main navigation */}
+        <nav className="ss-nav" aria-label="Main navigation">
+          <div className="landing-container ss-nav-row">
+            <div className="ss-nav-links">
+              {landingNav.map((item) => (
                 <Link
+                  key={item.label}
                   to={item.to}
-                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: false }}
+                  hash={item.hash}
+                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: !!item.hash }}
                   activeProps={{ className: "is-active", "aria-current": "page" }}
                 >
                   {item.label}
-                  {item.children && <ChevronDown aria-hidden="true" />}
                 </Link>
-                {item.children && (
-                  <div className="lnav-menu">
-                    {item.children.map((c) => (
-                      <Link key={c.label} to={c.to} hash={c.hash} search={c.search ?? {}}>
-                        {c.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-          <div className="lnav-actions">
+              ))}
+            </div>
             {user ? (
               // Signed-in staff: account menu with their portal and sign out.
-              <div className="lnav-item lnav-has-menu lnav-account">
+              <div className="lnav-has-menu lnav-account">
                 <button type="button" className="lnav-avatar" aria-label="Account menu" aria-haspopup="menu">
                   <span>{(user.email ?? "?").charAt(0).toUpperCase()}</span>
                   <ChevronDown aria-hidden="true" className="lnav-caret" />
@@ -91,52 +135,49 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
                 </div>
               </div>
             ) : (
-              <Link to="/auth" className="lnav-login">
+              <Link to="/auth" className="ss-login">
                 <User aria-hidden="true" /> Login
               </Link>
             )}
-            <Link to="/contact" search={{ service: "Servicing" }} className="lnav-book">
-              <Wrench aria-hidden="true" /> Book a Service
-            </Link>
-            <button
-              type="button"
-              className="lnav-icon lnav-menu-button"
-              onClick={() => setOpen(!open)}
-              aria-expanded={open}
-              aria-controls="lnav-mobile"
-              aria-label={open ? "Close navigation" : "Open navigation"}
-            >
-              {open ? <X /> : <Menu />}
-            </button>
           </div>
-        </div>
+        </nav>
+
         {open && (
-          <nav id="lnav-mobile" className="lnav-mobile" aria-label="Mobile navigation">
+          <nav id="ss-mobile-nav" className="ss-mobile-nav" aria-label="Mobile navigation">
             <div className="landing-container">
               {landingNav.map((item) => (
                 <Link
                   key={item.label}
                   to={item.to}
-                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: false }}
+                  hash={item.hash}
+                  activeOptions={{ exact: item.to === "/", includeSearch: false, includeHash: !!item.hash }}
                   activeProps={{ className: "is-active", "aria-current": "page" }}
-                  onClick={() => setOpen(false)}
                 >
                   {item.label}
                   <ArrowRight aria-hidden="true" />
                 </Link>
               ))}
-              <div className="lnav-mobile-actions">
-                <Link to={user ? portal : "/auth"} className="lnav-login" onClick={() => setOpen(false)}>
-                  {user ? <LayoutDashboard aria-hidden="true" /> : <User aria-hidden="true" />} {user ? "Dashboard" : "Login"}
-                </Link>
-                <Link
-                  to="/contact"
-                  search={{ service: "Servicing" }}
-                  className="lnav-book"
-                  onClick={() => setOpen(false)}
-                >
-                  <Wrench aria-hidden="true" /> Book a Service
-                </Link>
+              <div className="ss-mobile-actions">
+                <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-call">
+                  <Phone aria-hidden="true" /> Call {BRAND.phone}
+                </a>
+                <a href={enquire.general()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+                  <WhatsAppIcon aria-hidden="true" /> WhatsApp us
+                </a>
+                {user ? (
+                  <>
+                    <Link to={portal} className="ss-login">
+                      <LayoutDashboard aria-hidden="true" /> Dashboard
+                    </Link>
+                    <button type="button" className="ss-login" onClick={handleSignOut}>
+                      <LogOut aria-hidden="true" /> Log out
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/auth" className="ss-login">
+                    <User aria-hidden="true" /> Login
+                  </Link>
+                )}
               </div>
             </div>
           </nav>

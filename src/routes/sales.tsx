@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
@@ -11,13 +12,12 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Checklist, CtaBand, Feature, PageHero } from "@/components/LandingParts";
 import { BRAND, siteLink } from "@/lib/brand";
-import pcx from "@/assets/honda-pcx-125.jpg";
-import forza from "@/assets/honda-forza.jpg";
-import vision from "@/assets/honda-vision.jpg";
-import nmax from "@/assets/yamaha-nmax.jpg";
+import { ScooterDetails } from "@/components/ScooterDetails";
+import { SALE_EXTRAS, SALE_SCOOTERS, enquire, type SaleScooter } from "@/lib/scooters";
 import "@/styles/landing.css";
 
 const images = {
@@ -45,143 +45,54 @@ export const Route = createFileRoute("/sales")({
   component: Sales,
 });
 
-const models = [
-  {
-    name: "Honda PCX 125",
-    body: "The best-selling commuter: smooth, frugal and easy in traffic.",
-    image: pcx,
-    tags: ["125cc", "Automatic", "Learner legal"],
-  },
-  {
-    name: "Honda Forza",
-    body: "Maxi-scooter comfort with room for longer runs and a passenger.",
-    image: forza,
-    tags: ["Maxi", "Touring", "Storage"],
-  },
-  {
-    name: "Yamaha NMAX",
-    body: "Sharp, sporty and efficient — a great everyday all-rounder.",
-    image: nmax,
-    tags: ["125cc", "Automatic", "ABS"],
-  },
-  {
-    name: "Honda Vision 110",
-    body: "Light, low seat and simple to ride — ideal for new riders.",
-    image: vision,
-    tags: ["110cc", "Lightweight", "Low seat"],
-  },
-];
-
-const styles = [
-  {
-    name: "Honda PCX 125",
-    body: "Smooth, economical and comfortable for the daily commute.",
-    image: "/images/fleet/honda-pcx.webp",
-  },
-  {
-    name: "Honda Vision 110",
-    body: "Light and easy to handle, ideal for new riders.",
-    image: "/images/fleet/honda-vision.webp",
-  },
-  {
-    name: "Honda SH Mode 125",
-    body: "Slim step-through style that slips through city traffic.",
-    image: "/images/fleet/honda-sh-mode.webp",
-  },
-  {
-    name: "Yamaha NMAX 125",
-    body: "Sporty maxi-style comfort with plenty of storage.",
-    image: "/images/fleet/yamaha-nmax.webp",
-  },
-];
-
 function Sales() {
+  const [details, setDetails] = useState<SaleScooter | null>(null);
+
   return (
-    <SiteLayout appearance="landing" hideFloating>
+    <SiteLayout appearance="landing">
       <PageHero
         eyebrow="Sales"
         title="Find your"
         accent="next ride."
-        description="New and used scooters and motorcycles, each one checked over by our own workshop before it leaves with honest advice from people who ride."
+        description="New and used scooters, each one checked over by our own workshop and every scooter comes with a pizza box, hot grips, muffs and a phone holder."
         image={images.hero}
         imageAlt="Maxi scooter parked by the river"
         imagePosition="60% 25%"
       >
         <div className="landing-actions">
-          <Link to="/contact" search={{ service: "Scooter Sales" }} className="landing-button landing-button-blue">
-            Ask About Stock <ArrowRight />
-          </Link>
-          <a href="#models" className="landing-button landing-button-outline">
-            Popular Models <ArrowRight />
+          <a href={enquire.buy()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+            <WhatsAppIcon aria-hidden="true" /> Ask About Stock
+          </a>
+          <a href="#models" className="ss-btn-yellow">
+            View Scooters <ArrowRight aria-hidden="true" />
           </a>
         </div>
       </PageHero>
 
-      <section id="models" className="landing-container landing-block" aria-labelledby="models-title">
-        <div className="landing-section-heading">
+      <section id="models" className="landing-container ss-section" aria-labelledby="models-title">
+        <div className="ss-section-head">
           <div>
-            <p className="landing-eyebrow">Popular models</p>
-            <h2 id="models-title">Scooters riders love.</h2>
+            <h2 id="models-title" className="ss-title">
+              Scooters for <span>Sale</span>
+            </h2>
+            <p className="ss-subtitle">Every scooter comes with: {SALE_EXTRAS.join(", ").toLowerCase()}.</p>
           </div>
-          <Link to="/contact" search={{ service: "Scooter Sales" }} className="landing-text-link">
-            Check Availability <ArrowRight />
-          </Link>
         </div>
-        <div className="landing-card-grid landing-card-grid-4">
-          {models.map((m) => (
-            <article key={m.name} className="landing-card">
-              <div className="landing-card-photo landing-card-photo-contain">
-                <img src={m.image} alt={m.name} loading="lazy" width={1280} height={960} />
-              </div>
-              <div className="landing-card-body">
-                <h3>{m.name}</h3>
-                <p>{m.body}</p>
-                <div className="landing-tags">
-                  {m.tags.map((t) => (
-                    <span key={t}>{t}</span>
-                  ))}
-                </div>
-                <Link
-                  to="/contact"
-                  search={{ service: "Scooter Sales", bike: m.name }}
-                  className="landing-text-link"
-                >
-                  Enquire <ArrowRight />
-                </Link>
-              </div>
+        <div className="ss-sale-grid">
+          {SALE_SCOOTERS.map((m) => (
+            <article key={m.name} className="ss-sale-card">
+              <img src={m.image} alt={m.name} loading="lazy" />
+              <h3>
+                {m.name} <small className="ss-cc">{m.cc}</small>
+              </h3>
+              <p className="ss-sale-text">{m.body}</p>
+              <button type="button" className="ss-btn-outline" onClick={() => setDetails(m)}>
+                View Details
+              </button>
             </article>
           ))}
         </div>
-        <p className="landing-availability">
-          Models shown are examples of what we sell. Stock changes often — get in touch for what's in the showroom now.
-        </p>
-      </section>
-
-      <section id="styles" className="landing-container landing-block" aria-labelledby="styles-title">
-        <div className="landing-block-heading">
-          <p className="landing-eyebrow">Something for every rider</p>
-          <h2 id="styles-title">Pick your style.</h2>
-        </div>
-        <div className="landing-card-grid landing-card-grid-4">
-          {styles.map((s) => (
-            <article key={s.name} className="landing-card">
-              <div className="landing-card-photo landing-card-photo-studio">
-                <img src={s.image} alt={s.name} loading="lazy" width={800} height={500} />
-              </div>
-              <div className="landing-card-body">
-                <h3>{s.name}</h3>
-                <p>{s.body}</p>
-                <Link
-                  to="/contact"
-                  search={{ service: "Scooter Sales", bike: s.name }}
-                  className="landing-text-link"
-                >
-                  View Options <ArrowRight />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        <p className="ss-note">Stock changes often message us on WhatsApp for what's in the showroom now.</p>
       </section>
 
       <section id="buying" className="landing-container landing-block" aria-labelledby="why-title">
@@ -212,9 +123,9 @@ function Sales() {
               ]}
             />
             <div className="landing-actions">
-              <Link to="/contact" search={{ service: "Scooter Sales" }} className="landing-button landing-button-blue">
-                Talk to Sales <ArrowRight />
-              </Link>
+              <a href={enquire.buy()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+                <WhatsAppIcon aria-hidden="true" /> Talk to Sales
+              </a>
             </div>
           </div>
         </div>
@@ -249,6 +160,7 @@ function Sales() {
         service="Scooter Sales"
         primaryLabel="Ask About Stock"
       />
+      <ScooterDetails scooter={details} onClose={() => setDetails(null)} />
     </SiteLayout>
   );
 }

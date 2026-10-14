@@ -3,7 +3,7 @@
 
 - The signed-in shell (shadcn `Sidebar` + `SidebarInset`) is mounted once by `AccountShellLayout` in `_authenticated/route.tsx`; a page's `<AccountShell title=…>` only registers its options with it, so navigating swaps the page content without remounting the sidebar, header or till toolbar. Pages without `AccountShell` (receipts, invoices) render bare.
 - Render the browser-only administrator bottom navigation in `AccountShell` (phones/tablets only; the sidebar covers large screens); this keeps it consistent across admin pages while leaving installed-app navigation independent.
-- The signed-in shell never renders the public website header; on the public website, signed-in staff still see the navbar, with "Dashboard" (admins → /admin, staff → /staff/pos) in place of "Login".
+- The signed-in shell never renders the public website header; on the public website, signed-in staff still see the navbar, with a profile menu (Dashboard → /admin or /staff/pos, Log out) in place of "Login".
 - Keep AccountShell and AppShell page workspaces full-width without outer horizontal gutters; shared shell sizing prevents individual signed-in pages reverting to a centred layout.
 - Rental rent for admins other than the exempt original owner is charged as direct charges on that admin's own Stripe Connect account (stripe-connect.server.ts); the exempt owner keeps the built-in Stripe flow so existing payments are untouched.
 - Motorbike finance maths lives in `src/lib/finance-calc.ts` (pure, integer pence) and is recomputed server-side in `finance.server.ts` on every save; the browser only previews, so stored schedules are always server-authoritative.
@@ -24,3 +24,6 @@
 - Built-but-hidden modules are switched off in `src/lib/features.ts` (currently finance and Stripe online payments): gate navigation, routes, public links and outward-facing server actions on the flag instead of deleting the module, so it can be re-enabled.
 - The app sends no email of any kind (no reminders, receipts, invoices, alerts or contact emails) and runs no automatic rental billing; rental weeks are created when staff list or open rentals and payments are recorded manually. Only Supabase Auth's own password-reset email exists.
 - Public contact-form submissions are stored in `contact_enquiries` by the server (service role) and followed up in /admin/enquiries; anonymous users have no direct table access.
+- Every public enquiry (rent, buy, claim, repair, general, and the contact form) goes to the shop's WhatsApp via `whatsappLink`/`enquire` (src/lib/brand.ts, src/lib/scooters.ts); the contact form opens WhatsApp inside the submit gesture so it isn't popup-blocked, then saves its copy.
+- Rental prices, deposit, minimum term, the sale line-up and the extras supplied with every sold scooter live in src/lib/scooters.ts; pages read them from there rather than hard-coding figures.
+- Brand colours are yellow & black: admin tokens in src/styles.css (yellow `--primary` with black text; `--primary-ink` gold for primary text on white), public site in src/styles/landing.css (`ss-*` classes). Use the white logo (`staines-logo-light.webp`) on dark backgrounds.

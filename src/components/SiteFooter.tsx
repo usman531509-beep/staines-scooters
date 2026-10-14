@@ -1,52 +1,88 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Clock, Mail, Phone, MapPin, MessageCircle } from "lucide-react";
+import { Clock, Mail, Phone, MapPin, Navigation } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import logo from "@/assets/logo.png";
-import { BRAND, BRAND_ADDRESS, whatsappLink } from "@/lib/brand";
+import { BRAND, BRAND_ADDRESS, DIRECTIONS_URL, OPENING_HOURS } from "@/lib/brand";
+import { enquire } from "@/lib/scooters";
 
-import { LandingBrand, landingNav } from "./LandingBrand";
 
 export function SiteFooter({ appearance = "default" }: { appearance?: "default" | "landing" }) {
   if (appearance === "landing")
     return (
-      <footer className="landing-footer">
-        <div className="landing-container landing-footer-grid">
-          <div className="landing-footer-about">
-            <LandingBrand footer />
-            <p>
-              Scooter and motorcycle sales, repairs, servicing, rentals and accident claims with a
-              local team that keeps you moving.
-            </p>
-            <Link to="/contact" search={{ service: "Servicing" }} className="landing-footer-cta">
-              Book a Service <ArrowRight aria-hidden="true" />
-            </Link>
-          </div>
-          <nav aria-label="Footer navigation" className="landing-footer-col">
-            <h2>Explore</h2>
-            <Link to="/">Home</Link>
-            <Link to="/contact" search={{ service: "Servicing" }}>Book a Service</Link>
-            <Link to="/contact">Contact</Link>
-          </nav>
-          <nav aria-label="Our services" className="landing-footer-col">
-            <h2>Services</h2>
-            {landingNav
-              .filter((item) => !["/", "/contact"].includes(item.to))
-              .map((item) => (
-                <Link key={item.label} to={item.to}>
-                  {item.label}
-                </Link>
-              ))}
-          </nav>
-          <address className="landing-footer-col landing-footer-contact">
-            <h2>Visit or call</h2>
-            <span><MapPin aria-hidden="true" />{BRAND_ADDRESS}</span>
-            <a href={`tel:+${BRAND.phoneIntl}`}><Phone aria-hidden="true" />{BRAND.phone}</a>
-            <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"><MessageCircle aria-hidden="true" />WhatsApp us</a>
-            <a href={`mailto:${BRAND.email}`}><Mail aria-hidden="true" />{BRAND.email}</a>
-            <span><Clock aria-hidden="true" />Mon–Sat 9:30–18:30 · Sun 10:00–16:00</span>
-          </address>
+      <footer className="ss-footer">
+        <div className="landing-container ss-footer-grid">
+          <section className="ss-footer-block ss-footer-visit" aria-labelledby="ft-visit">
+            <MapPin aria-hidden="true" className="ss-footer-icon" />
+            <div>
+              <h2 id="ft-visit">Visit Our Shop</h2>
+              <address>
+                {BRAND.name}
+                <br />
+                {BRAND.addressLine}
+                <br />
+                {BRAND.town}, {BRAND.postcode}
+              </address>
+              <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="ss-btn-yellow ss-btn-sm">
+                <Navigation aria-hidden="true" /> Get Directions
+              </a>
+            </div>
+          </section>
+          <a
+            href={DIRECTIONS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ss-footer-map"
+            aria-label={`Open directions to ${BRAND.name} in Google Maps`}
+          >
+            <iframe
+              title={`${BRAND.name} location`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(BRAND_ADDRESS)}&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              tabIndex={-1}
+            />
+          </a>
+          <section className="ss-footer-block" aria-labelledby="ft-hours">
+            <Clock aria-hidden="true" className="ss-footer-icon" />
+            <div>
+              <h2 id="ft-hours">Opening Hours</h2>
+              <dl className="ss-hours">
+                {OPENING_HOURS.map(([day, hours]) => (
+                  <div key={day}>
+                    <dt>{day}</dt>
+                    <dd>{hours}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
+          <section className="ss-footer-block" aria-labelledby="ft-contact">
+            <Phone aria-hidden="true" className="ss-footer-icon" />
+            <div>
+              <h2 id="ft-contact">Get in Touch</h2>
+              <ul className="ss-footer-contact">
+                <li>
+                  <a href={`tel:+${BRAND.phoneIntl}`}><Phone aria-hidden="true" />{BRAND.phone}</a>
+                </li>
+                <li>
+                  <a href={`tel:+${BRAND.phone2Intl}`}><Phone aria-hidden="true" />{BRAND.phone2}</a>
+                </li>
+                <li>
+                  <a href={enquire.general()} target="_blank" rel="noopener noreferrer" className="ss-wa-link">
+                    <WhatsAppIcon aria-hidden="true" />WhatsApp {BRAND.phone}
+                  </a>
+                </li>
+                <li>
+                  <a href={`mailto:${BRAND.email}`}><Mail aria-hidden="true" />{BRAND.email}</a>
+                </li>
+              </ul>
+            </div>
+          </section>
         </div>
-        <div className="landing-container landing-footer-bottom">
-          <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
+        <div className="ss-footer-bottom">
+          <div className="landing-container ss-footer-bottom-row">
+            <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     );

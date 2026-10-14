@@ -40,6 +40,8 @@ export const getDashboardOverview = createServerFn({ method: "GET" })
     const weekStart = londonMidnight(weekDays[0]);
     const monthFirst = `${today.slice(0, 7)}-01`;
     const monthStart = londonMidnight(monthFirst);
+    const [y, m] = monthFirst.split("-").map(Number);
+    const nextMonthFirst = m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, "0")}-01`;
 
     const [sales, recent, expenses, refunds, till, products, enquiries, newEnquiries, rentals, customers, negative] =
       await Promise.all([
@@ -58,8 +60,10 @@ export const getDashboardOverview = createServerFn({ method: "GET" })
           .from("expenses")
           .select("amount_pence")
           .is("deleted_at", null)
-          .eq("is_template", false)
-          .gte("expense_date", monthFirst),
+          // A repeating expense's own row is its first occurrence (later ones are
+          // generated copies), so it counts — same as the Expenses page and P&L.
+          .gte("expense_date", monthFirst)
+          .lt("expense_date", nextMonthFirst),
         supabase.from("refunds").select("amount_pence").is("deleted_at", null).gte("created_at", todayStart.toISOString()),
         supabase
           .from("till_sessions")

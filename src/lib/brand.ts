@@ -1,6 +1,5 @@
-// Single source of truth for business identity shown across the site, emails,
-// invoices and payment links. Contact details are placeholders until the real
-// Staines Scooters details are available; update them here only.
+// Single source of truth for business identity shown across the site, receipts,
+// invoices and payment links; update contact details here only.
 
 const env = import.meta.env as Record<string, string | undefined>;
 
@@ -10,18 +9,36 @@ export const BRAND = {
   companyNumber: "00000000",
   /** Public site origin (no trailing slash); used for links in emails and payment pages. */
   siteUrl: (env.VITE_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
-  email: "contact@example.com",
-  phone: "+44 7721 541806",
+  email: "staines_scooter@outlook.com",
+  /** Main number; also the WhatsApp number every enquiry goes to. */
+  phone: "07471 109963",
   /** Digits only, international format, for tel:/wa.me links. */
-  phoneIntl: "447721541806",
-  /** Street and postcode are blank until the exact London address is known. */
-  addressLine: "" as string,
-  town: "London",
-  postcode: "" as string,
+  phoneIntl: "447471109963",
+  phone2: "07423 242927",
+  phone2Intl: "447423242927",
+  addressLine: "Burma House, Station Path",
+  town: "Staines-upon-Thames",
+  postcode: "TW18 4LA",
 } as const;
 
 /** One-line address, skipping any part that is still blank. */
 export const BRAND_ADDRESS = [BRAND.addressLine, BRAND.town, BRAND.postcode].filter(Boolean).join(", ");
+
+/** Google Maps directions to the shop. */
+export const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+  [BRAND.addressLine, BRAND.town, BRAND.postcode].join(", "),
+)}`;
+
+/** Opening hours shown on the site. */
+export const OPENING_HOURS: Array<[string, string]> = [
+  ["Monday", "9:00am – 6:00pm"],
+  ["Tuesday", "9:00am – 6:00pm"],
+  ["Wednesday", "9:00am – 6:00pm"],
+  ["Thursday", "9:00am – 6:00pm"],
+  ["Friday", "9:00am – 6:00pm"],
+  ["Saturday", "9:00am – 5:00pm"],
+  ["Sunday", "Closed"],
+];
 
 /** WhatsApp chat with the business number, with an optional pre-filled message. */
 export function whatsappLink(text = `Hi ${BRAND.name}, I'd like to enquire about `): string {

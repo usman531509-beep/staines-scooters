@@ -67,7 +67,7 @@ function Receipt() {
       <style>{PRINT_CSS}</style>
       <div className="receipt-sheet mx-auto w-[80mm] bg-white px-[5mm] py-[6mm] font-mono text-[12px] leading-snug text-black">
         <header className="text-center">
-          <img src="/images/brand/staines-logo.webp" alt="" className="mx-auto mb-2 h-16 w-16" />
+          <img src="/images/brand/staines-logo.webp" alt="" className="mx-auto mb-2 h-14 w-auto" />
           <h1 className="font-sans text-[17px] font-extrabold uppercase tracking-wide">{BRAND.name}</h1>
           {BRAND_ADDRESS && <p>{BRAND_ADDRESS}</p>}
           <p>Tel: {BRAND.phone}</p>

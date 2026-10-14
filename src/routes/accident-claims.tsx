@@ -5,13 +5,13 @@ import {
   Camera,
   ClipboardList,
   FileText,
-  MessageCircle,
   Phone,
   Search,
   ShieldCheck,
   Truck,
   Wrench,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Checklist, CtaBand, Feature, PageHero } from "@/components/LandingParts";
 import { BRAND, siteLink, whatsappLink } from "@/lib/brand";
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/accident-claims")({
 
 function AccidentClaims() {
   return (
-    <SiteLayout appearance="landing" hideFloating>
+    <SiteLayout appearance="landing">
       <PageHero
         eyebrow="Accident Claims"
         title="Had an accident?"
@@ -58,14 +58,11 @@ function AccidentClaims() {
         imagePosition="70% center"
       >
         <div className="landing-actions">
-          <Link to="/contact" search={{ service: "Accident Claims" }} className="landing-button landing-button-blue">
-            Start Your Claim <ArrowRight />
-          </Link>
-          <a href={whatsappLink(claimMessage)} target="_blank" rel="noopener noreferrer" className="landing-button landing-button-whatsapp">
-            <MessageCircle /> WhatsApp Us
+          <a href={whatsappLink(claimMessage)} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+            <WhatsAppIcon aria-hidden="true" /> Start Your Claim on WhatsApp
           </a>
-          <a href={`tel:+${BRAND.phoneIntl}`} className="landing-button landing-button-outline">
-            <Phone /> Call {BRAND.phone}
+          <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-yellow">
+            <Phone aria-hidden="true" /> Call {BRAND.phone}
           </a>
         </div>
       </PageHero>
@@ -116,9 +113,9 @@ function AccidentClaims() {
                   href={whatsappLink(`${claimMessage} I'll send photos of the damage here.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="landing-button landing-button-whatsapp"
+                  className="ss-btn-whatsapp"
                 >
-                  <MessageCircle /> Send Photos on WhatsApp
+                  <WhatsAppIcon /> Send Photos on WhatsApp
                 </a>
               </div>
             </div>

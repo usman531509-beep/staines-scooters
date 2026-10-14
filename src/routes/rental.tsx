@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
   Calendar,
+  CircleCheck,
   FileText,
   Phone,
   PoundSterling,
@@ -9,12 +10,11 @@ import {
   ShieldCheck,
   Wrench,
 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Checklist, CtaBand, Feature, PageHero } from "@/components/LandingParts";
 import { BRAND, siteLink } from "@/lib/brand";
-import pcx from "@/assets/honda-pcx-125.jpg";
-import forza from "@/assets/honda-forza.jpg";
-import vision from "@/assets/honda-vision.jpg";
+import { RENTAL_FLEET, RENTAL_TERMS, enquire, gbp } from "@/lib/scooters";
 import "@/styles/landing.css";
 
 const images = {
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/rental")({
       {
         name: "description",
         content:
-          "Weekly 125cc scooter rental for commuters, delivery riders and cover while your bike is repaired. Honda PCX, SH, SH Mode and Vision.",
+          "Weekly scooter rental in Staines from £60 a week: Honda Vision, SH Mode, PCX and Yamaha NMAX. £200 refundable deposit, minimum 4 weeks.",
       },
       { property: "og:title", content: `Scooter Rental — ${BRAND.name}` },
       { property: "og:url", content: siteLink("/rental") },
@@ -64,111 +64,83 @@ export const Route = createFileRoute("/rental")({
   component: Rental,
 });
 
-const fleet = [
-  {
-    name: "Honda PCX 125",
-    image: pcx,
-    contain: true,
-    body: "The commuter favourite — smooth, fuel-efficient and easy in city traffic.",
-    tags: ["125cc", "Automatic", "Keyless"],
-  },
-  {
-    name: "Honda SH 125",
-    image: forza,
-    contain: true,
-    body: "Premium commuter with bigger wheels for stability on busy roads.",
-    tags: ["125cc", "Automatic", '16" wheels'],
-  },
-  {
-    name: "Honda SH Mode 125",
-    image: "/images/fleet/honda-sh-mode.webp",
-    contain: true,
-    body: "Lighter and more agile — perfect for nipping through traffic.",
-    tags: ["125cc", "Automatic", "Lightweight"],
-  },
-  {
-    name: "Honda Vision 110",
-    image: vision,
-    contain: true,
-    body: "Nimble, economical and easy to ride — the ideal first scooter.",
-    tags: ["110cc", "Automatic", "Low seat"],
-  },
-];
-
 const documents = [
   "Full UK driving licence (photocard)",
   "Valid CBT certificate (DL196)",
   "Proof of address recent bill or bank statement",
-  "£200 refundable deposit",
+  `${gbp(RENTAL_TERMS.depositPence)} refundable deposit`,
 ];
 
 function Rental() {
   return (
-    <SiteLayout appearance="landing" hideFloating>
+    <SiteLayout appearance="landing">
       <PageHero
         eyebrow="Rentals"
         title="Scooter rental,"
         accent="week by week."
-        description="Honda 125s on simple weekly terms ideal for commuters, delivery riders and cover while your own bike is in for repair."
+        description={`Honda and Yamaha scooters from ${gbp(RENTAL_FLEET[0].weeklyPence)} a week ideal for commuters, delivery riders and cover while your own bike is in for repair.`}
         image={images.hero}
         imageAlt="Rider on a rental scooter in the city"
         imagePosition="70% 8%"
       >
         <div className="landing-chips">
           <div className="landing-chip">
-            <strong>Weekly</strong>
-            <span>flexible terms</span>
+            <strong>From {gbp(RENTAL_FLEET[0].weeklyPence)}</strong>
+            <span>per week</span>
           </div>
           <div className="landing-chip">
-            <strong>125cc</strong>
-            <span>Honda automatics</span>
+            <strong>{gbp(RENTAL_TERMS.depositPence)}</strong>
+            <span>refundable deposit</span>
           </div>
           <div className="landing-chip">
-            <strong>Serviced</strong>
-            <span>by our workshop</span>
+            <strong>{RENTAL_TERMS.minWeeks} weeks</strong>
+            <span>minimum rental</span>
           </div>
         </div>
         <div className="landing-actions">
-          <Link to="/contact" search={{ service: "Motorbike Rental" }} className="landing-button landing-button-blue">
-            Check Availability <ArrowRight />
-          </Link>
-          <a href={`tel:+${BRAND.phoneIntl}`} className="landing-button landing-button-outline">
-            <Phone /> Call Us
+          <a href={enquire.rent()} target="_blank" rel="noopener noreferrer" className="ss-btn-whatsapp">
+            <WhatsAppIcon aria-hidden="true" /> Check Availability
+          </a>
+          <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-yellow">
+            <Phone aria-hidden="true" /> Call {BRAND.phone}
           </a>
         </div>
       </PageHero>
 
-      <section id="fleet" className="landing-container landing-block" aria-labelledby="fleet-title">
-        <div className="landing-section-heading">
+      <section id="fleet" className="landing-container ss-section" aria-labelledby="fleet-title">
+        <div className="ss-section-head">
           <div>
-            <p className="landing-eyebrow">The fleet</p>
-            <h2 id="fleet-title">Choose your scooter.</h2>
+            <h2 id="fleet-title" className="ss-title">
+              Choose your <span>scooter</span>
+            </h2>
+            <p className="ss-subtitle">
+              {gbp(RENTAL_TERMS.depositPence)} refundable deposit · Minimum rental period {RENTAL_TERMS.minWeeks} weeks
+            </p>
           </div>
-          <Link to="/contact" search={{ service: "Motorbike Rental" }} className="landing-text-link">
-            Reserve a Scooter <ArrowRight />
-          </Link>
         </div>
-        <div className="landing-card-grid landing-card-grid-4">
-          {fleet.map((b) => (
-            <article key={b.name} className="landing-card">
-              <div className={`landing-card-photo${b.contain ? " landing-card-photo-contain" : ""}`}>
-                <img src={b.image} alt={b.name} loading="lazy" />
-              </div>
-              <div className="landing-card-body">
-                <h3>{b.name}</h3>
-                <p>{b.body}</p>
-                <div className="landing-tags">
-                  {b.tags.map((t) => (
-                    <span key={t}>{t}</span>
+        <div className="ss-rent-grid">
+          {RENTAL_FLEET.map((s) => (
+            <article key={s.name} className="ss-rent-card">
+              <img src={s.image} alt={s.name} loading="lazy" />
+              <div className="ss-rent-body">
+                <h3>
+                  {s.name} <small>({s.cc})</small>
+                </h3>
+                <p className="ss-price">
+                  {gbp(s.weeklyPence)}
+                  <small>/week</small>
+                </p>
+                <ul>
+                  {s.points.map((p) => (
+                    <li key={p}>
+                      <CircleCheck aria-hidden="true" />
+                      {p}
+                    </li>
                   ))}
-                </div>
-                <Link
-                  to="/contact"
-                  search={{ service: "Motorbike Rental", bike: b.name }}
-                  className="landing-text-link"
-                >
-                  Reserve this scooter <ArrowRight />
-                </Link>
+                </ul>
+                <a href={enquire.rent(s.name)} target="_blank" rel="noopener noreferrer" className="ss-btn-yellow ss-btn-sm">
+                  Rent Now <ArrowRight aria-hidden="true" />
+                </a>
               </div>
             </article>
           ))}
@@ -208,9 +180,13 @@ function Rental() {
             </p>
           </div>
           <div className="landing-panel-grid">
-            <Feature icon={Wallet} title="Deposit" body="£200, fully refundable when the scooter comes back as it went out." />
-            <Feature icon={PoundSterling} title="Weekly rent" body="£60 per week, the same for every model in the fleet." />
-            <Feature icon={Calendar} title="Weekly terms" body="Rent is paid weekly. Extend the hire or return the scooter at the end of any week." />
+            <Feature icon={Wallet} title="Deposit" body={`${gbp(RENTAL_TERMS.depositPence)}, fully refundable when the scooter comes back as it went out.`} />
+            <Feature
+              icon={PoundSterling}
+              title="Weekly rent"
+              body={RENTAL_FLEET.map((f) => `${f.name} ${gbp(f.weeklyPence)}`).join(" · ")}
+            />
+            <Feature icon={Calendar} title={`Minimum ${RENTAL_TERMS.minWeeks} weeks`} body={`Rent is paid weekly. After the first ${RENTAL_TERMS.minWeeks} weeks, extend the hire or return the scooter at the end of any week.`} />
             <Feature icon={FileText} title="Simple paperwork" body="A standard rental agreement is signed at the workshop when you collect." />
             <Feature icon={Wrench} title="Maintained by us" body={`Full servicing and maintenance are included at no cost to you by ${BRAND.name}.`} />
             <Feature icon={ShieldCheck} title="Ready to ride" body="Every scooter is checked before each hire." />
@@ -221,7 +197,7 @@ function Rental() {
       <CtaBand
         eyebrow="Ready to ride?"
         title="Check what's available this week."
-        body="Scooters go quickly get in touch to reserve yours."
+        body="Scooters go quickly — message us on WhatsApp to reserve yours."
         service="Motorbike Rental"
         primaryLabel="Reserve a Scooter"
       />

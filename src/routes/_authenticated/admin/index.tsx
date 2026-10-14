@@ -52,7 +52,7 @@ function DbStorageCard() {
             {fmtBytes(used)} used of {fmtBytes(total)} ({pct.toFixed(1)}% used)
           </p>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface">
-            <div className="h-full rounded-full bg-gradient-to-r from-primary to-sky-400" style={{ width: `${Math.max(pct, 1)}%` }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-primary to-amber-500" style={{ width: `${Math.max(pct, 1)}%` }} />
           </div>
           {data.topTables.length > 0 && (
             <ul className="mt-4 grid gap-1.5 text-xs text-ink-muted sm:grid-cols-2">
@@ -230,7 +230,7 @@ function AdminDashboard() {
 // Themed tints for icon tiles and accents (blue brand first, supporting hues after).
 type Tone = "blue" | "sky" | "emerald" | "amber" | "violet" | "rose";
 const TONE: Record<Tone, string> = {
-  blue: "bg-primary/10 text-primary",
+  blue: "bg-primary/20 text-[var(--primary-ink)]",
   sky: "bg-sky-500/10 text-sky-600",
   emerald: "bg-emerald-500/10 text-emerald-600",
   amber: "bg-amber-500/15 text-amber-600",
@@ -238,7 +238,7 @@ const TONE: Record<Tone, string> = {
   rose: "bg-rose-500/10 text-rose-600",
 };
 const TONE_BAR: Record<Tone, string> = {
-  blue: "from-primary to-primary/40",
+  blue: "from-primary to-[oklch(0.8_0.17_78)]",
   sky: "from-sky-500 to-sky-300",
   emerald: "from-emerald-500 to-emerald-300",
   amber: "from-amber-500 to-amber-300",
@@ -259,18 +259,19 @@ function greeting() {
 function Welcome({ till, todayPence, todayCount }: { till: { openedAt: string; floatPence: number } | null; todayPence: number; todayCount: number }) {
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/London" });
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary to-[oklch(0.42_0.2_265)] p-6 text-primary-foreground shadow-lg shadow-primary/20 sm:p-7">
-      <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-white/10 blur-2xl" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 right-40 size-56 rounded-full bg-white/10 blur-2xl" />
-      <img src="/images/brand/staines-logo.webp" alt="" className="pointer-events-none absolute -right-6 top-1/2 hidden size-48 -translate-y-1/2 opacity-15 lg:block" />
+    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[oklch(0.2_0.005_90)] via-[oklch(0.17_0.005_90)] to-[oklch(0.12_0.004_90)] p-6 text-white shadow-lg shadow-black/20 sm:p-7">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 size-72 rounded-full bg-primary/15 blur-2xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 right-40 size-56 rounded-full bg-primary/10 blur-2xl" />
+      <img src="/images/brand/staines-logo-light.webp" alt="" className="pointer-events-none absolute -right-4 top-1/2 hidden w-64 -translate-y-1/2 opacity-20 lg:block" />
       <div className="relative flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-sm font-medium text-primary-foreground/75">{today}</p>
+          <p className="text-sm font-medium text-primary">{today}</p>
           <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{greeting()}, welcome back</h2>
-          <p className="mt-2 text-sm text-primary-foreground/80">
+          <p className="mt-2 text-sm text-white/75">
             {todayCount ? `${todayCount} ${todayCount === 1 ? "sale" : "sales"} so far today · ${gbp(todayPence)}` : "No sales yet today."}
           </p>
-          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-sm font-medium backdrop-blur">
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium ring-1 ring-white/15">
             <span className={`size-2 rounded-full ${till ? "bg-emerald-300 shadow-[0_0_0_3px_rgb(110_231_183/0.35)]" : "bg-white/50"}`} aria-hidden="true" />
             {till
               ? `Till open since ${new Date(till.openedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · float ${gbp(till.floatPence)}`
@@ -278,10 +279,10 @@ function Welcome({ till, todayPence, todayCount }: { till: { openedAt: string; f
           </span>
         </div>
         <div className="flex flex-wrap gap-2 lg:mr-44">
-          <Link to="/staff/pos" className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-primary shadow-sm transition hover:bg-white/90">
+          <Link to="/staff/pos" className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-95">
             <Wrench className="size-4" /> {till ? "Go to POS" : "Open till"}
           </Link>
-          <Link to="/staff/sales" className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2.5 text-sm font-semibold text-primary-foreground ring-1 ring-white/30 transition hover:bg-white/25">
+          <Link to="/staff/sales" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/25 transition hover:bg-white/20">
             <ShoppingBag className="size-4" /> Sales
           </Link>
         </div>
@@ -305,11 +306,11 @@ function Card({ title, action, className = "", children }: { title: string; acti
 function Kpi({ icon: Icon, label, value, sub, tone = "blue", featured }: { icon: LucideIcon; label: string; value: string; sub?: string; tone?: Tone; featured?: boolean }) {
   if (featured) {
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.48_0.22_264)] p-5 text-primary-foreground shadow-lg shadow-primary/25">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-white/10" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.8_0.17_78)] p-5 text-primary-foreground shadow-lg shadow-primary/30">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-8 size-32 rounded-full bg-white/25" />
         <div className="relative flex items-center justify-between">
-          <p className="text-sm font-medium text-primary-foreground/80">{label}</p>
-          <span className="grid size-10 place-items-center rounded-xl bg-white/15 ring-1 ring-white/25">
+          <p className="text-sm font-medium text-primary-foreground/75">{label}</p>
+          <span className="grid size-10 place-items-center rounded-xl bg-black/10 ring-1 ring-black/10">
             <Icon className="size-5" />
           </span>
         </div>
@@ -353,7 +354,7 @@ function WeekChart({ week }: { week: Array<{ day: string; pence: number }> }) {
                 {d.pence ? gbp(d.pence) : "–"}
               </span>
               <div
-                className={`w-full max-w-12 rounded-t-lg bg-gradient-to-t transition-all ${isToday ? "from-primary to-primary/70 shadow-md shadow-primary/30" : "from-primary/35 to-primary/15 group-hover:from-primary/60 group-hover:to-primary/35"}`}
+                className={`w-full max-w-12 rounded-t-lg bg-gradient-to-t transition-all ${isToday ? "from-primary to-primary/70 shadow-md shadow-primary/30" : "from-neutral-800/80 to-neutral-700/60 group-hover:from-neutral-900 group-hover:to-neutral-700"}`}
                 style={{ height: `${Math.max((d.pence / max) * 82, d.pence ? 4 : 1.5)}%` }}
                 title={`${d.day}: ${gbp(d.pence)}`}
               />
@@ -387,7 +388,7 @@ function QuickLink({ to, icon: Icon, label, tone }: { to: string; icon: LucideIc
 
 function MethodBadge({ method }: { method: string }) {
   const style: Record<string, string> = {
-    card: "bg-primary/10 text-primary",
+    card: "bg-primary/20 text-[oklch(0.45_0.1_75)]",
     cash: "bg-emerald-500/10 text-emerald-700",
     split: "bg-violet-500/10 text-violet-700",
     bank_transfer: "bg-sky-500/10 text-sky-700",
