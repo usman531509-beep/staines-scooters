@@ -21,6 +21,14 @@ const TARGETS = [
   ".landing-form-card",
   ".landing-map",
   ".landing-availability",
+  ".ss-section-head",
+  ".ss-service-card",
+  ".ss-rent-card",
+  ".ss-sale-card",
+  ".ss-why",
+  ".ss-note",
+  ".ss-footer-block",
+  ".ss-footer-map",
 ].join(",");
 
 /**
