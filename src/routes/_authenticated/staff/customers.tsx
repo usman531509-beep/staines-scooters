@@ -8,6 +8,7 @@ import { AccountShell } from "@/components/AccountShell";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PosCustomerForm } from "@/components/PosCustomerPicker";
 import { deletePosCustomer, listPosCustomers, type PosCustomer } from "@/lib/pos-customers.functions";
+import { listCustomerRegistrations } from "@/lib/customer-registrations.functions";
 import { useAuth } from "@/lib/auth-client";
 import { ukDate } from "@/lib/format-date";
 import { BRAND } from "@/lib/brand";
@@ -35,6 +36,14 @@ function CustomersPage() {
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ["pos-customers", "list", term],
     queryFn: () => listFn({ data: { search: term, limit: 500 } }),
+  });
+  // Website registrations: date of birth, vehicle reg and address (admin view only).
+  const regFn = useServerFn(listCustomerRegistrations);
+  const websiteIds = customers.filter((c) => !c.created_by).map((c) => c.id);
+  const { data: registrations = {} } = useQuery({
+    queryKey: ["customer-registrations", websiteIds],
+    queryFn: () => regFn({ data: { ids: websiteIds } }),
+    enabled: websiteIds.length > 0,
   });
   const remove = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { id } }),
@@ -90,6 +99,17 @@ function CustomersPage() {
                         className="ml-2 rounded-full bg-primary/20 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-[var(--primary-ink)]"
                       >
                         Website
+                      </span>
+                    )}
+                    {registrations[c.id] && (
+                      <span className="mt-0.5 block text-xs font-normal text-ink-muted">
+                        {[
+                          registrations[c.id].date_of_birth && `DOB ${ukDate(registrations[c.id].date_of_birth!)}`,
+                          registrations[c.id].vehicle_reg && `Reg ${registrations[c.id].vehicle_reg}`,
+                          registrations[c.id].address,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
                     )}
                   </td>

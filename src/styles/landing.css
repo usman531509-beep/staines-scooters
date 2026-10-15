@@ -4079,7 +4079,8 @@
 .ss-nav-links a { height: 48px; padding-inline: 16px; font-size: 15px; font-weight: 500; }
 .ss-nav-links a::after { bottom: 0; }
 .ss-login { padding-inline: 8px; font-size: 13px; }
-.ss-home .ss-hero-image { width: 100%; object-position: 70% center; }
+/* Anchor the shopfront to the top so the "STAINES SCOOTERS" fascia is never cropped. */
+.ss-home .ss-hero-image { width: 100%; object-position: 70% top; }
 .ss-home .ss-hero::before {
   background: linear-gradient(90deg, #000e 0%, #000c 28%, #0007 45%, #0000 64%);
 }
@@ -4088,7 +4089,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: clamp(400px, 33vw, 560px);
+  /* Height follows the photo (3:1), so neither the fascia nor the tyres get cropped. */
+  min-height: max(420px, calc(100vw / 3));
   padding-block: 32px;
 }
 .ss-home .ss-hero h1 { max-width: 555px; font-size: clamp(34px, 3.65vw, 46px); line-height: 1.06; letter-spacing: -.025em; }
@@ -4385,7 +4387,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-position: 74% center;
+    object-position: 74% top;
   }
   .ss-home .ss-hero::before {
     background: linear-gradient(90deg, #000000f0 0%, #000000d9 42%, #00000073 64%, #00000000 86%);
@@ -4561,4 +4563,12 @@
   .ss-register-card.landing-form-card {
     padding: 28px 20px;
   }
+}
+.ss-register-card .ss-input-reg {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ss-register-card .ss-input-reg::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
 }

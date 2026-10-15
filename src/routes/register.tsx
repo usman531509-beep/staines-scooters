@@ -21,6 +21,11 @@ export const Route = createFileRoute("/register")({
   component: Register,
 });
 
+/** Today's date as YYYY-MM-DD, so the date-of-birth picker can't go into the future. */
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 function Register() {
   const [state, setState] = useState<"form" | "done" | "already">("form");
   const [sending, setSending] = useState(false);
@@ -36,6 +41,9 @@ function Register() {
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
       email: String(fd.get("email") ?? ""),
+      dateOfBirth: String(fd.get("dateOfBirth") ?? ""),
+      vehicleReg: String(fd.get("vehicleReg") ?? ""),
+      address: String(fd.get("address") ?? ""),
       website: String(fd.get("website") ?? ""),
     };
     try {
@@ -86,6 +94,25 @@ function Register() {
                 <div className="landing-field-wide">
                   <label htmlFor="reg-email">Email address (optional)</label>
                   <input id="reg-email" name="email" type="email" autoComplete="email" />
+                </div>
+                <div className="landing-field-wide">
+                  <label htmlFor="reg-dob">Date of birth</label>
+                  <input id="reg-dob" name="dateOfBirth" type="date" autoComplete="bday" max={today()} />
+                </div>
+                <div className="landing-field-wide">
+                  <label htmlFor="reg-vehicle">Vehicle registration number</label>
+                  <input
+                    id="reg-vehicle"
+                    name="vehicleReg"
+                    placeholder="e.g. AB12 CDE"
+                    autoCapitalize="characters"
+                    maxLength={12}
+                    className="ss-input-reg"
+                  />
+                </div>
+                <div className="landing-field-wide">
+                  <label htmlFor="reg-address">Address</label>
+                  <textarea id="reg-address" name="address" rows={3} autoComplete="street-address" maxLength={300} />
                 </div>
                 {err && (
                   <p className="landing-form-error" role="alert">

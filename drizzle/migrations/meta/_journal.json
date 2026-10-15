@@ -120,6 +120,13 @@
       "when": 1791745191737,
       "tag": "0016_uploads_bucket_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1791745251737,
+      "tag": "0017_customer_registrations",
+      "breakpoints": true
     }
   ]
 }

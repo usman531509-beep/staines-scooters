@@ -3980,6 +3980,41 @@ export type Database = {
           },
         ]
       }
+      customer_registrations: {
+        Row: {
+          address: string | null
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          pos_customer_id: string
+          vehicle_reg: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          pos_customer_id: string
+          vehicle_reg?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          pos_customer_id?: string
+          vehicle_reg?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_registrations_pos_customer_id_fkey"
+            columns: ["pos_customer_id"]
+            isOneToOne: false
+            referencedRelation: "pos_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pos_customers: {
         Row: {
           created_at: string
