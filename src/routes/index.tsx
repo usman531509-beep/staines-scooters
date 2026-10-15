@@ -157,11 +157,11 @@ function Home() {
             <li><ShieldCheck aria-hidden="true" /> Accident Claim Support</li>
           </ul>
           <div className="ss-hero-actions">
-            <Link to="/sales" className="ss-btn-yellow">
-              Shop Scooters <ArrowRight aria-hidden="true" />
+            <Link to="/register" className="ss-btn-yellow">
+              Register <ArrowRight aria-hidden="true" />
             </Link>
-            <Link to="/rental" className="ss-btn-white">
-              Rent a Scooter <ArrowRight aria-hidden="true" />
+            <Link to="/auth" className="ss-btn-white">
+              Sign In <ArrowRight aria-hidden="true" />
             </Link>
           </div>
         </div>

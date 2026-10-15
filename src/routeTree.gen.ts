@@ -15,6 +15,7 @@ import { Route as AccidentClaimsRouteImport } from './routes/accident-claims'
 import { Route as AppsignRouteImport } from './routes/appsign'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RentalRouteImport } from './routes/rental'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SalesRouteImport } from './routes/sales'
@@ -45,6 +46,7 @@ import { Route as AuthenticatedStaffRefundsRouteImport } from './routes/_authent
 import { Route as AuthenticatedStaffSalesRouteImport } from './routes/_authenticated/staff/sales'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as ApiPublicGeoCheckRouteImport } from './routes/api/public/geo-check'
+import { Route as ApiPublicRegisterRouteImport } from './routes/api/public/register'
 import { Route as AuthenticatedAdminRentalRentalIdRouteImport } from './routes/_authenticated/admin/rental_.$rentalId'
 import { Route as AuthenticatedStaffCategoriesIndexRouteImport } from './routes/_authenticated/staff/categories.index'
 import { Route as AuthenticatedStaffCategoriesCategoryIdRouteImport } from './routes/_authenticated/staff/categories.$categoryId'
@@ -87,6 +89,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RentalRoute = RentalRouteImport.update({
@@ -255,6 +262,11 @@ const ApiPublicGeoCheckRoute = ApiPublicGeoCheckRouteImport.update({
   path: '/api/public/geo-check',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRegisterRoute = ApiPublicRegisterRouteImport.update({
+  id: '/api/public/register',
+  path: '/api/public/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRentalRentalIdRoute =
   AuthenticatedAdminRentalRentalIdRouteImport.update({
     id: '/admin/rental_/$rentalId',
@@ -346,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/appsign': typeof AppsignRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/register': typeof RegisterRoute
   '/rental': typeof RentalRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sales': typeof SalesRoute
@@ -375,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/staff/sales': typeof AuthenticatedStaffSalesRouteWithChildren
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/geo-check': typeof ApiPublicGeoCheckRoute
+  '/api/public/register': typeof ApiPublicRegisterRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/rental/$rentalId': typeof AuthenticatedAdminRentalRentalIdRoute
   '/staff/categories/$categoryId': typeof AuthenticatedStaffCategoriesCategoryIdRoute
@@ -397,6 +411,7 @@ export interface FileRoutesByTo {
   '/appsign': typeof AppsignRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/register': typeof RegisterRoute
   '/rental': typeof RentalRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sales': typeof SalesRoute
@@ -424,6 +439,7 @@ export interface FileRoutesByTo {
   '/staff/refunds': typeof AuthenticatedStaffRefundsRoute
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/geo-check': typeof ApiPublicGeoCheckRoute
+  '/api/public/register': typeof ApiPublicRegisterRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/rental/$rentalId': typeof AuthenticatedAdminRentalRentalIdRoute
   '/staff/categories/$categoryId': typeof AuthenticatedStaffCategoriesCategoryIdRoute
@@ -448,6 +464,7 @@ export interface FileRoutesById {
   '/appsign': typeof AppsignRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/register': typeof RegisterRoute
   '/rental': typeof RentalRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sales': typeof SalesRoute
@@ -477,6 +494,7 @@ export interface FileRoutesById {
   '/_authenticated/staff/sales': typeof AuthenticatedStaffSalesRouteWithChildren
   '/api/public/contact': typeof ApiPublicContactRoute
   '/api/public/geo-check': typeof ApiPublicGeoCheckRoute
+  '/api/public/register': typeof ApiPublicRegisterRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/rental_/$rentalId': typeof AuthenticatedAdminRentalRentalIdRoute
   '/_authenticated/staff/categories/$categoryId': typeof AuthenticatedStaffCategoriesCategoryIdRoute
@@ -501,6 +519,7 @@ export interface FileRouteTypes {
     | '/appsign'
     | '/auth'
     | '/contact'
+    | '/register'
     | '/rental'
     | '/reset-password'
     | '/sales'
@@ -530,6 +549,7 @@ export interface FileRouteTypes {
     | '/staff/sales'
     | '/api/public/contact'
     | '/api/public/geo-check'
+    | '/api/public/register'
     | '/admin/'
     | '/admin/rental/$rentalId'
     | '/staff/categories/$categoryId'
@@ -552,6 +572,7 @@ export interface FileRouteTypes {
     | '/appsign'
     | '/auth'
     | '/contact'
+    | '/register'
     | '/rental'
     | '/reset-password'
     | '/sales'
@@ -579,6 +600,7 @@ export interface FileRouteTypes {
     | '/staff/refunds'
     | '/api/public/contact'
     | '/api/public/geo-check'
+    | '/api/public/register'
     | '/admin'
     | '/admin/rental/$rentalId'
     | '/staff/categories/$categoryId'
@@ -602,6 +624,7 @@ export interface FileRouteTypes {
     | '/appsign'
     | '/auth'
     | '/contact'
+    | '/register'
     | '/rental'
     | '/reset-password'
     | '/sales'
@@ -631,6 +654,7 @@ export interface FileRouteTypes {
     | '/_authenticated/staff/sales'
     | '/api/public/contact'
     | '/api/public/geo-check'
+    | '/api/public/register'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/rental_/$rentalId'
     | '/_authenticated/staff/categories/$categoryId'
@@ -655,6 +679,7 @@ export interface RootRouteChildren {
   AppsignRoute: typeof AppsignRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  RegisterRoute: typeof RegisterRoute
   RentalRoute: typeof RentalRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SalesRoute: typeof SalesRoute
@@ -665,6 +690,7 @@ export interface RootRouteChildren {
   PlanTokenRoute: typeof PlanTokenRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   ApiPublicGeoCheckRoute: typeof ApiPublicGeoCheckRoute
+  ApiPublicRegisterRoute: typeof ApiPublicRegisterRoute
   ApiPublicCronFixedMonthlyExpensesRoute: typeof ApiPublicCronFixedMonthlyExpensesRoute
   ApiPublicCronRecurringExpensesRoute: typeof ApiPublicCronRecurringExpensesRoute
   ApiPublicPaymentsConnectWebhookRoute: typeof ApiPublicPaymentsConnectWebhookRoute
@@ -713,6 +739,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rental': {
@@ -925,6 +958,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGeoCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/register': {
+      id: '/api/public/register'
+      path: '/api/public/register'
+      fullPath: '/api/public/register'
+      preLoaderRoute: typeof ApiPublicRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/rental_/$rentalId': {
       id: '/_authenticated/admin/rental_/$rentalId'
       path: '/admin/rental/$rentalId'
@@ -1131,6 +1171,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppsignRoute: AppsignRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  RegisterRoute: RegisterRoute,
   RentalRoute: RentalRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SalesRoute: SalesRoute,
@@ -1141,6 +1182,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlanTokenRoute: PlanTokenRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
   ApiPublicGeoCheckRoute: ApiPublicGeoCheckRoute,
+  ApiPublicRegisterRoute: ApiPublicRegisterRoute,
   ApiPublicCronFixedMonthlyExpensesRoute:
     ApiPublicCronFixedMonthlyExpensesRoute,
   ApiPublicCronRecurringExpensesRoute: ApiPublicCronRecurringExpensesRoute,

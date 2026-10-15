@@ -5,9 +5,17 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // Till customers: a plain contact record (name, phone, email) a sale can be
 // attached to so it shows on the receipt. No sign-in, loyalty or balances.
 
-export type PosCustomer = { id: string; name: string; phone: string; email: string | null; created_at: string };
+export type PosCustomer = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  created_at: string;
+  /** Null when the customer registered themselves on the website. */
+  created_by: string | null;
+};
 
-const COLUMNS = "id, name, phone, email, created_at";
+const COLUMNS = "id, name, phone, email, created_at, created_by";
 
 async function staffRoles(supabase: any, userId: string): Promise<string[]> {
   const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);

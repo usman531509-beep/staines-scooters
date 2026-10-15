@@ -4421,3 +4421,144 @@
     font-size: 15px;
   }
 }
+
+/* Footer: four even columns — visit, how to find us (two small pictures),
+   opening hours, get in touch. */
+/* The pictures' column gets the most room; hours and contacts need little. */
+.ss-footer-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: 36px;
+}
+.ss-footer-hint {
+  margin: -6px 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ss-muted);
+}
+.ss-footer-grid {
+  padding-block: 72px 80px;
+}
+.ss-find-us {
+  min-width: 0;
+}
+.ss-find-us-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.ss-find-us-photos a {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 3.4;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px #00000014;
+  border: 1px solid var(--ss-line);
+  background: #fff;
+}
+.ss-find-us-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.ss-find-us-photos a:first-child img {
+  object-position: 62% 60%;
+}
+.ss-find-us-photos a:last-child img {
+  object-position: 45% 55%;
+}
+.ss-find-us-photos a:hover img {
+  transform: scale(1.05);
+}
+@media (max-width: 1100px) {
+  .ss-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .ss-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ss-find-us-photos img {
+    transition: none;
+  }
+}
+
+/* Customer registration page. Selectors include .ss-register-card so they win
+   over the site-wide paragraph/heading resets. */
+.ss-register {
+  display: grid;
+  place-items: center;
+  padding-block: 64px 80px;
+}
+.ss-register-card.landing-form-card {
+  width: min(100%, 500px);
+  padding: 40px;
+}
+.ss-register-card .ss-register-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 18px;
+  border-radius: 14px;
+  background: var(--ss-yellow);
+  color: var(--ss-black);
+}
+.ss-register-card .ss-register-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.ss-register-card h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+.ss-register-card .ss-register-lead {
+  margin: 10px auto 28px;
+  max-width: 360px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ss-muted);
+  text-align: center;
+}
+.ss-register-card .landing-form {
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 0;
+}
+.ss-register-card .landing-form .ss-btn-yellow {
+  margin-top: 6px;
+  min-height: 54px;
+}
+.ss-register-card .ss-register-foot {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--ss-line);
+  font-size: 14px;
+  color: var(--ss-muted);
+  text-align: center;
+}
+.ss-register-card .ss-register-foot a {
+  color: var(--ss-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--ss-yellow);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.ss-register-card .landing-form-done .ss-btn-dark {
+  margin-top: 16px;
+}
+@media (max-width: 560px) {
+  .ss-register {
+    padding-block: 32px 48px;
+  }
+  .ss-register-card.landing-form-card {
+    padding: 28px 20px;
+  }
+}

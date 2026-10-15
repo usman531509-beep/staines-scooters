@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin, Clock, CheckCircle2, Navigation, type LucideIcon }
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/LandingParts";
-import { BRAND, BRAND_ADDRESS, DIRECTIONS_URL, siteLink, whatsappLink } from "@/lib/brand";
+import { BRAND, BRAND_ADDRESS, DIRECTIONS_URL, MAP_EMBED_URL, siteLink, whatsappLink } from "@/lib/brand";
 import "@/styles/landing.css";
 
 const images = {
@@ -278,7 +278,7 @@ function Contact() {
         <div className="landing-map">
           <iframe
             title={`${BRAND.name} map`}
-            src={`https://www.google.com/maps?q=${encodeURIComponent(BRAND_ADDRESS)}&output=embed`}
+            src={MAP_EMBED_URL}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />

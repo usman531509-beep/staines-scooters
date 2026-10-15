@@ -28,7 +28,7 @@ const TARGETS = [
   ".ss-why",
   ".ss-note",
   ".ss-footer-block",
-  ".ss-footer-map",
+  ".ss-find-us-photos > a",
 ].join(",");
 
 /**

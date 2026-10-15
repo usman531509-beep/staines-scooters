@@ -82,7 +82,17 @@ function CustomersPage() {
             ) : (
               customers.map((c) => (
                 <tr key={c.id} className="border-b border-border/60 last:border-0">
-                  <td className="px-3 py-2 font-semibold">{c.name}</td>
+                  <td className="px-3 py-2 font-semibold">
+                    {c.name}
+                    {!c.created_by && (
+                      <span
+                        title="Registered on the website"
+                        className="ml-2 rounded-full bg-primary/20 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-[var(--primary-ink)]"
+                      >
+                        Website
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-2 whitespace-nowrap">{c.phone}</td>
                   <td className="px-3 py-2">{c.email ?? <span className="text-ink-muted">—</span>}</td>
                   <td className="px-3 py-2 whitespace-nowrap text-xs text-ink-muted">{ukDate(c.created_at)}</td>

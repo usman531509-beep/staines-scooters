@@ -16,18 +16,29 @@ export const BRAND = {
   phoneIntl: "447471109963",
   phone2: "07423 242927",
   phone2Intl: "447423242927",
-  addressLine: "Burma House, Station Path",
+  /** As the owner wants it shown: the shop is reached from High Street, opposite the Co-op. */
+  addressLine: "Burma House, Opp. Co-op, High Street",
   town: "Staines-upon-Thames",
-  postcode: "TW18 4LA",
+  /** The Co-op's postcode — sat-navs routing to Burma House's own postcode end on the back road. */
+  postcode: "TW18 4BY",
 } as const;
 
 /** One-line address, skipping any part that is still blank. */
 export const BRAND_ADDRESS = [BRAND.addressLine, BRAND.town, BRAND.postcode].filter(Boolean).join(", ");
 
 /** Google Maps directions to the shop. */
-export const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-  [BRAND.addressLine, BRAND.town, BRAND.postcode].join(", "),
-)}`;
+/**
+ * Where directions end: bus stop J on High Street, in front of the Co-op and
+ * opposite the shop (NaPTAN 40004402125A). Routing to the address instead takes
+ * drivers round to the back road.
+ */
+export const DIRECTIONS_POINT = { lat: 51.435139, lng: -0.50768 };
+
+/** Google Maps directions to the shop (ends at bus stop J). */
+export const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${DIRECTIONS_POINT.lat},${DIRECTIONS_POINT.lng}`;
+
+/** Google Maps embed centred on the same point. */
+export const MAP_EMBED_URL = `https://www.google.com/maps?q=${DIRECTIONS_POINT.lat},${DIRECTIONS_POINT.lng}&z=17&output=embed`;
 
 /** Opening hours shown on the site. */
 export const OPENING_HOURS: Array<[string, string]> = [

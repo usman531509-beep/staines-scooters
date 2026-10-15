@@ -22,26 +22,22 @@ export function SiteFooter({ appearance = "default" }: { appearance?: "default" 
                 <br />
                 {BRAND.town}, {BRAND.postcode}
               </address>
+              <p className="ss-footer-hint">Directions end at bus stop J, in front of the Co-op, we're right opposite.</p>
               <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="ss-btn-yellow ss-btn-sm">
                 <Navigation aria-hidden="true" /> Get Directions
               </a>
             </div>
           </section>
-          <a
-            href={DIRECTIONS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ss-footer-map"
-            aria-label={`Open directions to ${BRAND.name} in Google Maps`}
-          >
-            <iframe
-              title={`${BRAND.name} location`}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(BRAND_ADDRESS)}&output=embed`}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              tabIndex={-1}
-            />
-          </a>
+          <section className="ss-find-us" aria-label="How to find us">
+            <div className="ss-find-us-photos">
+              <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" aria-label="Street view — open directions">
+                <img src="/images/landing/find-us-street.webp" alt="High Street with the walkway beside Nomad Stop marked" width={1000} height={719} loading="lazy" />
+              </a>
+              <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" aria-label="Walking route — open directions">
+                <img src="/images/landing/find-us-map.webp" alt="Map: walking route from High Street opposite the Co-op to Burma House" width={1000} height={614} loading="lazy" />
+              </a>
+            </div>
+          </section>
           <section className="ss-footer-block" aria-labelledby="ft-hours">
             <Clock aria-hidden="true" className="ss-footer-icon" />
             <div>
