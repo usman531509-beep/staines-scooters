@@ -465,6 +465,7 @@ export const listExpenses = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context as any;
     await assertStaff(supabase, userId);
+    await (await import("@/lib/recurring-expenses.server")).postDueRecurringExpensesQuietly();
     const { data, error } = await supabase.from("expenses").select("*").is("deleted_at", null).order("expense_date", { ascending: false }).limit(200);
     if (error) throw error;
     return data ?? [];

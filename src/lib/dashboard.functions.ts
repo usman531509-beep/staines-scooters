@@ -32,6 +32,7 @@ export const getDashboardOverview = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context as any;
     await assertRole(supabase, userId, ["owner", "admin"]);
+    await (await import("@/lib/recurring-expenses.server")).postDueRecurringExpensesQuietly();
 
     const now = new Date();
     const today = londonDate(now);

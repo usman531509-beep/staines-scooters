@@ -41,6 +41,7 @@ export const getProfitLoss = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
     await assertAdmin(supabase, userId);
+    await (await import("@/lib/recurring-expenses.server")).postDueRecurringExpensesQuietly();
 
     const fromIso = new Date(`${data.fromDate}T00:00:00.000Z`).toISOString();
     const toIso = new Date(`${data.toDate}T23:59:59.999Z`).toISOString();
@@ -162,6 +163,7 @@ export const getProfitLossDetail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
     await assertAdmin(supabase, userId);
+    await (await import("@/lib/recurring-expenses.server")).postDueRecurringExpensesQuietly();
     const fromIso = new Date(`${data.fromDate}T00:00:00.000Z`).toISOString();
     const toIso = new Date(`${data.toDate}T23:59:59.999Z`).toISOString();
     type Row = { id: string; date: string; type: string; description: string; detail: string; amountPence: number; extra: [string, string][] };
