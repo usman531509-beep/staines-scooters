@@ -8,7 +8,8 @@ export const BRAND = {
   legalName: "Staines Scooters Ltd",
   companyNumber: "00000000",
   /** Public site origin (no trailing slash); used for links in emails and payment pages. */
-  siteUrl: (env.VITE_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
+  // GoDaddy only sets env vars at runtime, so a missing build-time value means production.
+  siteUrl: (env.VITE_SITE_URL || "https://stainesscooter.com").replace(/\/+$/, ""),
   email: "staines_scooter@outlook.com",
   /** Main number; also the WhatsApp number every enquiry goes to. */
   phone: "07471 109963",
