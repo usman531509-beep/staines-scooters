@@ -513,6 +513,23 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
       details: { totalPence: finalTotal, source: "till", paymentMethod: sale.payment_method },
     });
 
+    // Email the shop inbox about the new sale (background; never blocks the till).
+    void (async () => {
+      const { notifyStaff, pounds } = await import("@/lib/notify.server");
+      const customer = data.customerId
+        ? (await supabase.from("pos_customers").select("name, phone").eq("id", data.customerId).maybeSingle()).data
+        : null;
+      await notifyStaff(`New sale${sale.receipt_no ? ` #${sale.receipt_no}` : ""} — ${pounds(finalTotal)}`, [
+        ["Total", pounds(finalTotal)],
+        ["Payment", String(sale.payment_method).replace("_", " ")],
+        ["Items", computed.map((it) => `${it.name}${it.qty !== 1 ? ` ×${it.qty}` : ""} — ${pounds(it.lineTotalPence)}`).join("\n")],
+        ["Discount", totalDiscount ? pounds(totalDiscount) : null],
+        ["Customer", customer ? `${customer.name}${customer.phone ? ` (${customer.phone})` : ""}` : null],
+        ["Notes", data.notes],
+        ["Date", new Date(sale.created_at).toLocaleString("en-GB", { timeZone: "Europe/London" })],
+      ]);
+    })().catch((err) => console.error("[notify] sale email failed", err));
+
     return {
       saleId: sale.id,
       total: finalTotal,

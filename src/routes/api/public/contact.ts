@@ -45,6 +45,20 @@ export const Route = createFileRoute("/api/public/contact")({
           console.error("contact enquiry save failed", error);
           return Response.json({ error: "Could not send enquiry" }, { status: 500 });
         }
+        const { notifyStaff } = await import("@/lib/notify.server");
+        void notifyStaff(
+          `New website enquiry from ${data.name}`,
+          [
+            ["Name", data.name],
+            ["Phone", data.phone],
+            ["Email", data.email],
+            ["Service", data.service],
+            ["Bike", data.bike],
+            ["Registration", data.reg ? data.reg.toUpperCase() : null],
+            ["Message", data.message],
+          ],
+          { replyTo: data.email },
+        );
         return Response.json({ success: true });
       },
     },

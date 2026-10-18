@@ -98,6 +98,19 @@ export const Route = createFileRoute("/api/public/register")({
             .insert({ pos_customer_id: created.id, ...details });
           if (detailsError) console.error("registration details save failed", detailsError);
         }
+        const { notifyStaff } = await import("@/lib/notify.server");
+        void notifyStaff(
+          `New customer registered: ${data.name}`,
+          [
+            ["Name", data.name],
+            ["Phone", data.phone],
+            ["Email", data.email],
+            ["Date of birth", details.date_of_birth],
+            ["Vehicle reg", details.vehicle_reg],
+            ["Address", details.address],
+          ],
+          data.email ? { replyTo: data.email } : undefined,
+        );
         return Response.json({ success: true });
       },
     },

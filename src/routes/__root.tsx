@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { UpdateAppPrompt } from "../components/UpdateAppPrompt";
 import { BRAND } from "@/lib/brand";
+import { publicEnvScript } from "@/lib/public-env";
 
 function NotFoundComponent() {
   return (
@@ -115,7 +116,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     // Browser extensions (zoom, dark mode) add classes to <html> before React hydrates.
     <html lang="en" suppressHydrationWarning>
-      <head><HeadContent /></head>
+      <head>
+        {/* Runs before the app bundle, so the Supabase client can start on hosts that set env vars only at runtime. */}
+        <script dangerouslySetInnerHTML={{ __html: publicEnvScript() }} suppressHydrationWarning />
+        <HeadContent />
+      </head>
       <body>
         {children}
         <Scripts />
