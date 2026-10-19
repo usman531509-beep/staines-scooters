@@ -197,39 +197,39 @@ function SalesPage() {
 
   return (
     <AccountShell title="Sales">
-      <div className={`grid gap-4 sm:grid-cols-2 ${isAdmin ? (restricted ? "lg:grid-cols-4" : "lg:grid-cols-5") : "lg:max-w-sm"}`}>
-        <div className="rounded-md bg-yellow-100 p-4">
+      <div className={`grid gap-3 sm:grid-cols-2 ${isAdmin ? (restricted ? "lg:grid-cols-4" : "lg:grid-cols-5") : "lg:max-w-sm"}`}>
+        <div className="rounded-md bg-yellow-100 px-4 py-3">
           <p className="text-xs font-semibold uppercase tracking-widest text-yellow-900">Net Sales</p>
-          <p className="mt-1 text-2xl font-bold text-yellow-950">
+          <p className="mt-0.5 text-xl font-bold text-yellow-950">
             {profitLoss.isLoading ? "…" : money(profitLoss.data?.netSalesPence ?? data?.totalAmount ?? 0)}
           </p>
         </div>
         {isAdmin && (
           <>
-            {!restricted && <div className="rounded-md bg-yellow-100 p-4">
+            {!restricted && <div className="rounded-md bg-yellow-100 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-yellow-900">COGS</p>
-              <p className="mt-1 text-2xl font-bold text-yellow-950">
+              <p className="mt-0.5 text-xl font-bold text-yellow-950">
                 {profitLoss.isLoading ? "…" : money(profitLoss.data?.cogsPence ?? 0)}
               </p>
               <p className="text-[10px] text-yellow-900">Cost of goods sold</p>
             </div>}
-            <div className="rounded-md bg-yellow-100 p-4">
+            <div className="rounded-md bg-yellow-100 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-yellow-900">Gross Profit</p>
-              <p className="mt-1 text-2xl font-bold text-yellow-950">
+              <p className="mt-0.5 text-xl font-bold text-yellow-950">
                 {profitLoss.isLoading ? "…" : money(profitLoss.data?.grossProfitPence ?? 0)}
               </p>
               <p className="text-[10px] text-yellow-900">Net sales − COGS</p>
             </div>
-            <div className="rounded-md bg-yellow-100 p-4">
+            <div className="rounded-md bg-yellow-100 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-yellow-900">Expenses</p>
-              <p className="mt-1 text-2xl font-bold text-yellow-950">
+              <p className="mt-0.5 text-xl font-bold text-yellow-950">
                 {profitLoss.isLoading ? "…" : money(profitLoss.data?.expensesPence ?? 0)}
               </p>
               <p className="text-[10px] text-yellow-900">All expenses</p>
             </div>
-            <div className="rounded-md bg-yellow-100 p-4">
+            <div className="rounded-md bg-yellow-100 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-yellow-900">Net Profit</p>
-              <p className="mt-1 text-2xl font-bold text-yellow-950">
+              <p className="mt-0.5 text-xl font-bold text-yellow-950">
                 {profitLoss.isLoading ? "…" : money(profitLoss.data?.netProfitPence ?? 0)}
               </p>
               <p className="text-[10px] text-yellow-900">Gross profit − all expenses</p>
@@ -238,13 +238,17 @@ function SalesPage() {
         )}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <button
           onClick={() => setShowAnalytics(true)}
           className="rounded-md border border-border bg-surface-elevated px-4 py-2 text-xs font-semibold uppercase tracking-widest text-foreground hover:bg-surface"
         >
           Sales Insights & Comparison
         </button>
+        <p className="text-xs text-ink-muted">
+          Click a sale to view or refund. Refunded sales are left out of the totals above.
+        </p>
+        <Link to="/staff/pos" className="ml-auto rounded-md bg-emerald-700 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-emerald-800">New sale</Link>
       </div>
 
       <Dialog open={showAnalytics} onOpenChange={setShowAnalytics}>
@@ -258,17 +262,7 @@ function SalesPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-ink-muted">Tip: click a sale to view or refund.</p>
-        <Link to="/staff/pos" className="rounded-md bg-emerald-700 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-emerald-800">New sale</Link>
-      </div>
-
-
-      <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm text-primary">
-        Sales and profit from refunded sales are excluded from the totals above.
-      </div>
-
-      <div className="mt-6 rounded-md border border-border bg-surface-elevated p-4">
+      <div className="mt-3 rounded-md border border-border bg-surface-elevated p-4">
         <div className="flex flex-wrap gap-2">
           <TabBtn active={tab === "active"} onClick={() => setTab("active")} label={`Active (${active.length})`} />
           <TabBtn active={tab === "refunded"} onClick={() => setTab("refunded")} label={`Refunded (${refunded.length})`} />
@@ -284,7 +278,7 @@ function SalesPage() {
         ) : (<>
 
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {PRESETS.map((p) => (
             <button
               key={p.key}
@@ -301,10 +295,10 @@ function SalesPage() {
           ))}
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_200px]">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
 
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customer, product, reference, notes…" className="rounded-sm border border-border bg-surface px-3 py-2 text-sm" />
-          <select value={payment} onChange={(e) => setPayment(e.target.value)} className="rounded-sm border border-border bg-surface px-3 py-2 text-sm">
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search customer, product, reference, notes…" className="min-w-[220px] flex-1 rounded-sm border border-border bg-surface px-3 py-2 text-sm" />
+          <select value={payment} onChange={(e) => setPayment(e.target.value)} className="w-[190px] rounded-sm border border-border bg-surface px-3 py-2 text-sm">
             <option value="all">All payment methods</option>
             <option value="cash">Cash</option>
             <option value="card">Card</option>
@@ -312,9 +306,6 @@ function SalesPage() {
             <option value="split">Split</option>
             <option value="credit">Credit</option>
           </select>
-        </div>
-
-        <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted">From</span>
           <input type="date" value={dateFrom} onChange={(e) => { setPreset("custom"); setDateFrom(e.target.value); }} className="rounded-sm border border-border bg-surface px-3 py-2 text-sm" />
           <span className="text-[11px] font-semibold uppercase tracking-widest text-ink-muted">To</span>
@@ -328,7 +319,7 @@ function SalesPage() {
         </div>
 
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <p className="rounded-sm bg-surface px-3 py-2 text-xs text-ink-muted">{filtered.length} sales in view</p>
           <div className="flex flex-wrap gap-2">
             <button
