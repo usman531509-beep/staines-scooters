@@ -539,12 +539,27 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
       details: { totalPence: finalTotal, source: "till", paymentMethod: sale.payment_method },
     });
 
-    // Email the shop inbox about the new sale (background; never blocks the till).
+    // Email the shop inbox about the new sale, and the customer their receipt
+    // when they have an email on file (background; never blocks the till).
     void (async () => {
-      const { notifyStaff, pounds } = await import("@/lib/notify.server");
+      const { notifyStaff, emailCustomerReceipt, pounds } = await import("@/lib/notify.server");
       const customer = data.customerId
-        ? (await supabase.from("pos_customers").select("name, phone").eq("id", data.customerId).maybeSingle()).data
+        ? (await supabase.from("pos_customers").select("name, phone, email").eq("id", data.customerId).maybeSingle()).data
         : null;
+      const date = new Date(sale.created_at).toLocaleString("en-GB", { timeZone: "Europe/London", dateStyle: "medium", timeStyle: "short" });
+      if (customer?.email) {
+        await emailCustomerReceipt({
+          to: customer.email,
+          customerName: customer.name,
+          receiptNo: sale.receipt_no,
+          date,
+          items: computed.map((it) => ({ name: it.name, qty: it.qty, totalPence: it.lineTotalPence })),
+          discountPence: orderDisc,
+          totalPence: finalTotal,
+          paymentLabel: ({ cash: "Cash", card: "Card", bank_transfer: "Bank transfer", split: "Card + Cash", credit: "Credit (pay later)" } as const)[data.paymentMethod],
+          owedPence: isCredit ? finalTotal - paidNow : 0,
+        });
+      }
       await notifyStaff(`New sale${sale.receipt_no ? ` #${sale.receipt_no}` : ""} — ${pounds(finalTotal)}`, [
         ["Total", pounds(finalTotal)],
         ["Payment", String(sale.payment_method).replace("_", " ")],

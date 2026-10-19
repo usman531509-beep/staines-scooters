@@ -1,14 +1,79 @@
-// Staff notification emails, sent from the shop's own GoDaddy mailbox over SMTP
-// to the shop inbox (support@stainesscooter.com by default). Notifications are
-// best-effort: a missing SMTP setting or a mail error is logged and never fails
-// the sale, enquiry or registration that triggered it.
+// App emails, sent as the shop's own Microsoft 365 mailbox (support@stainesscooter.com):
+//  - staff notifications to the shop inbox (sale, website enquiry, registration)
+//  - an order receipt to the customer when a till sale has a customer with an email
+// Everything is best-effort: a missing setting or a mail error is logged and never
+// fails the sale, enquiry or registration that triggered it.
 //
-// Env: SMTP_HOST, SMTP_PORT (465 = SSL, 587 = STARTTLS), SMTP_USER, SMTP_PASS,
-// optional NOTIFY_EMAIL (recipient) and SMTP_FROM (sender, defaults to SMTP_USER).
+// Transport, first configured wins:
+//  1. Microsoft Graph over HTTPS (works on GoDaddy Airo, which blocks SMTP ports):
+//     MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET (app registration with the
+//     Mail.Send application permission), MAIL_FROM = the mailbox to send as.
+//  2. SMTP: SMTP_HOST, SMTP_PORT (465 = SSL, 587 = STARTTLS), SMTP_USER, SMTP_PASS,
+//     optional SMTP_FROM.
+// NOTIFY_EMAIL overrides where staff notifications go.
 import nodemailer from "nodemailer";
 import { BRAND } from "@/lib/brand";
 
-const DEFAULT_TO = "support@stainesscooter.com";
+const SHOP_MAILBOX = "support@stainesscooter.com";
+
+type Email = { to: string; subject: string; html: string; text: string; replyTo?: string };
+
+// ---------- Microsoft Graph ----------
+
+function graphConfig() {
+  const tenant = process.env.MS_TENANT_ID;
+  const clientId = process.env.MS_CLIENT_ID;
+  const secret = process.env.MS_CLIENT_SECRET;
+  if (!tenant || !clientId || !secret) return null;
+  return { tenant, clientId, secret, from: process.env.MAIL_FROM || SHOP_MAILBOX };
+}
+
+let graphToken: { value: string; expires: number } | null = null;
+
+async function getGraphToken(cfg: NonNullable<ReturnType<typeof graphConfig>>) {
+  if (graphToken && graphToken.expires > Date.now() + 60_000) return graphToken.value;
+  const res = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(cfg.tenant)}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: cfg.clientId,
+      client_secret: cfg.secret,
+      scope: "https://graph.microsoft.com/.default",
+      grant_type: "client_credentials",
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  const json: any = await res.json().catch(() => ({}));
+  if (!res.ok || !json.access_token) {
+    throw new Error(`Microsoft sign-in failed (${res.status}): ${json.error_description ?? json.error ?? "no token"}`);
+  }
+  graphToken = { value: json.access_token, expires: Date.now() + Number(json.expires_in ?? 3600) * 1000 };
+  return graphToken.value;
+}
+
+async function sendViaGraph(cfg: NonNullable<ReturnType<typeof graphConfig>>, m: Email) {
+  const token = await getGraphToken(cfg);
+  const res = await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(cfg.from)}/sendMail`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: {
+        subject: m.subject,
+        body: { contentType: "HTML", content: m.html },
+        toRecipients: [{ emailAddress: { address: m.to } }],
+        ...(m.replyTo ? { replyTo: [{ emailAddress: { address: m.replyTo } }] } : {}),
+      },
+      saveToSentItems: true,
+    }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (res.status !== 202) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Microsoft Graph sendMail failed (${res.status}): ${body.slice(0, 300)}`);
+  }
+}
+
+// ---------- SMTP ----------
 
 let transport: nodemailer.Transporter | null | undefined;
 
@@ -34,40 +99,123 @@ function getTransport() {
   return transport;
 }
 
+/** Send one email by whichever transport is configured; logs and swallows failures. */
+export async function sendEmail(m: Email): Promise<boolean> {
+  try {
+    const graph = graphConfig();
+    if (graph) {
+      await sendViaGraph(graph, m);
+      return true;
+    }
+    const t = getTransport();
+    if (!t) {
+      console.warn(`[notify] email not configured; skipped "${m.subject}"`);
+      return false;
+    }
+    await t.sendMail({
+      from: { name: BRAND.name, address: process.env.SMTP_FROM || process.env.SMTP_USER! },
+      to: m.to,
+      replyTo: m.replyTo,
+      subject: m.subject,
+      text: m.text,
+      html: m.html,
+    });
+    return true;
+  } catch (err) {
+    console.error(`[notify] could not send "${m.subject}"`, err);
+    return false;
+  }
+}
+
+// ---------- Messages ----------
+
 const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-/** One notification: a subject plus label/value rows, rendered as a small table. */
-export async function notifyStaff(subject: string, rows: Array<[string, string | null | undefined]>, opts?: { replyTo?: string }) {
-  const t = getTransport();
-  if (!t) {
-    console.warn(`[notify] SMTP not configured; skipped "${subject}"`);
-    return;
-  }
+type Rows = Array<[string, string | null | undefined]>;
+
+function rowsTable(rows: Rows) {
   const filled = rows.filter(([, v]) => v != null && String(v).trim() !== "") as Array<[string, string]>;
-  const text = filled.map(([k, v]) => `${k}: ${v}`).join("\n");
-  const html = `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#111">
-  <h2 style="margin:0 0 12px;font-size:18px">${esc(subject)}</h2>
-  <table style="border-collapse:collapse;font-size:14px">${filled
+  return {
+    text: filled.map(([k, v]) => `${k}: ${v}`).join("\n"),
+    html: `<table style="border-collapse:collapse;font-size:14px">${filled
+      .map(
+        ([k, v]) =>
+          `<tr><td style="padding:4px 16px 4px 0;color:#555;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:4px 0;white-space:pre-wrap">${esc(v)}</td></tr>`,
+      )
+      .join("")}</table>`,
+  };
+}
+
+const wrap = (inner: string) =>
+  `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#111;max-width:560px">${inner}</div>`;
+
+/** Staff notification to the shop inbox: a subject plus label/value rows. */
+export async function notifyStaff(subject: string, rows: Rows, opts?: { replyTo?: string }) {
+  const t = rowsTable(rows);
+  await sendEmail({
+    to: process.env.NOTIFY_EMAIL || SHOP_MAILBOX,
+    subject: `[${BRAND.name}] ${subject}`,
+    replyTo: opts?.replyTo,
+    text: t.text,
+    html: wrap(
+      `<h2 style="margin:0 0 12px;font-size:18px">${esc(subject)}</h2>${t.html}<p style="margin-top:16px;font-size:12px;color:#888">Sent automatically by the ${esc(BRAND.name)} website.</p>`,
+    ),
+  });
+}
+
+/** Order receipt to the customer for a till sale. Replies go to the shop inbox. */
+export async function emailCustomerReceipt(p: {
+  to: string;
+  customerName: string;
+  receiptNo: number | string | null;
+  date: string;
+  items: Array<{ name: string; qty: number; totalPence: number }>;
+  discountPence: number;
+  totalPence: number;
+  paymentLabel: string;
+  owedPence?: number;
+}) {
+  const lines = p.items
     .map(
-      ([k, v]) =>
-        `<tr><td style="padding:4px 16px 4px 0;color:#555;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:4px 0;white-space:pre-wrap">${esc(v)}</td></tr>`,
+      (it) =>
+        `<tr><td style="padding:6px 0;border-bottom:1px solid #eee">${esc(it.name)}${it.qty !== 1 ? ` ×${it.qty}` : ""}</td><td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right">${pounds(it.totalPence)}</td></tr>`,
     )
-    .join("")}</table>
-  <p style="margin-top:16px;font-size:12px;color:#888">Sent automatically by the ${esc(BRAND.name)} website.</p>
-</div>`;
-  try {
-    await t.sendMail({
-      from: { name: BRAND.name, address: process.env.SMTP_FROM || process.env.SMTP_USER! },
-      to: process.env.NOTIFY_EMAIL || DEFAULT_TO,
-      replyTo: opts?.replyTo,
-      subject: `[${BRAND.name}] ${subject}`,
-      text,
-      html,
-    });
-  } catch (err) {
-    console.error(`[notify] could not send "${subject}"`, err);
-  }
+    .join("");
+  const extra = [
+    p.discountPence > 0 ? `<tr><td style="padding:4px 0;color:#555">Discount</td><td style="padding:4px 0;text-align:right">−${pounds(p.discountPence)}</td></tr>` : "",
+    `<tr><td style="padding:8px 0;font-weight:700;font-size:16px">Total</td><td style="padding:8px 0;text-align:right;font-weight:700;font-size:16px">${pounds(p.totalPence)}</td></tr>`,
+    `<tr><td style="padding:4px 0;color:#555">Paid by</td><td style="padding:4px 0;text-align:right">${esc(p.paymentLabel)}</td></tr>`,
+    p.owedPence && p.owedPence > 0
+      ? `<tr><td style="padding:4px 0;color:#555">Balance owed</td><td style="padding:4px 0;text-align:right;font-weight:700">${pounds(p.owedPence)}</td></tr>`
+      : "",
+  ].join("");
+  const ref = p.receiptNo ? `#${p.receiptNo}` : "";
+  const first = p.customerName.split(" ")[0] || "there";
+  await sendEmail({
+    to: p.to,
+    replyTo: SHOP_MAILBOX,
+    subject: `Your ${BRAND.name} receipt ${ref}`.trim(),
+    text: [
+      `Hi ${first},`,
+      `Thanks for your purchase at ${BRAND.name}.`,
+      ...p.items.map((it) => `${it.name}${it.qty !== 1 ? ` x${it.qty}` : ""}: ${pounds(it.totalPence)}`),
+      p.discountPence > 0 ? `Discount: -${pounds(p.discountPence)}` : "",
+      `Total: ${pounds(p.totalPence)} (${p.paymentLabel})`,
+      p.owedPence && p.owedPence > 0 ? `Balance owed: ${pounds(p.owedPence)}` : "",
+      `Receipt ${ref} · ${p.date}`,
+      `${BRAND.name} · ${BRAND.phone} · ${BRAND.addressLine}, ${BRAND.town} ${BRAND.postcode}`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    html: wrap(`
+  <h2 style="margin:0 0 4px;font-size:20px">Thanks, ${esc(first)}!</h2>
+  <p style="margin:0 0 16px;color:#555">Here's your receipt from ${esc(BRAND.name)}.</p>
+  <p style="margin:0 0 8px;font-size:13px;color:#555">Receipt ${esc(ref)} · ${esc(p.date)}</p>
+  <table style="border-collapse:collapse;width:100%;font-size:14px">${lines}${extra}</table>
+  <p style="margin-top:20px;font-size:13px;color:#555">Questions? Just reply to this email or call ${esc(BRAND.phone)}.</p>
+  <p style="margin:4px 0 0;font-size:12px;color:#888">${esc(BRAND.name)} · ${esc(BRAND.addressLine)}, ${esc(BRAND.town)} ${esc(BRAND.postcode)}</p>`),
+  });
 }
 
 export const pounds = (pence: number) => `£${(pence / 100).toFixed(2)}`;
