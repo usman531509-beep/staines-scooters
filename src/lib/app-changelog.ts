@@ -13,7 +13,7 @@ export const APP_CHANGELOG: AppRelease[] = [
     version: "1.0.0",
     date: "10/10/2026",
     items: [
-      "First Staines Scooters release: till, sales, stock, rental, claims, expenses and reports for staff.",
+      "First Staines Scooter release: till, sales, stock, rental, claims, expenses and reports for staff.",
     ],
   },
 ];

@@ -64,7 +64,7 @@
   --stock-later: oklch(0.78 0.17 78);
   --stock-badge-foreground: oklch(1 0 0);
 
-  /* Garage palette: Staines Scooters yellow & black on clean neutral greys. */
+  /* Garage palette: Staines Scooter yellow & black on clean neutral greys. */
   --background: oklch(0.982 0.002 90);         /* warm off-white */
   --foreground: oklch(0.18 0.005 90);          /* near-black ink */
 

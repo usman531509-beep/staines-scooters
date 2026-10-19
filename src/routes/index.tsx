@@ -144,7 +144,7 @@ function Home() {
     <SiteLayout appearance="landing" className="ss-home" hideFloating>
       {/* Hero */}
       <section className="ss-hero" aria-labelledby="hero-title">
-        <img className="ss-hero-image" src={images.hero} alt="Illustration of three scooters outside a Staines Scooters showroom" fetchPriority="high" />
+        <img className="ss-hero-image" src={images.hero} alt="Illustration of three scooters outside a Staines Scooter showroom" fetchPriority="high" />
         <div className="landing-container ss-hero-content">
           <h1 id="hero-title">
             Scooter Sales, Rental, Repairs &amp; Accident Claim Support <span>in Staines</span>

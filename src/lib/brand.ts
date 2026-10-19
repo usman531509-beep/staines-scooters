@@ -4,8 +4,8 @@
 const env = import.meta.env as Record<string, string | undefined>;
 
 export const BRAND = {
-  name: "Staines Scooters",
-  legalName: "Staines Scooters Ltd",
+  name: "Staines Scooter",
+  legalName: "Staines Scooter Ltd",
   companyNumber: "00000000",
   /** Public site origin (no trailing slash); used for links in emails and payment pages. */
   // GoDaddy only sets env vars at runtime, so a missing build-time value means production.
