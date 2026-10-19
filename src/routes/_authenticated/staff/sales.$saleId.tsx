@@ -283,6 +283,7 @@ function SaleDetailPage() {
                 <option value="card">Card</option>
                 <option value="bank_transfer">Bank transfer</option>
                 <option value="split">Split</option>
+                <option value="credit">Credit</option>
               </select>
             ) : <p className="mt-1 mb-3 uppercase">{payment}</p>}
             <label className="text-[10px] uppercase tracking-widest text-ink-muted">Notes</label>

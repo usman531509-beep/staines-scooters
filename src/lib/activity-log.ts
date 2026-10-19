@@ -18,6 +18,7 @@ export type ActivityAction =
   | "invoice_sent"
   | "refund_added"
   | "refund_deleted"
+  | "credit_payment_added"
   | "expense_added"
   | "expense_edited"
   | "expense_deleted"
@@ -35,6 +36,7 @@ export const ACTIVITY_LABELS: Record<ActivityAction, string> = {
   invoice_sent: "Invoice Sent",
   refund_added: "Refund Issued",
   refund_deleted: "Refund Deleted",
+  credit_payment_added: "Credit Payment",
   expense_added: "Expense Added",
   expense_edited: "Expense Edited",
   expense_deleted: "Expense Deleted",

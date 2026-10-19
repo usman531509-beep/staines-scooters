@@ -310,6 +310,7 @@ function SalesPage() {
             <option value="card">Card</option>
             <option value="bank_transfer">Bank</option>
             <option value="split">Split</option>
+            <option value="credit">Credit</option>
           </select>
         </div>
 

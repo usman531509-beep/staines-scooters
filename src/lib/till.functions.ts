@@ -83,6 +83,16 @@ export const getTillOverview = createServerFn({ method: "POST" })
         cardTodayPence += s.card_part_pence ?? 0;
       }
     }
+    // Payments towards credit sales are takings on the day they're paid.
+    const { data: creditPays } = await supabase
+      .from("credit_payments")
+      .select("amount_pence, method")
+      .eq("status", "succeeded")
+      .gte("created_at", start.toISOString());
+    for (const p of creditPays ?? []) {
+      if (p.method === "cash") cashTodayPence += p.amount_pence ?? 0;
+      else cardTodayPence += p.amount_pence ?? 0;
+    }
     return { session, ...figures, cashTodayPence, cardTodayPence };
   });
 

@@ -5,6 +5,7 @@ import {
   History, LogOut, Wrench, Users, Settings, FileBarChart, Package, FolderTree,
   ClipboardList, Undo2, Receipt, ChevronDown, ShoppingBag, Menu, LayoutDashboard, FileText, Bike, Trash2,
   ChartNoAxesCombined, UserRound, Inbox, Globe, ChevronsUpDown, type LucideIcon,
+  HandCoins,
 } from "lucide-react";
 import { UserAvatarImg, useMyAvatarUrl } from "./UserAvatar";
 import { AppShell } from "./AppShell";
@@ -126,7 +127,7 @@ function AccountShellFrame({ children, options }: { children: ReactNode; options
         )}
         <div
           data-account-workspace={bare ? undefined : ""}
-          className={bare ? undefined : cn("min-w-0 flex-1", compact ? "p-3 md:p-4" : "p-4 md:p-6", rolesReady && isAdmin && "pb-24 lg:pb-6")}
+          className={bare ? undefined : cn("min-w-0 flex-1", compact ? "p-3 md:p-4" : "p-4 md:p-6", rolesReady && isAdmin && "pb-24")}
         >
           {!bare && pathname === "/staff/pos" && (
             <div className="mb-3 flex flex-wrap items-center gap-1.5">
@@ -167,6 +168,7 @@ function AdminSidebar() {
               { to: "/staff/sales", label: "Sales", icon: ShoppingBag },
               { to: "/staff/refunds", label: "Refunds", icon: Undo2 },
               { to: "/staff/customers", label: "Customers", icon: UserRound },
+              { to: "/staff/credit", label: "Credit", icon: HandCoins },
               { to: "/admin/enquiries", label: "Enquiries", icon: Inbox },
             ],
           },
@@ -218,6 +220,7 @@ function AdminSidebar() {
                 { to: "/staff/pos", label: "POS", icon: Wrench, show: perms.pos },
                 { to: "/staff/sales", label: "Sales", icon: ShoppingBag, show: perms.sales },
                 { to: "/staff/customers", label: "Customers", icon: UserRound, show: perms.pos },
+                { to: "/staff/credit", label: "Credit", icon: HandCoins, show: perms.pos },
                 { to: "/staff/products", label: "Products", icon: Package, show: perms.products },
                 { to: "/staff/categories", label: "Categories", icon: FolderTree, show: perms.categories },
                 { to: "/staff/refunds", label: "Refunds", icon: Undo2, show: perms.refunds },
@@ -235,7 +238,8 @@ function AdminSidebar() {
   const roleLabel = auth.isOwner ? "Owner" : isAdmin ? "Admin" : "Staff";
 
   return (
-    <Sidebar collapsible="icon" variant="inset">
+    // Admins have the bottom tab bar on every screen size; keep the sidebar footer above it.
+    <Sidebar collapsible="icon" variant="inset" className={isAdmin ? "md:pb-[4.25rem]" : undefined}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -375,6 +379,7 @@ const ADMIN_BOTTOM_LINKS = [
   { to: "/staff/sales", label: "Sales", icon: ShoppingBag },
   { to: "/staff/refunds", label: "Refunds", icon: Undo2 },
   { to: "/staff/customers", label: "Customers", icon: UserRound },
+  { to: "/staff/credit", label: "Credit", icon: HandCoins },
   { to: "/admin/enquiries", label: "Enquiries", icon: Inbox },
   { to: "/staff/products", label: "Products", icon: Package },
   { to: "/admin/inventory", label: "Stock/Inventory", icon: Package },
@@ -386,20 +391,21 @@ const ADMIN_BOTTOM_LINKS = [
   { to: "/admin/profit-loss", label: "Profit & Loss", icon: ChartNoAxesCombined },
 ];
 
-/** Phone/tablet tab bar for administrators; on large screens the sidebar is enough. */
+/** Bottom tab bar for administrators on every screen size (alongside the sidebar on large screens). */
 function AdminBottomNav({ pathname }: { pathname: string }) {
-  const { setOpenMobile } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const isActive = (to: string) => (to === "/admin" ? pathname === to : pathname === to || pathname.startsWith(`${to}/`));
 
   return (
     <nav
       aria-label="Administrator navigation"
-      className="fixed inset-x-0 bottom-0 z-[70] h-[4.25rem] overflow-x-auto border-t border-border bg-surface-elevated shadow-[0_-3px_14px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[70] h-[4.25rem] overflow-x-auto border-t border-border bg-surface-elevated shadow-[0_-3px_14px_color-mix(in_oklab,var(--foreground)_10%,transparent)]"
     >
-      <div className="flex h-full min-w-max items-stretch">
+      {/* Centred when it fits; scrolls sideways from the first item when it doesn't. */}
+      <div className="mx-auto flex h-full w-max items-stretch">
         <button
           type="button"
-          onClick={() => setOpenMobile(true)}
+          onClick={toggleSidebar}
           className="flex w-[5.75rem] shrink-0 flex-col items-center justify-center gap-1 text-foreground transition-colors hover:bg-surface hover:text-primary"
         >
           <Menu className="h-[18px] w-[18px]" strokeWidth={1.8} />

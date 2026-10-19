@@ -20,6 +20,7 @@ const PAYMENT_LABELS: Record<string, string> = {
   card: "Card",
   split: "Card + Cash",
   bank_transfer: "Bank transfer",
+  credit: "Credit (pay later)",
 };
 
 // Zero page margins stop the browser printing its own title/date/URL header and
@@ -128,6 +129,12 @@ function Receipt() {
             <>
               <Row label="Cash given" value={fmt(s.cash_tendered_pence)} />
               <Row label="Change" value={fmt(Math.max(0, change))} />
+            </>
+          )}
+          {method === "credit" && (s.credit_amount_pence ?? 0) > 0 && (
+            <>
+              <Row label="Paid" value={fmt(s.credit_paid_pence ?? 0)} />
+              <Row label="Balance owed" value={fmt(Math.max(0, s.credit_amount_pence - (s.credit_paid_pence ?? 0)))} strong />
             </>
           )}
         </div>

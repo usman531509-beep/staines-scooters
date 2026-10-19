@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { PosCustomerForm } from "@/components/PosCustomerPicker";
 import { deletePosCustomer, listPosCustomers, type PosCustomer } from "@/lib/pos-customers.functions";
 import { listCustomerRegistrations } from "@/lib/customer-registrations.functions";
+import { listCustomerBalances } from "@/lib/credit.functions";
+import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-client";
 import { ukDate } from "@/lib/format-date";
 import { BRAND } from "@/lib/brand";
@@ -45,6 +47,12 @@ function CustomersPage() {
     queryFn: () => regFn({ data: { ids: websiteIds } }),
     enabled: websiteIds.length > 0,
   });
+  // Money still owed on credit, by customer.
+  const balancesFn = useServerFn(listCustomerBalances);
+  const { data: balances = {} } = useQuery({
+    queryKey: ["customer-balances"],
+    queryFn: () => balancesFn(),
+  });
   const remove = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["pos-customers"] }),
@@ -73,21 +81,22 @@ function CustomersPage() {
       </div>
 
       <div className="overflow-x-auto rounded-md border border-border bg-surface">
-        <table className="w-full min-w-[560px] text-sm">
+        <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-ink-muted">
               <th className="px-3 py-3">Name</th>
               <th className="px-3 py-3">Phone</th>
               <th className="px-3 py-3">Email</th>
               <th className="px-3 py-3">Added</th>
+              <th className="px-3 py-3 text-right">Owes</th>
               <th className="px-3 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="py-6 text-center text-ink-muted">Loading…</td></tr>
+              <tr><td colSpan={6} className="py-6 text-center text-ink-muted">Loading…</td></tr>
             ) : customers.length === 0 ? (
-              <tr><td colSpan={5} className="py-8 text-center text-ink-muted">{term ? "No customers match." : "No customers yet."}</td></tr>
+              <tr><td colSpan={6} className="py-8 text-center text-ink-muted">{term ? "No customers match." : "No customers yet."}</td></tr>
             ) : (
               customers.map((c) => (
                 <tr key={c.id} className="border-b border-border/60 last:border-0">
@@ -116,6 +125,15 @@ function CustomersPage() {
                   <td className="px-3 py-2 whitespace-nowrap">{c.phone}</td>
                   <td className="px-3 py-2">{c.email ?? <span className="text-ink-muted">—</span>}</td>
                   <td className="px-3 py-2 whitespace-nowrap text-xs text-ink-muted">{ukDate(c.created_at)}</td>
+                  <td className="px-3 py-2 whitespace-nowrap text-right">
+                    {balances[c.id] ? (
+                      <Link to="/staff/credit" className="font-semibold text-[var(--primary-ink)] hover:underline">
+                        £{(balances[c.id] / 100).toFixed(2)}
+                      </Link>
+                    ) : (
+                      <span className="text-ink-muted">—</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2">
                     <div className="flex justify-end gap-1.5">
                       <button type="button" onClick={() => setEditing(c)} title="Edit" className="grid h-8 w-8 place-items-center rounded-sm border border-border hover:border-primary">

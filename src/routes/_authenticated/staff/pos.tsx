@@ -4,7 +4,7 @@ import { markSaleEdited } from "@/lib/last-edited-sale";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp, SlidersHorizontal, Maximize2, Minimize2, ShoppingCart, Check } from "lucide-react";
+import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp, SlidersHorizontal, Maximize2, Minimize2, ShoppingCart, Check, HandCoins } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { z } from "zod";
 import { printInPlace } from "@/lib/print-in-place";
@@ -18,13 +18,16 @@ import { beep } from "@/lib/beep";
 import { useCatalogueRealtime } from "@/hooks/use-realtime";
 import { PriceEntryModal } from "@/components/PriceEntryModal";
 import { ProductForm } from "@/components/ProductForm";
-import { CashPayDialog, SplitPayDialog } from "@/components/till/TillModules";
+import { CashPayDialog, CreditPayDialog, SplitPayDialog } from "@/components/till/TillModules";
+import { getCustomerCredit } from "@/lib/credit.functions";
 import { BRAND } from "@/lib/brand";
 import { PosCustomerPicker, type PosCustomerRef } from "@/components/PosCustomerPicker";
 
 /** Extra payment details captured by the cash / card+cash dialogs. */
 type PayExtras = {
-  method?: "cash" | "card" | "bank_transfer" | "split";
+  method?: "cash" | "card" | "bank_transfer" | "split" | "credit";
+  creditPaidNowPence?: number;
+  creditPaidNowMethod?: "cash" | "card";
   cashTenderedPence?: number;
   cashPartPence?: number;
   cardPartPence?: number;
@@ -77,6 +80,8 @@ type CartLine = {
   mileage?: number | null;
 };
 
+const PAY_LABEL = { cash: "Cash", card: "Card", bank_transfer: "Bank", split: "Card + Cash", credit: "Credit" } as const;
+
 const fmt = (p: number) => {
   const abs = Math.abs(p);
   return `£${abs % 100 === 0 ? String(Math.trunc(p / 100)) : (p / 100).toFixed(2)}`;
@@ -126,7 +131,7 @@ function POS() {
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [cart, setCart] = useState<CartLine[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "bank_transfer" | "split">("card");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "bank_transfer" | "split" | "credit">("card");
   const [orderDiscountPct] = useState(0);
 
   // Tell the app-update logic (src/routes/__root.tsx) not to reload while a
@@ -150,6 +155,13 @@ function POS() {
   }, [orderDiscountFixedPence]);
   const [notes, setNotes] = useState("");
   const [customer, setCustomer] = useState<PosCustomerRef | null>(null);
+  // Warn when the chosen customer still owes money on credit.
+  const customerCreditFn = useServerFn(getCustomerCredit);
+  const { data: customerCredit } = useQuery({
+    queryKey: ["customer-credit", customer?.id],
+    queryFn: () => customerCreditFn({ data: { customerId: customer!.id } }),
+    enabled: !!customer?.id,
+  });
   const [error, setError] = useState<string | null>(null);
   const [lastSale, setLastSale] = useState<{ id: string; total: number } | null>(null);
   // Auto-dismiss the yellow "Sale recorded" banner after 2 minutes
@@ -539,6 +551,8 @@ function POS() {
           cashTenderedPence: extras?.cashTenderedPence ?? null,
           cashPartPence: extras?.cashPartPence ?? null,
           cardPartPence: extras?.cardPartPence ?? null,
+          creditPaidNowPence: extras?.creditPaidNowPence ?? null,
+          creditPaidNowMethod: extras?.creditPaidNowMethod ?? null,
           customerId: customer?.id ?? null,
         },
       });
@@ -562,7 +576,7 @@ function POS() {
     onError: (e: any) => setError(e.message ?? "Checkout failed"),
   });
 
-  const [payDialog, setPayDialog] = useState<null | "cash" | "split">(null);
+  const [payDialog, setPayDialog] = useState<null | "cash" | "split" | "credit">(null);
 
   async function onChargeClick(extras?: PayExtras) {
     setError(null);
@@ -592,6 +606,19 @@ function POS() {
 
 
 
+
+  /** The single Charge button: takes the payment the way chosen in the tabs above it. */
+  function chargeSelected() {
+    setError(null);
+    if (isEditMode) return void onChargeClick();
+    if (paymentMethod === "card") return void payByCard();
+    if (paymentMethod === "split") return setPayDialog("split");
+    if (paymentMethod === "credit") {
+      if (!customer) return setError("Choose the customer first — a credit sale needs to know who owes it.");
+      return setPayDialog("credit");
+    }
+    void onChargeClick({ method: paymentMethod });
+  }
 
   useEffect(() => { scanInputRef.current?.focus(); }, []);
 
@@ -641,7 +668,8 @@ function POS() {
 
   return (
     <AccountShell compact hideHeader fullWidth hideFooter hideFloating hideLastSignIn>
-      <div className="grid h-[100dvh] w-full gap-3 overflow-hidden p-0 xl:grid-cols-[minmax(0,1fr)_400px]">
+      {/* Admins have the bottom tab bar (4.25rem), so the till stops above it. */}
+      <div className={`grid w-full gap-3 overflow-hidden p-0 xl:grid-cols-[minmax(0,1fr)_400px] ${isAdmin ? "h-[calc(100dvh-4.25rem)]" : "h-[100dvh]"}`}>
         {/* LEFT — products */}
         <div className="flex min-h-0 flex-col space-y-4 overflow-y-auto pr-1">
           {/* Scan + search */}
@@ -922,13 +950,25 @@ function POS() {
         {/* RIGHT — cart + checkout */}
         <div className="flex min-h-0 flex-col space-y-4 overflow-y-auto pr-1">
           <PosCustomerPicker value={customer} onChange={setCustomer} disabled={checkout.isPending} />
+          {customer && (customerCredit?.outstandingPence ?? 0) > 0 && (
+            <div className="-mt-2 flex items-center justify-between gap-2 rounded-lg border border-primary bg-primary/15 px-3 py-2 text-xs">
+              <span>
+                <strong>{customer.name}</strong> owes <strong>{fmt(customerCredit!.outstandingPence)}</strong> on credit
+              </span>
+              <button type="button" onClick={() => navigate({ to: "/staff/credit" })} className="font-semibold underline">
+                View
+              </button>
+            </div>
+          )}
           {/* Payment + Totals + Charge (top of basket) */}
           <div className="rounded-xl border border-border bg-surface-elevated p-4 shadow-sm">
-            <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
+            {/* Pick how they pay here; the one button below takes the payment. */}
+            <div className="grid grid-cols-5 gap-1 rounded-lg bg-muted p-1">
               <PayBtn active={paymentMethod === "cash"} onClick={() => setPaymentMethod("cash")} icon={Banknote}>Cash</PayBtn>
               <PayBtn active={paymentMethod === "card"} onClick={() => setPaymentMethod("card")} icon={CreditCard}>Card</PayBtn>
               <PayBtn active={paymentMethod === "bank_transfer"} onClick={() => setPaymentMethod("bank_transfer")} icon={ArrowRightLeft}>Bank</PayBtn>
               <PayBtn active={paymentMethod === "split"} onClick={() => setPaymentMethod("split")} icon={ArrowRightLeft}>Split</PayBtn>
+              <PayBtn active={paymentMethod === "credit"} onClick={() => setPaymentMethod("credit")} icon={HandCoins}>Credit</PayBtn>
             </div>
             <div className="mt-3 space-y-1">
               <Totals label="Subtotal" value={fmt(subtotal)} />
@@ -967,46 +1007,18 @@ function POS() {
                 >Cancel</button>
               </div>
             )}
-            {/* Bank transfer and sale edits still use a single button. */}
-            {(isEditMode || paymentMethod === "bank_transfer") && (
-              <button
-                disabled={cart.length === 0 || checkout.isPending}
-                onClick={() => onChargeClick()}
-                className="mt-3 h-12 w-full rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
-              >
-                {checkout.isPending ? "Saving…" : isEditMode ? `Save changes · ${fmt(chargeTotal)}` : `Charge ${fmt(chargeTotal)}`}
-              </button>
-            )}
-
-            {/* Everyday payments: card machine, cash, or both together. */}
-            {!isEditMode && paymentMethod !== "bank_transfer" && (
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  disabled={cart.length === 0 || checkout.isPending}
-                  onClick={payByCard}
-                  className="inline-flex h-12 items-center justify-center gap-1.5 rounded-lg bg-primary px-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-                >
-                  <CreditCard className="h-4 w-4" /> Card
-                </button>
-                <button
-                  type="button"
-                  disabled={cart.length === 0 || checkout.isPending}
-                  onClick={() => { setPaymentMethod("cash"); setError(null); void onChargeClick({ method: "cash" }); }}
-                  className="inline-flex h-12 items-center justify-center gap-1.5 rounded-lg border-2 border-primary bg-background px-2 text-sm font-semibold text-primary hover:bg-accent disabled:opacity-50"
-                >
-                  <Banknote className="h-4 w-4" /> Cash
-                </button>
-                <button
-                  type="button"
-                  disabled={cart.length === 0 || checkout.isPending}
-                  onClick={() => { setPaymentMethod("split"); setError(null); setPayDialog("split"); }}
-                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border bg-background px-2 text-sm font-semibold text-foreground hover:bg-accent disabled:opacity-50"
-                >
-                  Card + Cash
-                </button>
-              </div>
-            )}
+            <button
+              type="button"
+              disabled={cart.length === 0 || checkout.isPending}
+              onClick={chargeSelected}
+              className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              {checkout.isPending
+                ? "Saving…"
+                : isEditMode
+                  ? `Save changes · ${fmt(chargeTotal)}`
+                  : `Charge ${fmt(chargeTotal)} · ${PAY_LABEL[paymentMethod]}`}
+            </button>
 
             {payDialog === "cash" && (
               <CashPayDialog
@@ -1014,6 +1026,20 @@ function POS() {
                 busy={checkout.isPending}
                 onCancel={() => setPayDialog(null)}
                 onConfirm={(tendered) => { setPayDialog(null); void onChargeClick({ method: "cash", cashTenderedPence: tendered }); }}
+              />
+            )}
+
+            {payDialog === "credit" && customer && (
+              <CreditPayDialog
+                totalPence={chargeTotal}
+                customerName={customer.name}
+                busy={checkout.isPending}
+                onCancel={() => setPayDialog(null)}
+                onConfirm={(paidNowPence, method) => {
+                  setPayDialog(null);
+                  setPaymentMethod("credit");
+                  void onChargeClick({ method: "credit", creditPaidNowPence: paidNowPence, creditPaidNowMethod: method });
+                }}
               />
             )}
 
@@ -1276,8 +1302,8 @@ function CatChip({ active, onClick, children }: any) {
 }
 function PayBtn({ active, onClick, icon: Icon, children }: any) {
   return (
-    <button onClick={onClick} className={`flex h-9 items-center justify-center gap-1.5 rounded-md px-2 text-sm font-medium transition-colors ${active ? "bg-surface-elevated text-primary shadow-sm" : "text-ink-muted hover:text-foreground"}`}>
-      <Icon className="h-3.5 w-3.5" /> {children}
+    <button onClick={onClick} className={`flex h-9 min-w-0 items-center justify-center gap-1 rounded-md px-1 text-[13px] font-medium transition-colors ${active ? "bg-surface-elevated text-primary shadow-sm" : "text-ink-muted hover:text-foreground"}`}>
+      <Icon className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{children}</span>
     </button>
   );
 }

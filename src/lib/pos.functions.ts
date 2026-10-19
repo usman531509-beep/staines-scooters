@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { logActivity } from "@/lib/activity-log";
+import { addCreditPayment, creditStatus, refreshSaleCredit } from "@/lib/credit-ledger";
 
 async function assertStaff(supabase: any, userId: string) {
   const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
@@ -384,7 +385,10 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) =>
     z.object({
       items: z.array(cartItemSchema).min(1),
-      paymentMethod: z.enum(["cash", "card", "bank_transfer", "split"]).default("cash"),
+      paymentMethod: z.enum(["cash", "card", "bank_transfer", "split", "credit"]).default("cash"),
+      // Credit sale: what the customer paid at the till now, and how (the rest is owed).
+      creditPaidNowPence: z.number().int().min(0).optional().nullable(),
+      creditPaidNowMethod: z.enum(["cash", "card", "bank_transfer"]).optional().nullable(),
       orderDiscountPence: z.number().int().min(0).default(0),
       notes: z.string().max(500).optional().nullable(),
       saleDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
@@ -423,6 +427,13 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
     // again here would double-discount the sale and understate profit.
     const orderLevelDiscount = orderDisc;
     const finalTotal = Math.max(0, total);
+
+    const isCredit = data.paymentMethod === "credit";
+    const paidNow = isCredit ? data.creditPaidNowPence ?? 0 : 0;
+    if (isCredit) {
+      if (!data.customerId) throw new Error("Choose the customer before putting a sale on credit.");
+      if (paidNow >= finalTotal) throw new Error("They're paying it all now — use Cash or Card instead of Credit.");
+    }
 
     const description =
       data.items.length === 1
@@ -467,6 +478,9 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
         cash_part_pence: data.cashPartPence ?? null,
         card_part_pence: data.cardPartPence ?? null,
         pos_customer_id: data.customerId ?? null,
+        ...(isCredit
+          ? { credit_amount_pence: finalTotal, credit_paid_pence: 0, credit_status: creditStatus(finalTotal, 0) }
+          : {}),
       })
       .select()
       .single();
@@ -493,6 +507,18 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
 
     const { error: itemsErr } = await supabase.from("sale_items").insert(itemsPayload);
     if (itemsErr) throw itemsErr;
+
+    // Part paid at the till: the first payment towards the credit.
+    if (isCredit && paidNow > 0) {
+      await addCreditPayment(supabase, {
+        saleId: sale.id,
+        receiptNo: sale.receipt_no,
+        amountPence: paidNow,
+        method: data.creditPaidNowMethod ?? "cash",
+        userId,
+        note: "Paid at the till",
+      });
+    }
 
     // Decrement stock for non-services with a product id
     for (const it of computed) {
@@ -524,6 +550,7 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
         ["Payment", String(sale.payment_method).replace("_", " ")],
         ["Items", computed.map((it) => `${it.name}${it.qty !== 1 ? ` ×${it.qty}` : ""} — ${pounds(it.lineTotalPence)}`).join("\n")],
         ["Discount", totalDiscount ? pounds(totalDiscount) : null],
+        ["On credit", isCredit ? `${pounds(finalTotal - paidNow)} owed (paid ${pounds(paidNow)} now)` : null],
         ["Customer", customer ? `${customer.name}${customer.phone ? ` (${customer.phone})` : ""}` : null],
         ["Notes", data.notes],
         ["Date", new Date(sale.created_at).toLocaleString("en-GB", { timeZone: "Europe/London" })],
@@ -807,6 +834,23 @@ export const updateSale = createServerFn({ method: "POST" })
       amount_pence: amount,
     };
     if (data.payment_method) patch.payment_method = data.payment_method;
+
+    // Credit: what's owed follows the edited total; a sale with payments towards
+    // it stays on credit so the payment history isn't orphaned.
+    const method = data.payment_method ?? sale.payment_method;
+    if (sale.payment_method === "credit" && method !== "credit") {
+      if ((sale.credit_paid_pence ?? 0) > 0) {
+        throw new Error("Payments have been taken towards this credit, so it has to stay on Credit.");
+      }
+      patch.credit_amount_pence = 0;
+      patch.credit_paid_pence = 0;
+      patch.credit_status = null;
+    }
+    if (method === "credit") {
+      const customerId = data.pos_customer_id !== undefined ? data.pos_customer_id : sale.pos_customer_id;
+      if (!customerId) throw new Error("A credit sale needs a customer.");
+      patch.credit_amount_pence = amount;
+    }
     if (data.notes !== undefined) patch.notes = data.notes;
     if (data.description !== undefined) patch.description = data.description;
     if (data.pos_customer_id !== undefined) patch.pos_customer_id = data.pos_customer_id;
@@ -817,6 +861,7 @@ export const updateSale = createServerFn({ method: "POST" })
     }
     const { error: uErr } = await supabase.from("sales").update(patch).eq("id", data.saleId);
     if (uErr) throw uErr;
+    if (method === "credit") await refreshSaleCredit(supabase, data.saleId);
 
     await logActivity(supabase, {
       actorId: userId,
@@ -886,6 +931,37 @@ export const undoSale = createServerFn({ method: "POST" })
     if (refundIds.length) {
       await supabase.from("refund_items").delete().in("refund_id", refundIds);
       await supabase.from("refunds").delete().in("id", refundIds);
+    }
+
+    // Cash taken towards a credit sale goes back out of the till; the
+    // credit_payments rows go with the sale (ON DELETE CASCADE).
+    if (sale.payment_method === "credit") {
+      const { data: cashPays } = await supabase
+        .from("credit_payments")
+        .select("amount_pence")
+        .eq("sale_id", saleId)
+        .eq("method", "cash")
+        .eq("status", "succeeded");
+      const cashBack = (cashPays ?? []).reduce((a: number, p: any) => a + (p.amount_pence ?? 0), 0);
+      if (cashBack > 0) {
+        const { data: till } = await supabase
+          .from("till_sessions")
+          .select("id")
+          .is("closed_at", null)
+          .is("deleted_at", null)
+          .order("opened_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (till?.id) {
+          await supabase.from("till_cash_movements").insert({
+            till_session_id: till.id,
+            kind: "payout",
+            amount_pence: cashBack,
+            reason: `Undo credit sale #${sale.receipt_no ?? ""} · cash returned`,
+            created_by: userId,
+          });
+        }
+      }
     }
 
     // Delete line items then the sale itself

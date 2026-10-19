@@ -1027,3 +1027,69 @@ export function SplitPayDialog({
     </TillSheet>
   );
 }
+
+/** Credit ("pay later"): optional part paid now; the rest is owed by the customer. */
+export function CreditPayDialog({
+  totalPence,
+  customerName,
+  onCancel,
+  onConfirm,
+  busy,
+}: {
+  totalPence: number;
+  customerName: string;
+  onCancel: () => void;
+  onConfirm: (paidNowPence: number, method: "cash" | "card") => void;
+  busy?: boolean;
+}) {
+  const [paid, setPaid] = useState("");
+  const [method, setMethod] = useState<"cash" | "card">("cash");
+  const paidPence = toPence(paid);
+  const owedPence = Math.max(0, totalPence - paidPence);
+  const tooMuch = paidPence >= totalPence;
+  return (
+    <TillSheet title="Credit · pay later" onClose={onCancel}>
+      <div className="grid gap-3">
+        <Stat label={`Total for ${customerName}`} value={pounds(totalPence)} />
+        <div>
+          <label className={LABEL}>Paid now (£) — leave empty if nothing</label>
+          <input
+            autoFocus
+            value={paid}
+            onChange={(e) => setPaid(e.target.value)}
+            inputMode="decimal"
+            className={`${FIELD} text-xl font-bold`}
+            placeholder="0.00"
+          />
+        </div>
+        {paidPence > 0 && (
+          <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+            {(["cash", "card"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMethod(m)}
+                className={`h-9 rounded-md text-xs font-semibold uppercase tracking-widest ${method === m ? "bg-primary text-primary-foreground" : "text-ink-muted"}`}
+              >
+                {m === "cash" ? "Cash" : "Card"}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-2">
+          <Stat label="Paid now" value={pounds(Math.min(paidPence, totalPence))} />
+          <Stat label="On credit" value={pounds(owedPence)} />
+        </div>
+        {tooMuch && <p className="text-xs font-semibold text-primary">That's the full amount — use Cash or Card instead.</p>}
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className={BTN}>
+            Cancel
+          </button>
+          <button onClick={() => onConfirm(paidPence, method)} disabled={busy || tooMuch} className={BTN_RED}>
+            {busy ? "Recording…" : `Put ${pounds(owedPence)} on credit`}
+          </button>
+        </div>
+      </div>
+    </TillSheet>
+  );
+}

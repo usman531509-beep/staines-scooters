@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin/team'
 import { Route as AuthenticatedStaffCategoriesRouteImport } from './routes/_authenticated/staff/categories'
+import { Route as AuthenticatedStaffCreditRouteImport } from './routes/_authenticated/staff/credit'
 import { Route as AuthenticatedStaffCustomersRouteImport } from './routes/_authenticated/staff/customers'
 import { Route as AuthenticatedStaffExpensesRouteImport } from './routes/_authenticated/staff/expenses'
 import { Route as AuthenticatedStaffPosRouteImport } from './routes/_authenticated/staff/pos'
@@ -218,6 +219,12 @@ const AuthenticatedStaffCategoriesRoute =
     path: '/staff/categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStaffCreditRoute =
+  AuthenticatedStaffCreditRouteImport.update({
+    id: '/staff/credit',
+    path: '/staff/credit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStaffCustomersRoute =
   AuthenticatedStaffCustomersRouteImport.update({
     id: '/staff/customers',
@@ -380,6 +387,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/staff/categories': typeof AuthenticatedStaffCategoriesRouteWithChildren
+  '/staff/credit': typeof AuthenticatedStaffCreditRoute
   '/staff/customers': typeof AuthenticatedStaffCustomersRoute
   '/staff/expenses': typeof AuthenticatedStaffExpensesRoute
   '/staff/pos': typeof AuthenticatedStaffPosRoute
@@ -432,6 +440,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
+  '/staff/credit': typeof AuthenticatedStaffCreditRoute
   '/staff/customers': typeof AuthenticatedStaffCustomersRoute
   '/staff/expenses': typeof AuthenticatedStaffExpensesRoute
   '/staff/pos': typeof AuthenticatedStaffPosRoute
@@ -486,6 +495,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/staff/categories': typeof AuthenticatedStaffCategoriesRouteWithChildren
+  '/_authenticated/staff/credit': typeof AuthenticatedStaffCreditRoute
   '/_authenticated/staff/customers': typeof AuthenticatedStaffCustomersRoute
   '/_authenticated/staff/expenses': typeof AuthenticatedStaffExpensesRoute
   '/_authenticated/staff/pos': typeof AuthenticatedStaffPosRoute
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/team'
     | '/staff/categories'
+    | '/staff/credit'
     | '/staff/customers'
     | '/staff/expenses'
     | '/staff/pos'
@@ -593,6 +604,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/team'
+    | '/staff/credit'
     | '/staff/customers'
     | '/staff/expenses'
     | '/staff/pos'
@@ -646,6 +658,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/team'
     | '/_authenticated/staff/categories'
+    | '/_authenticated/staff/credit'
     | '/_authenticated/staff/customers'
     | '/_authenticated/staff/expenses'
     | '/_authenticated/staff/pos'
@@ -902,6 +915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStaffCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/staff/credit': {
+      id: '/_authenticated/staff/credit'
+      path: '/staff/credit'
+      fullPath: '/staff/credit'
+      preLoaderRoute: typeof AuthenticatedStaffCreditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/staff/customers': {
       id: '/_authenticated/staff/customers'
       path: '/staff/customers'
@@ -1116,6 +1136,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedStaffCategoriesRoute: typeof AuthenticatedStaffCategoriesRouteWithChildren
+  AuthenticatedStaffCreditRoute: typeof AuthenticatedStaffCreditRoute
   AuthenticatedStaffCustomersRoute: typeof AuthenticatedStaffCustomersRoute
   AuthenticatedStaffExpensesRoute: typeof AuthenticatedStaffExpensesRoute
   AuthenticatedStaffPosRoute: typeof AuthenticatedStaffPosRoute
@@ -1145,6 +1166,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedStaffCategoriesRoute:
     AuthenticatedStaffCategoriesRouteWithChildren,
+  AuthenticatedStaffCreditRoute: AuthenticatedStaffCreditRoute,
   AuthenticatedStaffCustomersRoute: AuthenticatedStaffCustomersRoute,
   AuthenticatedStaffExpensesRoute: AuthenticatedStaffExpensesRoute,
   AuthenticatedStaffPosRoute: AuthenticatedStaffPosRoute,

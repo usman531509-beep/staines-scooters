@@ -81,7 +81,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 const gbp = (pence: number) =>
   (pence / 100).toLocaleString("en-GB", { style: "currency", currency: "GBP" });
 
-const METHOD_LABEL: Record<string, string> = { cash: "Cash", card: "Card", bank_transfer: "Bank", split: "Split" };
+const METHOD_LABEL: Record<string, string> = { cash: "Cash", card: "Card", bank_transfer: "Bank", split: "Split", credit: "Credit" };
 
 function AdminDashboard() {
   const fn = useServerFn(getDashboardOverview);
