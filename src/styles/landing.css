@@ -3280,6 +3280,15 @@
 .ss-hero h1 span {
   color: var(--ss-yellow);
 }
+.ss-hero h1 .ss-hero-brand {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
 .ss-hero-lead {
   margin: 18px 0 0;
   font-size: 22px;

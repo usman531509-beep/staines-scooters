@@ -191,7 +191,9 @@ function Home() {
       <section className="ss-hero" aria-labelledby="hero-title">
         <img className="ss-hero-image" src={images.hero} alt="Illustration of three scooters outside a Staines Scooter showroom" fetchPriority="high" />
         <div className="landing-container ss-hero-content">
+          {/* The brand name is part of the H1 so "Staines Scooter" searches match the page's main heading. */}
           <h1 id="hero-title">
+            <span className="ss-hero-brand">{BRAND.name}</span>
             Scooter Sales, Rental, Repairs &amp; Accident Claim Support <span>in Staines</span>
           </h1>
           <p className="ss-hero-lead">Your local scooter specialists.</p>
