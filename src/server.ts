@@ -39,6 +39,12 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // One address for search engines: www.stainesscooter.com → stainesscooter.com.
+    const host = request.headers.get("host") ?? new URL(request.url).host;
+    if (host.startsWith("www.")) {
+      const url = new URL(request.url);
+      return Response.redirect(`https://${host.slice(4)}${url.pathname}${url.search}`, 301);
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

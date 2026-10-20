@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ScooterDetails } from "@/components/ScooterDetails";
-import { BRAND, siteLink } from "@/lib/brand";
+import { BRAND, DIRECTIONS_POINT, DIRECTIONS_URL, siteLink } from "@/lib/brand";
 import { RENTAL_FLEET, RENTAL_TERMS, SALE_SCOOTERS, enquire, gbp, type SaleScooter } from "@/lib/scooters";
 import "@/styles/landing.css";
 
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Scooter sales, weekly scooter rental, repairs and accident claim support in Staines-upon-Thames. Honda Vision, SH Mode, PCX and Yamaha NMAX from £60 a week.",
+          `${BRAND.name}: scooter sales, weekly scooter rental, repairs and accident claim support in Staines-upon-Thames. Honda Vision, SH Mode, PCX and Yamaha NMAX from £60 a week.`,
       },
       { property: "og:title", content: `${BRAND.name} | Your local scooter specialists` },
       {
@@ -53,21 +53,66 @@ export const Route = createFileRoute("/")({
     scripts: [
       {
         type: "application/ld+json",
+        // Tells Google the site's name (for brand searches like "Staines Scooter")
+        // and the shop's details for local results.
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "MotorcycleDealer",
-          name: BRAND.name,
-          url: siteLink("/"),
-          image: siteLink(images.hero),
-          telephone: `+${BRAND.phoneIntl}`,
-          email: BRAND.email,
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: BRAND.addressLine,
-            addressLocality: BRAND.town,
-            postalCode: BRAND.postcode,
-            addressCountry: "GB",
-          },
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": `${siteLink("/")}#website`,
+              name: BRAND.name,
+              alternateName: ["Staines Scooters", "StainesScooter", "stainesscooter.com"],
+              url: siteLink("/"),
+              publisher: { "@id": `${siteLink("/")}#business` },
+            },
+            {
+              "@type": ["MotorcycleDealer", "MotorcycleRepair"],
+              "@id": `${siteLink("/")}#business`,
+              name: BRAND.name,
+              alternateName: "Staines Scooters",
+              description:
+                "Scooter sales, weekly 125cc scooter rental, servicing and repairs, and accident claim support in Staines-upon-Thames.",
+              url: siteLink("/"),
+              logo: siteLink("/app-icon-512.png"),
+              image: [siteLink(images.hero), siteLink("/images/brand/staines-logo.webp")],
+              telephone: `+${BRAND.phoneIntl}`,
+              email: BRAND.email,
+              priceRange: "££",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: BRAND.addressLine,
+                addressLocality: BRAND.town,
+                postalCode: BRAND.postcode,
+                addressCountry: "GB",
+              },
+              geo: { "@type": "GeoCoordinates", latitude: DIRECTIONS_POINT.lat, longitude: DIRECTIONS_POINT.lng },
+              hasMap: DIRECTIONS_URL,
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "09:00",
+                  closes: "18:00",
+                },
+                { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:00", closes: "17:00" },
+              ],
+              contactPoint: [
+                { "@type": "ContactPoint", telephone: `+${BRAND.phoneIntl}`, contactType: "customer service", areaServed: "GB" },
+                { "@type": "ContactPoint", telephone: `+${BRAND.phone2Intl}`, contactType: "customer service", areaServed: "GB" },
+              ],
+              areaServed: [
+                "Staines-upon-Thames",
+                "Ashford",
+                "Egham",
+                "Stanwell",
+                "Laleham",
+                "Shepperton",
+                "Sunbury-on-Thames",
+                "Thorpe",
+              ].map((name) => ({ "@type": "Place", name })),
+            },
+          ],
         }),
       },
     ],

@@ -32,7 +32,9 @@ export const Route = createFileRoute("/contact")({
         property: "og:description",
         content: `Call ${BRAND.phone} or visit the workshop at ${BRAND_ADDRESS}.`,
       },
+      { property: "og:url", content: siteLink("/contact") },
     ],
+    links: [{ rel: "canonical", href: siteLink("/contact") }],
     scripts: [
       {
         type: "application/ld+json",

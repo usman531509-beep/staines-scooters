@@ -89,12 +89,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Scooter sales, weekly rental, repairs and accident claim support in Staines-upon-Thames. Honda Vision, SH Mode, PCX and Yamaha NMAX." },
       { name: "apple-mobile-web-app-title", content: BRAND.name },
       { name: "application-name", content: BRAND.name },
+      { property: "og:site_name", content: BRAND.name },
+      { property: "og:locale", content: "en_GB" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
+      // Google wants a square favicon in a multiple of 48px.
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/app-icon-192.png" },
       { rel: "icon", type: "image/png", href: "/app-icon.png" },
       { rel: "apple-touch-icon", href: "/app-icon.png" },
 
