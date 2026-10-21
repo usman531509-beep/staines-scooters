@@ -64,17 +64,29 @@ export const grantRole = createServerFn({ method: "POST" })
 
 // ============ PHASE 3: Reports (CSV) ============
 
-function toCsv(rows: any[]): string {
-  if (!rows.length) return "";
-  const keys = Object.keys(rows[0]);
-  const esc = (v: any) => {
+function toCsv(header: string[], rows: Array<Array<string | number | null | undefined>>): string {
+  const esc = (v: string | number | null | undefined) => {
     if (v == null) return "";
-    const s = typeof v === "object" ? JSON.stringify(v) : String(v);
+    const s = String(v);
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  return [keys.join(","), ...rows.map(r => keys.map(k => esc(r[k])).join(","))].join("\n");
+  return [header, ...rows].map((r) => r.map(esc).join(",")).join("\n");
 }
 
+const money = (p: number | null | undefined) => (p == null ? "" : (p / 100).toFixed(2));
+const ukTime = (iso: string) =>
+  new Date(iso).toLocaleString("en-GB", {
+    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+    hour12: false, timeZone: "Europe/London",
+  });
+const PAYMENT: Record<string, string> = {
+  cash: "Cash", card: "Card", split: "Card + Cash", bank_transfer: "Bank transfer", credit: "Credit (pay later)",
+};
+
+/**
+ * Admin CSV exports. Sales: one row per live (not deleted) sale with only what the
+ * till records today. Audit: the staff activity log shown on /admin/activity.
+ */
 export const getReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -86,13 +98,101 @@ export const getReport = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
     await assertRole(supabase, userId, ["owner", "admin"]);
-    const table = data.kind === "sales" ? "sales" : "audit_log";
-    let q = supabase.from(table).select("*").order("created_at", { ascending: false }).limit(5000);
-    if (data.fromDate) q = q.gte("created_at", data.fromDate);
-    if (data.toDate) q = q.lte("created_at", data.toDate);
-    const { data: rows, error } = await q;
+    const range = (q: any) => {
+      if (data.fromDate) q = q.gte("created_at", `${data.fromDate}T00:00:00`);
+      // Inclusive of the whole "to" day.
+      if (data.toDate) q = q.lte("created_at", `${data.toDate}T23:59:59.999`);
+      return q;
+    };
+    const names = async (ids: string[]) => {
+      const unique = [...new Set(ids.filter(Boolean))];
+      if (!unique.length) return new Map<string, string>();
+      const { data: profs } = await supabase.from("profiles").select("id, full_name, email").in("id", unique);
+      return new Map<string, string>((profs ?? []).map((p: any) => [p.id, p.full_name || p.email || ""]));
+    };
+
+    if (data.kind === "sales") {
+      const { data: sales, error } = await range(
+        supabase
+          .from("sales")
+          .select("id, receipt_no, created_at, description, subtotal_pence, discount_pence, tax_pence, amount_pence, payment_method, card_part_pence, cash_part_pence, cash_tendered_pence, credit_amount_pence, credit_paid_pence, refunded, notes, staff_id, pos_customer:pos_customers(name, phone, email)")
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false })
+          .limit(5000),
+      );
+      if (error) throw error;
+      const rows = sales ?? [];
+      const ids = rows.map((r: any) => r.id);
+      const items = new Map<string, any[]>();
+      for (let i = 0; i < ids.length; i += 200) {
+        const { data: its } = await supabase
+          .from("sale_items")
+          .select("sale_id, name, qty, discount_pence")
+          .in("sale_id", ids.slice(i, i + 200))
+          .order("created_at");
+        for (const it of its ?? []) items.set(it.sale_id, [...(items.get(it.sale_id) ?? []), it]);
+      }
+      const staff = await names(rows.map((r: any) => r.staff_id));
+      const csv = toCsv(
+        ["Receipt", "Date", "Customer", "Phone", "Email", "Items", "Subtotal (£)", "Item discounts (£)", "Discount (£)", "VAT (£)", "Total (£)", "Paid by", "Card (£)", "Cash (£)", "Cash given (£)", "Credit owed (£)", "Credit paid (£)", "Refunded", "Notes", "Staff"],
+        rows.map((s: any) => {
+          const its = items.get(s.id) ?? [];
+          const split = s.payment_method === "split";
+          const credit = s.payment_method === "credit";
+          return [
+            s.receipt_no ?? s.id.slice(0, 8),
+            ukTime(s.created_at),
+            s.pos_customer?.name,
+            s.pos_customer?.phone,
+            s.pos_customer?.email,
+            its.length ? its.map((it) => `${it.name}${Number(it.qty) !== 1 ? ` x${it.qty}` : ""}`).join("; ") : s.description,
+            money(s.subtotal_pence),
+            money(its.reduce((t, it) => t + (it.discount_pence ?? 0), 0) || null),
+            money(s.discount_pence || null),
+            money(s.tax_pence || null),
+            money(s.amount_pence),
+            PAYMENT[s.payment_method] ?? s.payment_method,
+            split ? money(s.card_part_pence) : "",
+            split ? money(s.cash_part_pence) : "",
+            money(s.cash_tendered_pence || null),
+            credit ? money(Math.max(0, (s.credit_amount_pence ?? 0) - (s.credit_paid_pence ?? 0))) : "",
+            credit ? money(s.credit_paid_pence ?? 0) : "",
+            s.refunded ? "Yes" : "",
+            s.notes,
+            staff.get(s.staff_id),
+          ];
+        }),
+      );
+      return { csv, rowCount: rows.length };
+    }
+
+    const { data: acts, error } = await range(
+      supabase.from("activity_log").select("created_at, actor_id, module, action, label, details").order("created_at", { ascending: false }).limit(5000),
+    );
     if (error) throw error;
-    return { csv: toCsv(rows ?? []), rowCount: (rows ?? []).length };
+    const rows = acts ?? [];
+    const { ACTIVITY_LABELS } = await import("@/lib/activity-log");
+    const who = await names(rows.map((r: any) => r.actor_id));
+    const detail = (d: any) =>
+      Object.entries(d ?? {})
+        .filter(([, v]) => v != null && v !== "" && typeof v !== "object")
+        .map(([k, v]) => {
+          const label = k.replace(/Pence$/, "").replace(/([A-Z])/g, " $1").toLowerCase();
+          return `${label}: ${/Pence$/.test(k) ? `£${money(Number(v))}` : String(v).replace("_", " ")}`;
+        })
+        .join("; ");
+    const csv = toCsv(
+      ["Date", "Who", "Area", "Action", "Reference", "Details"],
+      rows.map((r: any) => [
+        ukTime(r.created_at),
+        who.get(r.actor_id),
+        r.module === "sales" ? "Sales" : r.module === "expenses" ? "Expenses" : r.module,
+        (ACTIVITY_LABELS as Record<string, string>)[r.action] ?? r.action,
+        r.module === "sales" && r.label ? `#${r.label}` : r.label,
+        detail(r.details),
+      ]),
+    );
+    return { csv, rowCount: rows.length };
   });
 
 // ============ Team & admin utilities ============
