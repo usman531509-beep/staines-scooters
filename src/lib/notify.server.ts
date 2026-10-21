@@ -1,8 +1,8 @@
 // App emails, sent as the shop's own Microsoft 365 mailbox (support@stainesscooter.com):
-//  - staff notifications to the shop inbox (sale, website enquiry, registration)
+//  - staff notifications to the shop inbox (website enquiry, registration)
 //  - a till receipt to a customer, when staff press Email on a sale
 // Staff notifications are best-effort: a missing setting or a mail error is logged
-// and never fails the sale, enquiry or registration that triggered it.
+// and never fails the enquiry or registration that triggered it.
 //
 // Transport, first configured wins:
 //  1. Microsoft Graph over HTTPS (works on GoDaddy Airo, which blocks SMTP ports):

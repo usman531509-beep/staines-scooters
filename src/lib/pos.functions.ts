@@ -539,24 +539,9 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
       details: { totalPence: finalTotal, source: "till", paymentMethod: sale.payment_method },
     });
 
-    // Email the shop inbox about the new sale (background; never blocks the till).
-    // The customer's receipt is only sent when staff choose Email or WhatsApp.
-    void (async () => {
-      const { notifyStaff, pounds } = await import("@/lib/notify.server");
-      const customer = data.customerId
-        ? (await supabase.from("pos_customers").select("name, phone").eq("id", data.customerId).maybeSingle()).data
-        : null;
-      await notifyStaff(`New sale${sale.receipt_no ? ` #${sale.receipt_no}` : ""} — ${pounds(finalTotal)}`, [
-        ["Total", pounds(finalTotal)],
-        ["Payment", String(sale.payment_method).replace("_", " ")],
-        ["Items", computed.map((it) => `${it.name}${it.qty !== 1 ? ` ×${it.qty}` : ""} — ${pounds(it.lineTotalPence)}`).join("\n")],
-        ["Discount", totalDiscount ? pounds(totalDiscount) : null],
-        ["On credit", isCredit ? `${pounds(finalTotal - paidNow)} owed (paid ${pounds(paidNow)} now)` : null],
-        ["Customer", customer ? `${customer.name}${customer.phone ? ` (${customer.phone})` : ""}` : null],
-        ["Notes", data.notes],
-        ["Date", new Date(sale.created_at).toLocaleString("en-GB", { timeZone: "Europe/London" })],
-      ]);
-    })().catch((err) => console.error("[notify] sale email failed", err));
+    // No email per sale: the shop inbox only gets website enquiries and registrations,
+    // and customers get a receipt when staff press WhatsApp or Email.
+
 
     return {
       saleId: sale.id,
