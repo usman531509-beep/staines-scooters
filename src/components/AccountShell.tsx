@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, createContext, useContext, type ReactNode } from "react";
+import { useState, useLayoutEffect, useEffect, useRef, createContext, useContext, type ReactNode } from "react";
 import { Link, useRouter, useLocation } from "@tanstack/react-router";
 import { BRAND } from "@/lib/brand";
 import {
@@ -100,6 +100,12 @@ function AccountShellFrame({ children, options }: { children: ReactNode; options
   const { hidden } = useSidebarHidden();
   const appMode = useAppMode();
   const rolesReady = !loading && !rolesLoading;
+  const withBottomNav = !bare && rolesReady && isAdmin;
+  const insetRef = useRef<HTMLDivElement>(null);
+  // The panel stays mounted across pages, so start each page at the top.
+  useEffect(() => {
+    insetRef.current?.scrollTo({ top: 0 });
+  }, [pathname]);
 
   // Native app: the compact AppShell (top bar + bottom tab nav) replaces this shell.
   if (appMode) {
@@ -110,7 +116,15 @@ function AccountShellFrame({ children, options }: { children: ReactNode; options
     <SidebarProvider open={!hidden} onOpenChange={(open) => setSidebarHidden(!open)}>
       <RouteProgress />
       {!bare && <AdminSidebar />}
-      <SidebarInset className={bare ? undefined : "min-w-0"}>
+      <SidebarInset
+        ref={insetRef}
+        className={cn(
+          !bare && "min-w-0",
+          // With the bottom bar, the page scrolls inside this panel, which ends
+          // above the bar, so the bar never covers the bottom of a page.
+          withBottomNav && "h-[calc(100svh-4.25rem)] overflow-y-auto md:h-[calc(100svh-4.25rem-1rem)]",
+        )}
+      >
         {!bare && (
           <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/85 px-4 backdrop-blur md:rounded-t-xl">
             <SidebarTrigger className="-ml-1" />
@@ -127,7 +141,7 @@ function AccountShellFrame({ children, options }: { children: ReactNode; options
         )}
         <div
           data-account-workspace={bare ? undefined : ""}
-          className={bare ? undefined : cn("min-w-0 flex-1", compact ? "p-3 md:p-4" : "p-4 md:p-6", rolesReady && isAdmin && "pb-24")}
+          className={bare ? undefined : cn("min-w-0 flex-1", compact ? "p-3 md:p-4" : "p-4 md:p-6")}
         >
           {!bare && pathname === "/staff/pos" && (
             <div className="mb-3 flex flex-wrap items-center gap-1.5">
@@ -137,7 +151,7 @@ function AccountShellFrame({ children, options }: { children: ReactNode; options
           {!bare && !hideLastSignIn && <LastSignInBanner user={user} emphasized={isAdmin} />}
           {children}
         </div>
-        {!bare && rolesReady && isAdmin && <AdminBottomNav pathname={pathname} />}
+        {withBottomNav && <AdminBottomNav pathname={pathname} />}
       </SidebarInset>
     </SidebarProvider>
   );

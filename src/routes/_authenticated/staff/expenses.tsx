@@ -87,7 +87,8 @@ function ExpensesPage() {
       category: (TYPES as readonly string[]).includes(e.category) ? e.category : "Other",
       recurrence: (e.recurrence ?? "none") as FormState["recurrence"],
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Admin pages scroll inside the shell panel, not the window.
+    document.querySelector("[data-account-workspace]")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   async function remove(id: string) {

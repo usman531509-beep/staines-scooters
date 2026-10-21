@@ -14,7 +14,7 @@ import { useAppChrome } from "@/components/AppShell";
 import { useSidebarHidden } from "@/hooks/use-sidebar-hidden";
 import { CloudImage } from "@/components/CloudImage";
 import { useAuth } from "@/lib/auth-client";
-import { listCategories, listProducts, findProductByBarcode, recordSaleV2, getTopSellingProductIds, getSaleFull, updateSale, setProductBestSellerExcluded, setProductBestSellerPinned, undoSale, setCategoryHidden, reorderProducts, upsertProduct } from "@/lib/pos.functions";
+import { listCategories, listProducts, findProductByBarcode, recordSaleV2, getTopSellingProductIds, getSaleFull, updateSale, setProductBestSellerExcluded, setProductBestSellerPinned, undoSale, setCategoryHidden, reorderProducts, upsertProduct, getPosDisplayMode } from "@/lib/pos.functions";
 import { beep } from "@/lib/beep";
 import { useCatalogueRealtime } from "@/hooks/use-realtime";
 import { PriceEntryModal } from "@/components/PriceEntryModal";
@@ -131,6 +131,10 @@ function POS() {
 
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  // Admin-chosen till display (Settings → POS Settings), shared by every account.
+  const posModeFn = useServerFn(getPosDisplayMode);
+  const { data: posModeData } = useQuery({ queryKey: ["pos-display-mode"], queryFn: () => posModeFn(), staleTime: 30_000 });
+  const posDisplayMode = posModeData?.mode ?? "all_products";
   const [cart, setCart] = useState<CartLine[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "bank_transfer" | "split" | "credit">("card");
   const [orderDiscountPct] = useState(0);
@@ -321,6 +325,8 @@ function POS() {
   // Show every product in the current category, sorted by best-sellers first (task 5).
   const canCollapse = false;
   const baseProducts = filteredProducts;
+  // "categories" mode: category tiles until a category is chosen or something is searched.
+  const showCategoryTiles = posDisplayMode === "categories" && categoryId === null && !search.trim();
 
   // ===== Admin manual ordering: press & hold a tile, then drag it into place =====
   const [dragId, setDragId] = useState<string | null>(null);
@@ -437,6 +443,8 @@ function POS() {
 
     // Clear the search box so all products display normally again after adding.
     setSearch("");
+    // Tiles view: back to the category tiles after adding.
+    if (posDisplayMode === "categories") setCategoryId(null);
 
     setCart((c) => {
       const existing = c.findIndex((l) => l.productId === p.id);
@@ -859,6 +867,17 @@ function POS() {
           </div>
 
           {/* Product grid — top 8 best-sellers first, scrollable */}
+          {posDisplayMode === "categories" && !showCategoryTiles && (
+            <div className="mb-2 flex justify-center">
+              <button
+                type="button"
+                onClick={() => { setCategoryId(null); setSearch(""); }}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground shadow transition-transform hover:brightness-105 active:scale-95"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back to categories
+              </button>
+            </div>
+          )}
           <div className="rounded-md pb-[calc(env(safe-area-inset-bottom)+7rem)]">
             <div
               className="grid gap-1.5 sm:gap-2"
@@ -868,7 +887,17 @@ function POS() {
               onPointerCancel={endHold}
               onPointerLeave={() => { clearTimeout(holdTimer.current); }}
             >
-              {visibleProducts.map((p) => {
+              {showCategoryTiles && sortedCategories.filter((c: any) => !c.hidden).map((c: any) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCategoryId(c.id)}
+                  className="flex aspect-[5/2] items-center justify-center overflow-hidden rounded-xl border-2 border-primary bg-primary p-2 text-center transition-transform hover:shadow-[var(--shadow-card)] active:scale-95"
+                >
+                  <span className="break-words font-bold uppercase leading-tight tracking-wide text-primary-foreground" style={{ fontSize: nameFontSize }}>{c.name}</span>
+                </button>
+              ))}
+              {!showCategoryTiles && visibleProducts.map((p) => {
                 const isFlashing = flashProductId === p.id;
                 return (
                   <button
@@ -941,7 +970,7 @@ function POS() {
                   </button>
                 );
               })}
-              {visibleProducts.length === 0 && (
+              {!showCategoryTiles && visibleProducts.length === 0 && (
                 <p className="col-span-full py-10 text-center text-sm text-ink-muted">No products match.</p>
               )}
             </div>

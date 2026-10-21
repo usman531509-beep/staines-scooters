@@ -648,6 +648,31 @@ export const getReceiptWhatsApp = createServerFn({ method: "POST" })
     };
   });
 
+// ===== POS display mode (one setting shared by every admin/staff account) =====
+// "categories": the till opens with category tiles; "all_products": every product (original view).
+export const getPosDisplayMode = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    // Settings rows are admin-only under RLS; staff still need to read this one value.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin.from("loyalty_settings").select("pos_display_mode").limit(1).maybeSingle();
+    return { mode: ((data as any)?.pos_display_mode === "categories" ? "categories" : "all_products") as "categories" | "all_products" };
+  });
+
+export const setPosDisplayMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ mode: z.enum(["categories", "all_products"]) }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("loyalty_settings").update({ pos_display_mode: data.mode } as any).eq("id", true);
+    if (error) throw error;
+    return { mode: data.mode };
+  });
+
 export const listSales = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
