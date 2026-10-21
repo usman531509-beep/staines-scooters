@@ -539,27 +539,13 @@ export const recordSaleV2 = createServerFn({ method: "POST" })
       details: { totalPence: finalTotal, source: "till", paymentMethod: sale.payment_method },
     });
 
-    // Email the shop inbox about the new sale, and the customer their receipt
-    // when they have an email on file (background; never blocks the till).
+    // Email the shop inbox about the new sale (background; never blocks the till).
+    // The customer's receipt is only sent when staff choose Email or WhatsApp.
     void (async () => {
-      const { notifyStaff, emailCustomerReceipt, pounds } = await import("@/lib/notify.server");
+      const { notifyStaff, pounds } = await import("@/lib/notify.server");
       const customer = data.customerId
-        ? (await supabase.from("pos_customers").select("name, phone, email").eq("id", data.customerId).maybeSingle()).data
+        ? (await supabase.from("pos_customers").select("name, phone").eq("id", data.customerId).maybeSingle()).data
         : null;
-      const date = new Date(sale.created_at).toLocaleString("en-GB", { timeZone: "Europe/London", dateStyle: "medium", timeStyle: "short" });
-      if (customer?.email) {
-        await emailCustomerReceipt({
-          to: customer.email,
-          customerName: customer.name,
-          receiptNo: sale.receipt_no,
-          date,
-          items: computed.map((it) => ({ name: it.name, qty: it.qty, totalPence: it.lineTotalPence })),
-          discountPence: orderDisc,
-          totalPence: finalTotal,
-          paymentLabel: ({ cash: "Cash", card: "Card", bank_transfer: "Bank transfer", split: "Card + Cash", credit: "Credit (pay later)" } as const)[data.paymentMethod],
-          owedPence: isCredit ? finalTotal - paidNow : 0,
-        });
-      }
       await notifyStaff(`New sale${sale.receipt_no ? ` #${sale.receipt_no}` : ""} — ${pounds(finalTotal)}`, [
         ["Total", pounds(finalTotal)],
         ["Payment", String(sale.payment_method).replace("_", " ")],
@@ -607,6 +593,74 @@ export const getSaleFull = createServerFn({ method: "POST" })
       cost_price_pence: it.cost_price_pence ?? it.product?.cost_price_pence ?? null,
     }));
     return { sale: saleRes.data, items };
+  });
+
+/** Emails the customer the same receipt as the printed one, with it attached as a PDF. */
+export const emailSaleReceipt = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ saleId: z.string().uuid(), to: z.string().trim().email("Enter a valid email address") }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    const { loadReceiptDoc, receiptPdfBuffer } = await import("@/lib/receipt-link.server");
+    const loaded = await loadReceiptDoc(supabase, data.saleId);
+    if (!loaded) throw new Error("Sale not found");
+    const { doc, sale } = loaded;
+    const { receiptEmailHtml, receiptText, receiptFileName, RECEIPT_LOGO } = await import("@/lib/receipt-doc");
+    const { BRAND } = await import("@/lib/brand");
+    const { sendEmailOrThrow, SHOP_MAILBOX } = await import("@/lib/notify.server");
+    const logoUrl = `${BRAND.siteUrl}${RECEIPT_LOGO.path}`;
+    const pdf = await receiptPdfBuffer(doc);
+
+    const first = (doc.customerName ?? "").split(" ")[0];
+    await sendEmailOrThrow({
+      to: data.to,
+      replyTo: SHOP_MAILBOX,
+      subject: `Your ${BRAND.name} receipt #${doc.receiptNo}`,
+      text: `${first ? `Hi ${first},\n\n` : ""}Thanks for your purchase. Your receipt is below and attached.\n\n${receiptText(doc)}`,
+      html: `<p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#111;margin:0 0 12px">${first ? `Hi ${first.replace(/[<>&]/g, "")},<br><br>` : ""}Thanks for your purchase at ${BRAND.name}. Your receipt is below and attached as a PDF.</p>${receiptEmailHtml(doc, logoUrl)}`,
+      attachments: [
+        { filename: receiptFileName(doc), contentType: "application/pdf", content: pdf },
+      ],
+    });
+
+    // Remember the address on the till customer if they didn't have one yet.
+    if (sale.pos_customer && !sale.pos_customer.email) {
+      await supabase.from("pos_customers").update({ email: data.to }).eq("id", sale.pos_customer.id);
+    }
+    return { ok: true, to: data.to };
+  });
+
+/** The WhatsApp message for a sale's receipt (a text carrying the receipt link), plus the customer's number and email. */
+export const getReceiptWhatsApp = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ saleId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    const { loadReceiptDoc, receiptLink } = await import("@/lib/receipt-link.server");
+    const loaded = await loadReceiptDoc(supabase, data.saleId);
+    if (!loaded) throw new Error("Sale not found");
+    const { doc, sale } = loaded;
+    const { BRAND } = await import("@/lib/brand");
+    const first = (doc.customerName ?? "").split(" ")[0];
+    // Single line breaks only: WhatsApp's desktop app keeps just the last
+    // paragraph of a pre-filled message that contains blank lines.
+    const text = [
+      `${first ? `Hi ${first}, thank` : "Thank"} you for shopping at ${BRAND.name}!`,
+      `Receipt #${doc.receiptNo}`,
+      ...doc.items.map((it) => `- ${it.name}: ${it.value}`),
+      `*Total: ${doc.total}*`,
+      ...doc.payment.map((p) => `${p.label.trim()}: ${p.value}`),
+      `View / download your receipt: ${receiptLink(data.saleId)}`,
+    ].join("\n");
+    return {
+      phone: (sale.pos_customer?.phone as string | null) ?? null,
+      email: (sale.pos_customer?.email as string | null) ?? null,
+      text,
+    };
   });
 
 export const listSales = createServerFn({ method: "POST" })

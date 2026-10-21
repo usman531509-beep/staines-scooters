@@ -1,8 +1,8 @@
 // App emails, sent as the shop's own Microsoft 365 mailbox (support@stainesscooter.com):
 //  - staff notifications to the shop inbox (sale, website enquiry, registration)
-//  - an order receipt to the customer when a till sale has a customer with an email
-// Everything is best-effort: a missing setting or a mail error is logged and never
-// fails the sale, enquiry or registration that triggered it.
+//  - a till receipt to a customer, when staff press Email on a sale
+// Staff notifications are best-effort: a missing setting or a mail error is logged
+// and never fails the sale, enquiry or registration that triggered it.
 //
 // Transport, first configured wins:
 //  1. Microsoft Graph over HTTPS (works on GoDaddy Airo, which blocks SMTP ports):
@@ -14,9 +14,10 @@
 import nodemailer from "nodemailer";
 import { BRAND } from "@/lib/brand";
 
-const SHOP_MAILBOX = "support@stainesscooter.com";
+export const SHOP_MAILBOX = "support@stainesscooter.com";
 
-type Email = { to: string; subject: string; html: string; text: string; replyTo?: string };
+type Attachment = { filename: string; contentType: string; content: Buffer };
+type Email = { to: string; subject: string; html: string; text: string; replyTo?: string; attachments?: Attachment[] };
 
 // ---------- Microsoft Graph ----------
 
@@ -62,6 +63,16 @@ async function sendViaGraph(cfg: NonNullable<ReturnType<typeof graphConfig>>, m:
         body: { contentType: "HTML", content: m.html },
         toRecipients: [{ emailAddress: { address: m.to } }],
         ...(m.replyTo ? { replyTo: [{ emailAddress: { address: m.replyTo } }] } : {}),
+        ...(m.attachments?.length
+          ? {
+              attachments: m.attachments.map((a) => ({
+                "@odata.type": "#microsoft.graph.fileAttachment",
+                name: a.filename,
+                contentType: a.contentType,
+                contentBytes: a.content.toString("base64"),
+              })),
+            }
+          : {}),
       },
       saveToSentItems: true,
     }),
@@ -99,27 +110,31 @@ function getTransport() {
   return transport;
 }
 
+/** Send one email by whichever transport is configured; throws on failure. */
+export async function sendEmailOrThrow(m: Email): Promise<void> {
+  const graph = graphConfig();
+  if (graph) return sendViaGraph(graph, m);
+  const t = getTransport();
+  if (!t) throw new Error("Email isn't set up on the server.");
+  await t.sendMail({
+    from: { name: BRAND.name, address: process.env.SMTP_FROM || process.env.SMTP_USER! },
+    to: m.to,
+    replyTo: m.replyTo,
+    subject: m.subject,
+    text: m.text,
+    html: m.html,
+    attachments: m.attachments,
+  });
+}
+
 /** Send one email by whichever transport is configured; logs and swallows failures. */
 export async function sendEmail(m: Email): Promise<boolean> {
+  if (!graphConfig() && !getTransport()) {
+    console.warn(`[notify] email not configured; skipped "${m.subject}"`);
+    return false;
+  }
   try {
-    const graph = graphConfig();
-    if (graph) {
-      await sendViaGraph(graph, m);
-      return true;
-    }
-    const t = getTransport();
-    if (!t) {
-      console.warn(`[notify] email not configured; skipped "${m.subject}"`);
-      return false;
-    }
-    await t.sendMail({
-      from: { name: BRAND.name, address: process.env.SMTP_FROM || process.env.SMTP_USER! },
-      to: m.to,
-      replyTo: m.replyTo,
-      subject: m.subject,
-      text: m.text,
-      html: m.html,
-    });
+    await sendEmailOrThrow(m);
     return true;
   } catch (err) {
     console.error(`[notify] could not send "${m.subject}"`, err);
@@ -161,60 +176,6 @@ export async function notifyStaff(subject: string, rows: Rows, opts?: { replyTo?
     html: wrap(
       `<h2 style="margin:0 0 12px;font-size:18px">${esc(subject)}</h2>${t.html}<p style="margin-top:16px;font-size:12px;color:#888">Sent automatically by the ${esc(BRAND.name)} website.</p>`,
     ),
-  });
-}
-
-/** Order receipt to the customer for a till sale. Replies go to the shop inbox. */
-export async function emailCustomerReceipt(p: {
-  to: string;
-  customerName: string;
-  receiptNo: number | string | null;
-  date: string;
-  items: Array<{ name: string; qty: number; totalPence: number }>;
-  discountPence: number;
-  totalPence: number;
-  paymentLabel: string;
-  owedPence?: number;
-}) {
-  const lines = p.items
-    .map(
-      (it) =>
-        `<tr><td style="padding:6px 0;border-bottom:1px solid #eee">${esc(it.name)}${it.qty !== 1 ? ` ×${it.qty}` : ""}</td><td style="padding:6px 0;border-bottom:1px solid #eee;text-align:right">${pounds(it.totalPence)}</td></tr>`,
-    )
-    .join("");
-  const extra = [
-    p.discountPence > 0 ? `<tr><td style="padding:4px 0;color:#555">Discount</td><td style="padding:4px 0;text-align:right">−${pounds(p.discountPence)}</td></tr>` : "",
-    `<tr><td style="padding:8px 0;font-weight:700;font-size:16px">Total</td><td style="padding:8px 0;text-align:right;font-weight:700;font-size:16px">${pounds(p.totalPence)}</td></tr>`,
-    `<tr><td style="padding:4px 0;color:#555">Paid by</td><td style="padding:4px 0;text-align:right">${esc(p.paymentLabel)}</td></tr>`,
-    p.owedPence && p.owedPence > 0
-      ? `<tr><td style="padding:4px 0;color:#555">Balance owed</td><td style="padding:4px 0;text-align:right;font-weight:700">${pounds(p.owedPence)}</td></tr>`
-      : "",
-  ].join("");
-  const ref = p.receiptNo ? `#${p.receiptNo}` : "";
-  const first = p.customerName.split(" ")[0] || "there";
-  await sendEmail({
-    to: p.to,
-    replyTo: SHOP_MAILBOX,
-    subject: `Your ${BRAND.name} receipt ${ref}`.trim(),
-    text: [
-      `Hi ${first},`,
-      `Thanks for your purchase at ${BRAND.name}.`,
-      ...p.items.map((it) => `${it.name}${it.qty !== 1 ? ` x${it.qty}` : ""}: ${pounds(it.totalPence)}`),
-      p.discountPence > 0 ? `Discount: -${pounds(p.discountPence)}` : "",
-      `Total: ${pounds(p.totalPence)} (${p.paymentLabel})`,
-      p.owedPence && p.owedPence > 0 ? `Balance owed: ${pounds(p.owedPence)}` : "",
-      `Receipt ${ref} · ${p.date}`,
-      `${BRAND.name} · ${BRAND.phone} · ${BRAND.addressLine}, ${BRAND.town} ${BRAND.postcode}`,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-    html: wrap(`
-  <h2 style="margin:0 0 4px;font-size:20px">Thanks, ${esc(first)}!</h2>
-  <p style="margin:0 0 16px;color:#555">Here's your receipt from ${esc(BRAND.name)}.</p>
-  <p style="margin:0 0 8px;font-size:13px;color:#555">Receipt ${esc(ref)} · ${esc(p.date)}</p>
-  <table style="border-collapse:collapse;width:100%;font-size:14px">${lines}${extra}</table>
-  <p style="margin-top:20px;font-size:13px;color:#555">Questions? Just reply to this email or call ${esc(BRAND.phone)}.</p>
-  <p style="margin:4px 0 0;font-size:12px;color:#888">${esc(BRAND.name)} · ${esc(BRAND.addressLine)}, ${esc(BRAND.town)} ${esc(BRAND.postcode)}</p>`),
   });
 }
 

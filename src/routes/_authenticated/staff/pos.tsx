@@ -8,6 +8,7 @@ import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { z } from "zod";
 import { printInPlace } from "@/lib/print-in-place";
+import { ReceiptShareButtons } from "@/components/ReceiptShareButtons";
 import { AccountShell } from "@/components/AccountShell";
 import { useAppChrome } from "@/components/AppShell";
 import { useSidebarHidden } from "@/hooks/use-sidebar-hidden";
@@ -1056,7 +1057,7 @@ function POS() {
             {error && <p className="mt-2 text-xs text-primary">{error}</p>}
             {lastSale && (
               <div className="mt-4 overflow-hidden rounded-lg border-2 border-sale bg-sale text-sale-foreground shadow-[var(--shadow-card)]">
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                   <div className="flex items-center gap-2">
                     <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sale-foreground text-sale text-lg font-black">✓</span>
                     <div className="min-w-0">
@@ -1066,7 +1067,7 @@ function POS() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => printInPlace(`/staff/receipt/${lastSale.id}`)}
@@ -1074,6 +1075,10 @@ function POS() {
                     >
                       <Printer className="h-3.5 w-3.5" /> Print
                     </button>
+                    <ReceiptShareButtons
+                      saleId={lastSale.id}
+                      className="inline-flex items-center gap-1.5 rounded-sm bg-sale-foreground px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-sale hover:opacity-90 disabled:opacity-60"
+                    />
                     {isAdmin && (
                       <button
                         onClick={async () => {

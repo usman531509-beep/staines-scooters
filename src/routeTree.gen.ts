@@ -60,6 +60,7 @@ import { Route as ApiPublicCronFixedMonthlyExpensesRouteImport } from './routes/
 import { Route as ApiPublicCronRecurringExpensesRouteImport } from './routes/api/public/cron/recurring-expenses'
 import { Route as ApiPublicPaymentsConnectWebhookRouteImport } from './routes/api/public/payments/connect-webhook'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicReceiptSaleIdRouteImport } from './routes/api/public/receipt.$saleId'
 import { Route as AuthenticatedAdminRentalBikeBikeIdRouteImport } from './routes/_authenticated/admin/rental_.bike.$bikeId'
 import { Route as AuthenticatedAdminRentalCustomerCustomerIdRouteImport } from './routes/_authenticated/admin/rental_.customer.$customerId'
 
@@ -346,6 +347,11 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicReceiptSaleIdRoute = ApiPublicReceiptSaleIdRouteImport.update({
+  id: '/api/public/receipt/$saleId',
+  path: '/api/public/receipt/$saleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRentalBikeBikeIdRoute =
   AuthenticatedAdminRentalBikeBikeIdRouteImport.update({
     id: '/admin/rental_/bike/$bikeId',
@@ -408,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/receipt/$saleId': typeof ApiPublicReceiptSaleIdRoute
   '/staff/categories/': typeof AuthenticatedStaffCategoriesIndexRoute
   '/staff/sales/': typeof AuthenticatedStaffSalesIndexRoute
   '/admin/rental/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -460,6 +467,7 @@ export interface FileRoutesByTo {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/receipt/$saleId': typeof ApiPublicReceiptSaleIdRoute
   '/staff/categories': typeof AuthenticatedStaffCategoriesIndexRoute
   '/staff/sales': typeof AuthenticatedStaffSalesIndexRoute
   '/admin/rental/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -516,6 +524,7 @@ export interface FileRoutesById {
   '/api/public/cron/recurring-expenses': typeof ApiPublicCronRecurringExpensesRoute
   '/api/public/payments/connect-webhook': typeof ApiPublicPaymentsConnectWebhookRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/receipt/$saleId': typeof ApiPublicReceiptSaleIdRoute
   '/_authenticated/staff/categories/': typeof AuthenticatedStaffCategoriesIndexRoute
   '/_authenticated/staff/sales/': typeof AuthenticatedStaffSalesIndexRoute
   '/_authenticated/admin/rental_/bike/$bikeId': typeof AuthenticatedAdminRentalBikeBikeIdRoute
@@ -572,6 +581,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/receipt/$saleId'
     | '/staff/categories/'
     | '/staff/sales/'
     | '/admin/rental/bike/$bikeId'
@@ -624,6 +634,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/receipt/$saleId'
     | '/staff/categories'
     | '/staff/sales'
     | '/admin/rental/bike/$bikeId'
@@ -679,6 +690,7 @@ export interface FileRouteTypes {
     | '/api/public/cron/recurring-expenses'
     | '/api/public/payments/connect-webhook'
     | '/api/public/payments/webhook'
+    | '/api/public/receipt/$saleId'
     | '/_authenticated/staff/categories/'
     | '/_authenticated/staff/sales/'
     | '/_authenticated/admin/rental_/bike/$bikeId'
@@ -708,6 +720,7 @@ export interface RootRouteChildren {
   ApiPublicCronRecurringExpensesRoute: typeof ApiPublicCronRecurringExpensesRoute
   ApiPublicPaymentsConnectWebhookRoute: typeof ApiPublicPaymentsConnectWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicReceiptSaleIdRoute: typeof ApiPublicReceiptSaleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1069,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/receipt/$saleId': {
+      id: '/api/public/receipt/$saleId'
+      path: '/api/public/receipt/$saleId'
+      fullPath: '/api/public/receipt/$saleId'
+      preLoaderRoute: typeof ApiPublicReceiptSaleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/rental_/bike/$bikeId': {
       id: '/_authenticated/admin/rental_/bike/$bikeId'
       path: '/admin/rental/bike/$bikeId'
@@ -1210,6 +1230,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCronRecurringExpensesRoute: ApiPublicCronRecurringExpensesRoute,
   ApiPublicPaymentsConnectWebhookRoute: ApiPublicPaymentsConnectWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicReceiptSaleIdRoute: ApiPublicReceiptSaleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

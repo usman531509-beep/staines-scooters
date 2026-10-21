@@ -4,7 +4,7 @@ import { X, User, Home, Wrench, Bike, Mail, Phone, MapPin, ArrowRight, Menu, Che
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { useAuth, signOut } from "@/lib/auth-client";
 import logoText from "@/assets/logo.png";
-import { BRAND } from "@/lib/brand";
+import { BRAND, DIRECTIONS_URL } from "@/lib/brand";
 import { enquire } from "@/lib/scooters";
 
 import { LandingBrand, landingNav } from "./LandingBrand";
@@ -42,11 +42,13 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
             <LandingBrand light className="ss-logo" />
             <ul className="ss-promises" aria-label="Why choose us">
               <li>
-                <MapPin aria-hidden="true" />
-                <span>
-                  Local to Staines
-                  <small>Friendly &amp; Trusted</small>
-                </span>
+                <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className="ss-promise-link">
+                  <MapPin aria-hidden="true" />
+                  <span>
+                    Opp. Co-op, High Street
+                    <small>Staines · Get directions</small>
+                  </span>
+                </a>
               </li>
               <li>
                 <Wrench aria-hidden="true" />
@@ -64,10 +66,23 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
               </li>
             </ul>
             <div className="ss-contact-buttons">
+              <a
+                href={DIRECTIONS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ss-btn-map"
+                aria-label="Get directions to the shop"
+              >
+                <MapPin aria-hidden="true" />
+                <span>
+                  Find Us{" "}
+                  <strong>Directions</strong>
+                </span>
+              </a>
               <a href={`tel:+${BRAND.phoneIntl}`} className="ss-btn-call" aria-label={`Call us on ${BRAND.phone}`}>
                 <Phone aria-hidden="true" />
                 <span>
-                  Call Us
+                  Call Us{" "}
                   <strong>{BRAND.phone}</strong>
                 </span>
               </a>
@@ -80,7 +95,7 @@ export function SiteHeader({ appearance = "default" }: { appearance?: "default" 
               >
                 <WhatsAppIcon aria-hidden="true" />
                 <span>
-                  WhatsApp
+                  WhatsApp{" "}
                   <strong>{BRAND.phone}</strong>
                 </span>
               </a>

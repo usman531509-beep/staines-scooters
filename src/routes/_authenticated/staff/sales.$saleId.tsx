@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { printInPlace } from "@/lib/print-in-place";
+import { ReceiptShareButtons } from "@/components/ReceiptShareButtons";
 import { AccountShell } from "@/components/AccountShell";
 import { getSaleFull, updateSale } from "@/lib/pos.functions";
 import { PosCustomerPicker, type PosCustomerRef } from "@/components/PosCustomerPicker";
@@ -125,6 +126,10 @@ function SaleDetailPage() {
         <div className="flex flex-wrap gap-2 text-xs">
           <Link to="/staff/sales" className="rounded-sm border border-border px-3 py-2 uppercase tracking-widest hover:border-primary">← Back to sales</Link>
           <button type="button" onClick={() => printInPlace(`/staff/receipt/${saleId}`)} className="rounded-sm border border-border px-3 py-2 uppercase tracking-widest hover:border-primary">Print receipt</button>
+          <ReceiptShareButtons
+            saleId={saleId}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-2 uppercase tracking-widest hover:border-primary disabled:opacity-60"
+          />
         </div>
         <div className="flex gap-2">
           {!editing ? (
