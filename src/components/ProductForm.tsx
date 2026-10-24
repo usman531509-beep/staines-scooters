@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { STORAGE_BUCKET } from "@/lib/storage-bucket";
-import { Upload, ImageIcon, Crop, Undo2, Eraser, X } from "lucide-react";
+import { Upload, ImageIcon, Crop, Undo2, Eraser, X, Pencil, Check } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { renameCategory } from "@/lib/pos.functions";
+import { categoryOptions } from "@/components/BulkProductsDialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageEditor } from "@/components/ImageEditor";
@@ -49,6 +53,27 @@ export function ProductForm({
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string>("");
   const [editing, setEditing] = useState<string | null>(null);
+
+  // Rename the chosen category in place (overwrites its name everywhere).
+  const qc = useQueryClient();
+  const renameFn = useServerFn(renameCategory);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const selectedCategory = categories.find((c: any) => c.id === form.category_id) ?? null;
+  const renameMut = useMutation({
+    mutationFn: (v: { id: string; name: string }) => renameFn({ data: v }),
+    onSuccess: () => {
+      setRenaming(null);
+      qc.invalidateQueries({ predicate: (q) => /cat/i.test(String(q.queryKey[0])) });
+      qc.invalidateQueries({ queryKey: ["pos-products"] });
+    },
+    onError: (e: any) => alert(e?.message ?? "Could not rename the category"),
+  });
+  function saveRename() {
+    const name = (renaming ?? "").trim();
+    if (!selectedCategory || !name) return;
+    if (name === selectedCategory.name) { setRenaming(null); return; }
+    renameMut.mutate({ id: selectedCategory.id, name });
+  }
 
   async function uploadBlob(blob: Blob, ext: string) {
     const contentType = blob.type || (ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg");
@@ -134,10 +159,45 @@ export function ProductForm({
             {scanOpen && <BarcodeScanner onClose={() => setScanOpen(false)} onDetected={(code) => { setScanOpen(false); setForm((f: any) => ({ ...f, barcode: code })); }} />}
           </Field>
           <Field label="Category">
-            <select value={form.category_id ?? ""} onChange={(e) => setForm({ ...form, category_id: e.target.value || null })} className="w-full rounded-sm border border-border bg-input px-3 py-2 text-sm">
-              <option value="">— none —</option>
-              {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            {renaming !== null ? (
+              <div className="flex gap-2">
+                <input
+                  autoFocus
+                  value={renaming}
+                  onChange={(e) => setRenaming(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); saveRename(); }
+                    if (e.key === "Escape") setRenaming(null);
+                  }}
+                  className="w-full rounded-sm border border-primary bg-input px-3 py-2 text-sm"
+                  aria-label="New category name"
+                />
+                <button type="button" onClick={saveRename} disabled={renameMut.isPending || !renaming.trim()} title="Save name" aria-label="Save category name" className="rounded-sm border border-border px-2.5 text-primary hover:border-primary disabled:opacity-40">
+                  <Check className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => setRenaming(null)} title="Cancel" aria-label="Cancel rename" className="rounded-sm border border-border px-2.5 hover:border-primary">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <select value={form.category_id ?? ""} onChange={(e) => setForm({ ...form, category_id: e.target.value || null })} className="w-full rounded-sm border border-border bg-input px-3 py-2 text-sm">
+                  <option value="">— none —</option>
+                  {categoryOptions(categories).map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+                </select>
+                {selectedCategory && (
+                  <button
+                    type="button"
+                    onClick={() => setRenaming(selectedCategory.name)}
+                    title="Rename this category"
+                    aria-label={`Rename ${selectedCategory.name}`}
+                    className="rounded-sm border border-border px-2.5 hover:border-primary hover:text-primary"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
           </Field>
           <Field label="Cost price (£)">
             <input type="text" inputMode="decimal" placeholder="0" value={costStr} onChange={(e) => setCostStr(e.target.value)} className="w-full rounded-sm border border-border bg-input px-3 py-2 text-sm" />

@@ -7,10 +7,11 @@ import { Plus, Pencil, AlertCircle, Trash2, ImageIcon } from "lucide-react";
 import { AccountShell } from "@/components/AccountShell";
 import { CloudImage } from "@/components/CloudImage";
 import { ProductForm } from "@/components/ProductForm";
+import { BulkProductsDialog } from "@/components/BulkProductsDialog";
 import { SectionRecycleBin } from "@/components/SectionRecycleBin";
 import {
   listProducts, upsertProduct, deleteProduct, listCategories,
-  bulkDeleteProducts, deleteAllProductsExceptEngineOil,
+  bulkDeleteProducts, bulkCreateProducts, deleteAllProductsExceptEngineOil,
 } from "@/lib/pos.functions";
 import { BRAND } from "@/lib/brand";
 
@@ -31,6 +32,8 @@ function ProductsPage() {
   const delFn = useServerFn(deleteProduct);
   const bulkDelFn = useServerFn(bulkDeleteProducts);
   const deleteAllExceptOilFn = useServerFn(deleteAllProductsExceptEngineOil);
+  const bulkCreateFn = useServerFn(bulkCreateProducts);
+  const [showBulk, setShowBulk] = useState(false);
 
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -60,6 +63,11 @@ function ProductsPage() {
       alert(`"${variables?.name ?? "Product"}" has been saved.`);
     },
     onError: (e: any) => alert(e?.message ?? "Save failed"),
+  });
+  const bulkCreate = useMutation({
+    mutationFn: (v: any) => bulkCreateFn({ data: v }),
+    onSuccess: (r: any) => { invalidate(); qc.invalidateQueries({ queryKey: ["pos-products"] }); setShowBulk(false); alert(`Added ${r.created} product(s).`); },
+    onError: (e: any) => alert(e?.message ?? "Bulk add failed"),
   });
   const remove = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
@@ -101,6 +109,12 @@ function ProductsPage() {
           className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground"
         >
           <Plus className="h-4 w-4" /> New product
+        </button>
+        <button
+          onClick={() => setShowBulk(true)}
+          className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface-elevated px-4 py-2.5 text-xs font-semibold uppercase tracking-widest hover:border-primary"
+        >
+          <Plus className="h-4 w-4" /> Bulk add
         </button>
       </div>
 
@@ -186,6 +200,14 @@ function ProductsPage() {
         </table>
       </div>
 
+      {showBulk && (
+        <BulkProductsDialog
+          categories={categories as any[]}
+          saving={bulkCreate.isPending}
+          onCancel={() => setShowBulk(false)}
+          onSave={(v) => bulkCreate.mutate(v)}
+        />
+      )}
       {showForm && (
         <ProductForm
           initial={editing}

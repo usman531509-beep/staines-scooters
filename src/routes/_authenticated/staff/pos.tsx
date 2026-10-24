@@ -4,7 +4,7 @@ import { markSaleEdited } from "@/lib/last-edited-sale";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp, SlidersHorizontal, Maximize2, Minimize2, ShoppingCart, Check, HandCoins } from "lucide-react";
+import { LayoutGrid, ChevronDown, Plus, Minus, ScanLine, X, CreditCard, Banknote, ArrowRightLeft, Printer, PanelLeftClose, PanelLeftOpen, Eye, EyeOff, Star, Menu, ChevronLeft, LogOut, AArrowDown, AArrowUp, SlidersHorizontal, Maximize2, Minimize2, ShoppingCart, Check, HandCoins } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { z } from "zod";
 import { printInPlace } from "@/lib/print-in-place";
@@ -131,6 +131,9 @@ function POS() {
 
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [catMenuOpen, setCatMenuOpen] = useState(false);
+  // Parent category whose subcategories are shown in the Categories menu.
+  const [openParentId, setOpenParentId] = useState<string | null>(null);
   // Admin-chosen till display (Settings → POS Settings), shared by every account.
   const posModeFn = useServerFn(getPosDisplayMode);
   const { data: posModeData } = useQuery({ queryKey: ["pos-display-mode"], queryFn: () => posModeFn(), staleTime: 30_000 });
@@ -327,6 +330,18 @@ function POS() {
   const baseProducts = filteredProducts;
   // "categories" mode: category tiles until a category is chosen or something is searched.
   const showCategoryTiles = posDisplayMode === "categories" && categoryId === null && !search.trim();
+  // Tiles: top-level categories first; inside a parent, its subcategories sit above
+  // its products (the parent's list already includes its subcategories' products).
+  const visibleCategories = sortedCategories.filter((c: any) => !c.hidden);
+  const visibleIds = new Set(visibleCategories.map((c: any) => c.id));
+  const tileCategories = showCategoryTiles
+    ? visibleCategories.filter((c: any) => !c.parent_id || !visibleIds.has(c.parent_id))
+    : posDisplayMode === "categories" && categoryId && !search.trim()
+      ? visibleCategories.filter((c: any) => c.parent_id === categoryId)
+      : [];
+  const currentParentId = (sortedCategories.find((c: any) => c.id === categoryId) as any)?.parent_id ?? null;
+  const currentCategory = isBestSellers ? null : (sortedCategories.find((c: any) => c.id === categoryId) as any) ?? null;
+  const menuParents = visibleCategories.filter((c: any) => !c.parent_id || !visibleIds.has(c.parent_id));
 
   // ===== Admin manual ordering: press & hold a tile, then drag it into place =====
   const [dragId, setDragId] = useState<string | null>(null);
@@ -835,35 +850,72 @@ function POS() {
               )}
 
             </div>
-            <div className="mt-2 flex flex-nowrap items-center gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "thin" }}>
-              <CatChip active={isBestSellers} onClick={() => setCategoryId("__best_sellers__")}><Star className="h-3.5 w-3.5" /> Best sellers</CatChip>
-              <CatChip active={categoryId === null} onClick={() => setCategoryId(null)}>All</CatChip>
-              {sortedCategories.filter((c: any) => !c.hidden).map((c) => (
-                <div
-                  key={c.id}
-                  className={`inline-flex shrink-0 items-center overflow-hidden rounded-full text-sm font-semibold transition-colors ${categoryId === c.id ? "bg-primary text-primary-foreground shadow-sm" : "border border-border bg-surface-elevated text-foreground"}`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setCategoryId(c.id)}
-                    className={`whitespace-nowrap py-2 ${isAdmin ? "pl-4 pr-2.5" : "px-4"} ${categoryId === c.id ? "" : "hover:bg-accent hover:text-accent-foreground"}`}
-                  >
-                    {c.name}
-                  </button>
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      title="Hide from POS"
-                      aria-label={`Hide ${c.name} from POS`}
-                      onClick={(e) => { e.stopPropagation(); toggleCatHidden.mutate({ id: c.id, hidden: true }); }}
-                      className={`flex items-center self-stretch border-l py-2 pl-2 pr-3 ${categoryId === c.id ? "border-primary-foreground/30 text-primary-foreground/80 hover:text-primary-foreground" : "border-border text-ink-muted hover:bg-accent hover:text-primary"}`}
-                    >
-                      <EyeOff className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-              ))}
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <CatChip active={isBestSellers} onClick={() => { setCategoryId("__best_sellers__"); setCatMenuOpen(false); }}><Star className="h-3.5 w-3.5" /> Best sellers</CatChip>
+              <CatChip active={categoryId === null} onClick={() => { setCategoryId(null); setCatMenuOpen(false); }}>All</CatChip>
+              <CatChip active={catMenuOpen || (categoryId !== null && !isBestSellers)} onClick={() => setCatMenuOpen((o) => !o)}>
+                <LayoutGrid className="h-3.5 w-3.5" />
+                {currentCategory ? `Category: ${currentCategory.name}` : "Categories"}
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${catMenuOpen ? "rotate-180" : ""}`} />
+              </CatChip>
             </div>
+            {catMenuOpen && (
+              <div className="mt-2 max-h-[60vh] overflow-y-auto rounded-lg border border-border bg-surface-elevated p-3 shadow-lg">
+                {menuParents.length === 0 && <p className="text-sm text-ink-muted">No categories to show.</p>}
+                <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+                  {menuParents.map((c: any) => {
+                    const kids = visibleCategories.filter((k: any) => k.parent_id === c.id);
+                    return (
+                      <div key={c.id} className="flex flex-col gap-1">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => { setCategoryId(c.id); setSearch(""); setCatMenuOpen(false); }}
+                            className={`flex min-h-[64px] w-full items-center justify-center rounded-xl border-2 border-primary px-2 py-3 text-center text-sm font-bold uppercase leading-tight tracking-wide transition-transform active:scale-95 ${categoryId === c.id ? "bg-foreground text-primary" : "bg-primary text-primary-foreground hover:brightness-105"}`}
+                          >
+                            {c.name}
+                          </button>
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              title="Hide from POS"
+                              aria-label={`Hide ${c.name} from POS`}
+                              onClick={() => toggleCatHidden.mutate({ id: c.id, hidden: true })}
+                              className="absolute right-1 top-1 rounded-full bg-background/80 p-1 text-ink-muted hover:text-primary"
+                            >
+                              <EyeOff className="h-3 w-3" />
+                            </button>
+                          )}
+                          {kids.length > 0 && (
+                            <button
+                              type="button"
+                              title={openParentId === c.id ? "Hide subcategories" : "Show subcategories"}
+                              aria-expanded={openParentId === c.id}
+                              aria-label={`${openParentId === c.id ? "Hide" : "Show"} ${c.name} subcategories`}
+                              onClick={() => setOpenParentId((id) => (id === c.id ? null : c.id))}
+                              className="absolute bottom-1 right-1 inline-flex items-center gap-0.5 rounded-full bg-background/85 px-1.5 py-0.5 text-[11px] font-bold text-foreground hover:bg-background"
+                            >
+                              {kids.length}
+                              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${openParentId === c.id ? "rotate-180" : ""}`} />
+                            </button>
+                          )}
+                        </div>
+                        {openParentId === c.id && kids.map((k: any) => (
+                          <button
+                            key={k.id}
+                            type="button"
+                            onClick={() => { setCategoryId(k.id); setSearch(""); setCatMenuOpen(false); }}
+                            className={`w-full rounded-lg border px-2 py-1.5 text-center text-xs font-semibold uppercase tracking-wide ${categoryId === k.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"}`}
+                          >
+                            {k.name}
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Product grid — top 8 best-sellers first, scrollable */}
@@ -871,7 +923,7 @@ function POS() {
             <div className="mb-2 flex justify-center">
               <button
                 type="button"
-                onClick={() => { setCategoryId(null); setSearch(""); }}
+                onClick={() => { setCategoryId(search.trim() ? null : (visibleIds.has(currentParentId) ? currentParentId : null)); setSearch(""); }}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground shadow transition-transform hover:brightness-105 active:scale-95"
               >
                 <ChevronLeft className="h-4 w-4" /> Back to categories
@@ -887,7 +939,7 @@ function POS() {
               onPointerCancel={endHold}
               onPointerLeave={() => { clearTimeout(holdTimer.current); }}
             >
-              {showCategoryTiles && sortedCategories.filter((c: any) => !c.hidden).map((c: any) => (
+              {tileCategories.map((c: any) => (
                 <button
                   key={c.id}
                   type="button"

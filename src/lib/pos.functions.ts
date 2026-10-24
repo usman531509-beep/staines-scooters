@@ -71,6 +71,20 @@ export const upsertCategory = createServerFn({ method: "POST" })
   });
 
 
+/** Renames a category (or subcategory) in place, keeping its position and parent. */
+export const renameCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ id: z.string().uuid(), name: z.string().trim().min(1).max(60) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    const { data: row, error } = await supabase.from("categories").update({ name: data.name }).eq("id", data.id).select().single();
+    if (error) throw error;
+    return row;
+  });
+
 export const deleteCategory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
@@ -104,7 +118,11 @@ export const listProducts = createServerFn({ method: "POST" })
       .order("name")
       .limit(500);
     if (!data.includeInactive) q = q.eq("is_active", true);
-    if (data.categoryId) q = q.eq("category_id", data.categoryId);
+    if (data.categoryId) {
+      // A parent category also lists its subcategories' products.
+      const { data: kids } = await supabase.from("categories").select("id").eq("parent_id", data.categoryId).is("deleted_at", null);
+      q = q.in("category_id", [data.categoryId, ...(kids ?? []).map((k: any) => k.id)]);
+    }
     if (data.search && data.search.trim()) {
       const s = data.search.trim();
       q = q.or(`name.ilike.%${s}%,sku.ilike.%${s}%,barcode.eq.${s}`);
@@ -241,6 +259,42 @@ export const upsertProduct = createServerFn({ method: "POST" })
     const { data: row, error } = await q;
     if (error) throw error;
     return row;
+  });
+
+/** Creates many products in one go (name + prices), all in one category. */
+export const bulkCreateProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({
+      category_id: z.string().uuid().nullable().optional(),
+      is_service: z.boolean().default(false),
+      items: z
+        .array(
+          z.object({
+            name: z.string().trim().min(1).max(120),
+            retail_price_pence: z.number().int().min(0),
+            cost_price_pence: z.number().int().min(0).default(0),
+          }),
+        )
+        .min(1)
+        .max(500),
+    }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    const rows = data.items.map((it) => ({
+      ...it,
+      category_id: data.category_id ?? null,
+      is_service: data.is_service,
+      is_active: true,
+      stock_qty: 0,
+      min_stock: 0,
+      vat_rate: 0,
+    }));
+    const { data: inserted, error } = await supabase.from("products").insert(rows).select("id");
+    if (error) throw error;
+    return { created: (inserted ?? []).length };
   });
 
 export const deleteProduct = createServerFn({ method: "POST" })
