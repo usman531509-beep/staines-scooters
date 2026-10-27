@@ -3,15 +3,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Plus, Pencil, AlertCircle, Trash2, ImageIcon } from "lucide-react";
+import { Plus, Pencil, AlertCircle, Trash2, ImageIcon, FileSpreadsheet } from "lucide-react";
 import { AccountShell } from "@/components/AccountShell";
 import { CloudImage } from "@/components/CloudImage";
 import { ProductForm } from "@/components/ProductForm";
 import { BulkProductsDialog } from "@/components/BulkProductsDialog";
+import { ProductImportDialog, type ImportResult } from "@/components/ProductImportDialog";
+import { nameKey } from "@/lib/spreadsheet-import";
+import { useAuth } from "@/lib/auth-client";
 import { SectionRecycleBin } from "@/components/SectionRecycleBin";
 import {
   listProducts, upsertProduct, deleteProduct, listCategories,
-  bulkDeleteProducts, bulkCreateProducts, deleteAllProductsExceptEngineOil,
+  bulkDeleteProducts, bulkCreateProducts, importProducts, listProductCatalogue, deleteAllProductsExceptEngineOil,
 } from "@/lib/pos.functions";
 import { BRAND } from "@/lib/brand";
 
@@ -34,6 +37,9 @@ function ProductsPage() {
   const deleteAllExceptOilFn = useServerFn(deleteAllProductsExceptEngineOil);
   const bulkCreateFn = useServerFn(bulkCreateProducts);
   const [showBulk, setShowBulk] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const importFn = useServerFn(importProducts);
+  const { isAdmin } = useAuth();
 
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
@@ -68,6 +74,28 @@ function ProductsPage() {
     mutationFn: (v: any) => bulkCreateFn({ data: v }),
     onSuccess: (r: any) => { invalidate(); qc.invalidateQueries({ queryKey: ["pos-products"] }); setShowBulk(false); alert(`Added ${r.created} product(s).`); },
     onError: (e: any) => alert(e?.message ?? "Bulk add failed"),
+  });
+  // Every product (no 500-row cap), so the import can flag ones that already exist.
+  const catalogueFn = useServerFn(listProductCatalogue);
+  const { data: allProducts = [], isFetching: loadingCatalogue } = useQuery({
+    queryKey: ["product-catalogue"],
+    queryFn: () => catalogueFn(),
+    enabled: showImport,
+    staleTime: 0,
+  });
+  const existingByName = useMemo(
+    () => new Map((allProducts as any[]).map((p) => [nameKey(String(p.name ?? "")), p])),
+    [allProducts],
+  );
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const importMut = useMutation({
+    mutationFn: (v: any) => importFn({ data: v }),
+    onSuccess: (r: any) => {
+      invalidate();
+      qc.invalidateQueries({ predicate: (q) => /cat|pos-products|product-catalogue/i.test(String(q.queryKey[0])) });
+      setImportResult(r);
+    },
+    onError: (e: any) => alert(e?.message ?? "Import failed"),
   });
   const remove = useMutation({
     mutationFn: (id: string) => delFn({ data: { id } }),
@@ -115,6 +143,12 @@ function ProductsPage() {
           className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface-elevated px-4 py-2.5 text-xs font-semibold uppercase tracking-widest hover:border-primary"
         >
           <Plus className="h-4 w-4" /> Bulk add
+        </button>
+        <button
+          onClick={() => setShowImport(true)}
+          className="inline-flex items-center gap-2 rounded-sm border border-border bg-surface-elevated px-4 py-2.5 text-xs font-semibold uppercase tracking-widest hover:border-primary"
+        >
+          <FileSpreadsheet className="h-4 w-4" /> Import Excel / CSV
         </button>
       </div>
 
@@ -200,6 +234,18 @@ function ProductsPage() {
         </table>
       </div>
 
+      {showImport && (
+        <ProductImportDialog
+          categories={categories as any[]}
+          existing={existingByName}
+          loadingExisting={loadingCatalogue}
+          result={importResult}
+          canReceiveStock={isAdmin}
+          saving={importMut.isPending}
+          onCancel={() => { setShowImport(false); setImportResult(null); }}
+          onImport={(v) => importMut.mutate(v)}
+        />
+      )}
       {showBulk && (
         <BulkProductsDialog
           categories={categories as any[]}

@@ -297,6 +297,173 @@ export const bulkCreateProducts = createServerFn({ method: "POST" })
     return { created: (inserted ?? []).length };
   });
 
+/** Every live product's name, SKU, prices, stock and category, for import duplicate checks (no 500-row cap). */
+export const listProductCatalogue = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    const out: any[] = [];
+    for (let from = 0; from < 20000; from += 1000) {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, name, sku, cost_price_pence, retail_price_pence, stock_qty, category:categories(name)")
+        .is("deleted_at", null)
+        .order("name")
+        .range(from, from + 999);
+      if (error) throw error;
+      out.push(...(data ?? []));
+      if (!data || data.length < 1000) break;
+    }
+    return out;
+  });
+
+/**
+ * Imports products from a spreadsheet. The server re-checks names against live
+ * products (and within the file), so nothing already in the catalogue is added
+ * twice even if the browser's list was stale. New categories named in the file
+ * are created once each and removed again if the products can't be saved.
+ * Admins can also receive each row's quantity as a stock delivery at cost.
+ */
+export const importProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({
+      receiveStock: z.boolean().default(false),
+      reference: z.string().trim().max(120).optional(),
+      items: z
+        .array(
+          z.object({
+            name: z.string().trim().min(1).max(120),
+            category_id: z.string().uuid().nullable().optional(),
+            new_category: z.string().trim().min(1).max(60).nullable().optional(),
+            cost_price_pence: z.number().int().min(0).max(100_000_000),
+            retail_price_pence: z.number().int().min(0).max(100_000_000),
+            qty: z.number().int().min(0).max(100000).default(0),
+            sku: z.string().trim().max(40).nullable().optional(),
+          }),
+        )
+        .min(1)
+        .max(1000),
+    }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    await assertStaff(supabase, userId);
+    if (data.receiveStock) await assertAdmin(supabase, userId);
+    const key = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+    // Skip names already in the catalogue or repeated in the file (first one wins).
+    // SKUs are unique across every product row, including ones in the Recycle Bin.
+    const { data: all, error: allErr } = await supabase.from("products").select("name, sku, deleted_at");
+    if (allErr) throw allErr;
+    const taken = new Set<string>((all ?? []).filter((p: any) => !p.deleted_at).map((p: any) => key(p.name ?? "")));
+    const skus = new Set<string>((all ?? []).map((p: any) => key(p.sku ?? "")).filter(Boolean));
+    const skipped: Array<{ name: string; reason: string }> = [];
+    const items = data.items.filter((it) => {
+      const k = key(it.name);
+      if (taken.has(k)) {
+        skipped.push({ name: it.name, reason: "Already in products" });
+        return false;
+      }
+      const sku = key(it.sku ?? "");
+      if (sku && skus.has(sku)) {
+        skipped.push({ name: it.name, reason: `SKU ${it.sku} is already used` });
+        return false;
+      }
+      taken.add(k);
+      if (sku) skus.add(sku);
+      return true;
+    });
+    if (!items.length) {
+      return { created: 0, categoriesCreated: 0, newCategories: [] as string[], received: 0, stockErrors: [] as string[], products: [], skipped };
+    }
+
+    // New categories, created once each (reusing any that already exist by name).
+    const wanted = [...new Set(items.map((it) => it.new_category).filter(Boolean) as string[])];
+    const catIds = new Map<string, string>();
+    const createdCats: Array<{ id: string; name: string }> = [];
+    if (wanted.length) {
+      const { data: cats } = await supabase.from("categories").select("id, name").is("deleted_at", null);
+      for (const name of wanted) {
+        const hit = (cats ?? []).find((c: any) => key(c.name) === key(name));
+        if (hit) { catIds.set(name, hit.id); continue; }
+        const { data: row, error } = await supabase.from("categories").insert({ name, sort_order: 0, parent_id: null }).select("id").single();
+        if (error) throw error;
+        catIds.set(name, row.id);
+        createdCats.push({ id: row.id, name });
+      }
+    }
+
+    const rows = items.map((it) => ({
+      name: it.name,
+      category_id: it.new_category ? catIds.get(it.new_category) ?? null : it.category_id ?? null,
+      cost_price_pence: it.cost_price_pence,
+      retail_price_pence: it.retail_price_pence,
+      sku: it.sku || null,
+      is_service: false,
+      is_active: true,
+      stock_qty: 0,
+      min_stock: 0,
+      vat_rate: 0,
+    }));
+    // One insert, so either every product is added or none is.
+    const { data: inserted, error } = await supabase.from("products").insert(rows).select("id, name");
+    if (error) {
+      if (createdCats.length) await supabase.from("categories").delete().in("id", createdCats.map((c) => c.id));
+      throw new Error(
+        /duplicate key|unique/i.test(error.message)
+          ? "Some products clash with existing ones (same SKU or barcode). Nothing was imported; check the SKU column."
+          : error.message,
+      );
+    }
+    const idByName = new Map<string, string>((inserted ?? []).map((p: any) => [key(p.name), p.id]));
+
+    let received = 0;
+    const receivedIds = new Set<string>();
+    const stockErrors: string[] = [];
+    if (data.receiveStock) {
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(new Date());
+      for (const it of items) {
+        const productId = idByName.get(key(it.name));
+        if (!productId || it.qty <= 0) continue;
+        const { error: rErr } = await supabase.rpc("receive_stock_v2", {
+          _product: productId,
+          _qty: it.qty,
+          _cost_pence: it.cost_price_pence,
+          _sale_price_pence: null,
+          _make_live: false,
+          _supplier: null,
+          _reference: data.reference ?? "Spreadsheet import",
+          _received: today,
+          _notes: "Added with the product import",
+        });
+        if (rErr) stockErrors.push(`${it.name}: ${rErr.message}`);
+        else { received++; receivedIds.add(productId); }
+      }
+    }
+
+    return {
+      created: (inserted ?? []).length,
+      categoriesCreated: createdCats.length,
+      newCategories: createdCats.map((c) => c.name),
+      received,
+      stockErrors,
+      products: items.map((it) => {
+        const id = idByName.get(key(it.name)) ?? "";
+        return {
+          id,
+          name: it.name,
+          categoryId: it.new_category ? catIds.get(it.new_category) ?? null : it.category_id ?? null,
+          costPence: it.cost_price_pence,
+          retailPence: it.retail_price_pence,
+          qtyReceived: receivedIds.has(id) ? it.qty : 0,
+        };
+      }),
+      skipped,
+    };
+  });
+
 export const deleteProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
