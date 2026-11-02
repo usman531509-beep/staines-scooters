@@ -257,15 +257,19 @@ function ActiveStock({ level, onLevelChange, data, showCost, catName, onAdjust, 
     if (next.has(id)) next.delete(id); else next.add(id);
     return next;
   });
-  const columnCount = showCost ? 10 : 8;
+  const columnCount = showCost ? 9 : 7;
   const rows = stockProducts(data).filter((p) => { const units = unitsOf(data, p.id); const search = [p.name, p.sku, p.barcode, catName(p.category_id), ...batchesOf(data, p.id).flatMap((b) => [b.batch_code, b.supplier, b.reference])].some((v) => v?.toLowerCase().includes(q.toLowerCase())); return search && (level === "all" || (level === "low" && units <= n(p.min_stock)) || (level === "out" && units <= 0) || (level === "in" && units > 0)); });
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2"><SearchBox value={q} onChange={setQ} placeholder="Search stock (name, SKU, barcode, category, batch code, supplier)" /><select aria-label="Stock level" value={level} onChange={(e) => onLevelChange(e.target.value)} className="h-11 rounded-md border border-border bg-background px-3 text-sm"><option value="all">All stock levels</option><option value="in">In stock</option><option value="low">Low stock</option><option value="out">Out of stock</option></select></div>
       <div className="overflow-x-auto rounded-md border border-border">
-        <table className="inventory-stock-table w-full text-sm">
+        <table className="inventory-stock-table w-full min-w-[1000px] table-fixed text-sm">
           <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
-            <tr>{["Product", "Category", ...(showCost ? ["Cost"] : []), "Price", "Units", "Low level", ...(showCost ? ["Cost value"] : []), "Batches", "Status", ""].map((h, i) => <th key={i} className="px-3 py-2">{h}</th>)}</tr>
+            {/* Fixed layout: Product and the buttons get set widths, and every other column
+                gets an equal share of the rest, so the gaps between columns are even. */}
+            <tr>{["Product", "Category", ...(showCost ? ["Cost"] : []), "Price", "Units", "Low level", ...(showCost ? ["Cost value"] : []), "Status", ""].map((h, i, all) => (
+              <th key={i} className={`px-3 py-2 ${i === 0 ? "w-[20%]" : i === all.length - 1 ? "w-[240px] text-right" : ""}`}>{h}</th>
+            ))}</tr>
           </thead>
           <tbody>
             {rows.map((p) => {
@@ -278,14 +282,13 @@ function ActiveStock({ level, onLevelChange, data, showCost, catName, onAdjust, 
               return (
                 <Fragment key={p.id}>
                 <tr onClick={() => toggleProduct(p.id)} className="cursor-pointer border-t border-border hover:bg-muted/50">
-                  <td className="px-3 py-2 font-semibold"><Button variant="ghost" aria-expanded={isExpanded} aria-controls={`product-batches-${p.id}`} onClick={(e) => { e.stopPropagation(); toggleProduct(p.id); }} className="h-auto justify-start px-0 py-1 text-left hover:bg-transparent hover:text-foreground">{isExpanded ? <ChevronDown /> : <ChevronRight />}<>{p.image_url ? <img src={p.image_url} alt="" className="h-8 w-8 shrink-0 rounded-sm object-contain" /> : <Package className="h-8 w-8 text-muted-foreground" />}<span>{p.name}<span className="block text-xs font-normal text-muted-foreground">{p.sku ?? p.barcode ?? "—"}</span></span></></Button></td>
-                  <td className="px-3 py-2">{catName(p.category_id)}</td>
+                  <td className="whitespace-normal px-3 py-2 font-semibold"><Button variant="ghost" aria-expanded={isExpanded} aria-controls={`product-batches-${p.id}`} onClick={(e) => { e.stopPropagation(); toggleProduct(p.id); }} className="h-auto justify-start whitespace-normal px-0 py-1 text-left hover:bg-transparent hover:text-foreground">{isExpanded ? <ChevronDown /> : <ChevronRight />}<>{p.image_url ? <img src={p.image_url} alt="" className="h-8 w-8 shrink-0 rounded-sm object-contain" /> : <Package className="h-8 w-8 text-muted-foreground" />}<span>{p.name}<span className="block text-xs font-normal text-muted-foreground">{p.sku ?? p.barcode ?? "—"}</span></span></></Button></td>
+                  <td className="whitespace-normal px-3 py-2">{catName(p.category_id)}</td>
                   {showCost && <td className="px-3 py-2">{gbp(cost)}</td>}
                   <td className="px-3 py-2">{gbp(p.retail_price_pence)}</td>
                   <td className="px-3 py-2 font-semibold">{units}</td>
                   <td className="px-3 py-2">{n(p.min_stock)}</td>
                   {showCost && <td className="px-3 py-2">{gbp(value)}</td>}
-                  <td className="px-3 py-2">{bs.length}</td>
                   <td className="px-3 py-2"><span className={`rounded-sm px-2 py-1 text-xs font-bold ${status === "OK" ? "bg-muted" : "bg-primary text-primary-foreground"}`}>{status}</span></td>
                   <td className="px-3 py-2"><div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                     <Button variant="outline" size="sm" onClick={() => onAdjust(p.id)}>Adjust Stock</Button>
@@ -293,7 +296,7 @@ function ActiveStock({ level, onLevelChange, data, showCost, catName, onAdjust, 
                   </div></td>
                 </tr>
                 {isExpanded && <tr id={`product-batches-${p.id}`}><td colSpan={columnCount} className="bg-surface-elevated px-4 pb-3 pt-1">
-                  <table aria-label={`Received batches for ${p.name}`} className="w-full whitespace-nowrap text-xs">
+                  <div className="overflow-x-auto"><table aria-label={`Received batches for ${p.name}`} className="w-full whitespace-nowrap text-xs">
                     <thead className="text-left text-muted-foreground"><tr>
                       {["Batch", "Received", "Opening", "Remaining", ...(showCost ? ["Unit cost"] : []), "Price at delivery", ...(showCost ? ["Margin / unit", "Value left"] : []), "Supplier / ref", "FIFO", ""].map((heading, index) => <th key={index} className="px-2 py-2 font-semibold">{heading}</th>)}
                     </tr></thead>
@@ -312,7 +315,7 @@ function ActiveStock({ level, onLevelChange, data, showCost, catName, onAdjust, 
                         <td className="px-2 py-3"><Button variant="ghost" size="sm" onClick={() => onAdjust(p.id, batch.id)}><SlidersHorizontal /> Adjust Stock</Button></td>
                       </tr>;
                     })}</tbody>
-                  </table>
+                  </table></div>
                   {bs.length === 0 && <p className="px-2 py-3 text-sm text-muted-foreground">No received batches with stock remaining.</p>}
                 </td></tr>}
                 </Fragment>
@@ -476,14 +479,14 @@ function CardDetail({ metric, data, catName, showCost, onClose }: { metric: stri
         <div className="rounded-md border border-border p-2"><span className="block text-xs text-muted-foreground">Retail value</span><b>{gbp(sum("retail"))}</b></div>
         {showCost && <div className="rounded-md border border-border p-2"><span className="block text-xs text-muted-foreground">Gross margin</span><b>{gbp(sum("margin"))}</b></div>}
       </div>
-      <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left"><th className="py-3 pr-2">Product</th><th className="pr-2">SKU / barcode</th><th className="pr-2">Category</th><th className="pr-2">Batches</th><th className="pr-2">Units</th><th className="pr-2">Min</th>{showCost && <th className="pr-2">Cost</th>}<th className="pr-2">Retail</th>{showCost && <th>Margin</th>}</tr></thead>
+      <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left"><th className="py-3 pr-2">Product</th><th className="pr-2">SKU / barcode</th><th className="pr-2">Category</th><th className="pr-2">Units</th><th className="pr-2">Min</th>{showCost && <th className="pr-2">Cost</th>}<th className="pr-2">Retail</th>{showCost && <th>Margin</th>}</tr></thead>
         <tbody>{rows.map((r) => (
           <Fragment key={r.p.id}>
             <tr onClick={() => setOpen(open === r.p.id ? null : r.p.id)} className="cursor-pointer border-t border-border hover:bg-muted/50" aria-expanded={open === r.p.id}>
-              <td className="py-3 pr-2"><span className="inline-flex items-center gap-1">{open === r.p.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}{r.p.name}</span></td><td className="pr-2 text-muted-foreground">{r.p.sku ?? r.p.barcode ?? "—"}</td><td className="pr-2">{catName(r.p.category_id)}</td><td className="pr-2">{r.batches.length}</td><td className="pr-2">{r.units}</td><td className="pr-2">{n(r.p.min_stock)}</td>{showCost && <td className="pr-2">{gbp(r.cost)}</td>}<td className="pr-2">{gbp(r.retail)}</td>{showCost && <td>{gbp(r.margin)}</td>}
+              <td className="py-3 pr-2"><span className="inline-flex items-center gap-1">{open === r.p.id ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}{r.p.name}</span></td><td className="pr-2 text-muted-foreground">{r.p.sku ?? r.p.barcode ?? "—"}</td><td className="pr-2">{catName(r.p.category_id)}</td><td className="pr-2">{r.units}</td><td className="pr-2">{n(r.p.min_stock)}</td>{showCost && <td className="pr-2">{gbp(r.cost)}</td>}<td className="pr-2">{gbp(r.retail)}</td>{showCost && <td>{gbp(r.margin)}</td>}
             </tr>
             {open === r.p.id && (
-              <tr className="border-t border-border bg-muted/30"><td colSpan={9} className="p-3">
+              <tr className="border-t border-border bg-muted/30"><td colSpan={8} className="p-3">
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Batches behind this product</p>
                 {r.batches.length === 0 ? <p className="text-xs text-muted-foreground">No batches in this date range.</p> : (
                   <table className="w-full text-xs"><thead className="text-left uppercase tracking-wider text-muted-foreground"><tr>{["Received", "Batch", "Opening", "Remaining", ...(showCost ? ["Unit cost"] : []), "Sale price", "Supplier", "Reference", "Notes", "Status"].map((h, i) => <th key={i} className="py-1 pr-2">{h}</th>)}</tr></thead>
@@ -502,7 +505,7 @@ function CardDetail({ metric, data, catName, showCost, onClose }: { metric: stri
             )}
           </Fragment>
         ))}
-        {rows.length === 0 && <tr><td colSpan={9} className="py-6 text-center text-muted-foreground">No products match.</td></tr>}</tbody></table></div>
+        {rows.length === 0 && <tr><td colSpan={8} className="py-6 text-center text-muted-foreground">No products match.</td></tr>}</tbody></table></div>
       <p className="mt-2 text-[11px] text-muted-foreground">Click any product row to see the batches behind it.</p>
     </Modal>
   );
